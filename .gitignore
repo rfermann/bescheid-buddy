@@ -2,9 +2,6 @@ node_modules
 
 # Output
 .output
-.vercel
-.netlify
-.wrangler
 /.svelte-kit
 /build
 
@@ -26,3 +23,4 @@ test-results
 # Paraglide
 src/lib/paraglide
 project.inlang/cache/
+.idea
