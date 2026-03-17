@@ -58,7 +58,6 @@
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 
-		// Clear in CSS pixels because we setTransform(dpr,...)
 		ctx.clearRect(0, 0, size.w, size.h);
 
 		const r = Math.min(size.w, size.h) * 0.25;
