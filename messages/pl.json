@@ -1,4 +1,11 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from pl!"
+	"nav_ueber_uns": "O nas",
+	"nav_bescheidbuddy": "BescheidBuddy",
+	"nav_fuer_partner": "Dla partnerów",
+	"nav_kontakt": "Kontakt",
+	"nav_fragen_antworten": "Pytania i odpowiedzi",
+	"footer_dsgvo": "🔒 Zgodne z RODO • Twoje dane są chronione",
+	"footer_impressum": "Dane firmy",
+	"footer_datenschutz": "Polityka prywatności"
 }

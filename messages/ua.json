@@ -1,4 +1,11 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"hello_world": "Hello, {name} from ua!"
+	"nav_ueber_uns": "Про нас",
+	"nav_bescheidbuddy": "BescheidBuddy",
+	"nav_fuer_partner": "Для партнерів",
+	"nav_kontakt": "Контакт",
+	"nav_fragen_antworten": "Питання та відповіді",
+	"footer_dsgvo": "🔒 Відповідає GDPR • Ваші дані захищені",
+	"footer_impressum": "Реквізити",
+	"footer_datenschutz": "Політика конфіденційності"
 }
