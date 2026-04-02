@@ -14,12 +14,7 @@
 		"format": "prettier --write .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run && npm run test:e2e",
-		"test:e2e": "playwright test",
-		"db:push": "drizzle-kit push",
-		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate",
-		"db:studio": "drizzle-kit studio",
-		"auth:schema": "better-auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes"
+		"test:e2e": "playwright test"
 	},
 	"devDependencies": {
 		"@better-auth/cli": "latest",
@@ -37,10 +32,7 @@
 		"@types/node": "^24",
 		"@types/nodemailer": "^7.0.11",
 		"@vitest/browser-playwright": "^4.1.0",
-		"better-auth": "~1.4.21",
 		"clsx": "^2.1.1",
-		"drizzle-kit": "^0.31.8",
-		"drizzle-orm": "^0.45.1",
 		"eslint": "^9.39.2",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.14.0",
