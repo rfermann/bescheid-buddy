@@ -1,0 +1,6 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"validation_name_min": "Name must be at least 3 characters",
+	"validation_email_invalid": "Please enter a valid email address",
+	"validation_message_min": "Message must be at least 3 characters"
+}

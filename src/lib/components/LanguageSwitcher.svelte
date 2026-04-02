@@ -15,7 +15,8 @@
 		{ code: 'en', flag: '🇬🇧' },
 		{ code: 'pl', flag: '🇵🇱' },
 		{ code: 'ru', flag: '🇷🇺' },
-		{ code: 'ua', flag: '🇺🇦' }
+		{ code: 'ua', flag: '🇺🇦' },
+		{ code: 'ar', flag: '🇦🇪' }
 	];
 
 	let isOpen = $state(false);

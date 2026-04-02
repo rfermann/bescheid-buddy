@@ -5,7 +5,7 @@
 </script>
 
 <a
-	class="text-text text-lg py-2.5 px-4 rounded-xl bg border-main {page.url.pathname === href ? 'bg-active' : ''}"
+	class="text-text text-lg py-2.5 px-4 rounded-xl {page.url.pathname === href ? 'border bg-purple-300/35 border-violet-300/90 shadow-[0_0_18px_rgba(200,160,255,0.7)]' : 'bg border-main'}"
 	href={href}
 >{text}</a>
 

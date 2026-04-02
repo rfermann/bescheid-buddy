@@ -1,0 +1,6 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"validation_name_min": "Ім'я повинно містити щонайменше 3 символи",
+	"validation_email_invalid": "Будь ласка, введіть дійсну електронну адресу",
+	"validation_message_min": "Повідомлення повинно містити щонайменше 3 символи"
+}

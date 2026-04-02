@@ -1,0 +1,13 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"kontakt_title": "Kontakt",
+	"kontakt_email": "E-Mail",
+	"kontakt_phone": "Telefon",
+	"kontakt_address": "Adresse",
+	"kontakt_form_name": "Name",
+	"kontakt_form_email": "E-Mail",
+	"kontakt_form_message": "Nachricht",
+	"kontakt_form_submit": "Senden",
+	"kontakt_form_success": "Ihre Nachricht wurde erfolgreich gesendet.",
+	"kontakt_form_error": "Bitte füllen Sie alle Felder aus."
+}

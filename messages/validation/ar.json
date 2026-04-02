@@ -1,0 +1,6 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"validation_name_min": "يجب أن يكون الاسم مكونًا من 3 أحرف على الأقل",
+	"validation_email_invalid": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+	"validation_message_min": "يجب أن تكون الرسالة مكونة من 3 أحرف على الأقل"
+}

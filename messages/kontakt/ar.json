@@ -1,0 +1,13 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"kontakt_title": "اتصل",
+	"kontakt_email": "البريد الإلكتروني",
+	"kontakt_phone": "الهاتف",
+	"kontakt_address": "العنوان",
+	"kontakt_form_name": "الاسم",
+	"kontakt_form_email": "البريد الإلكتروني",
+	"kontakt_form_message": "الرسالة",
+	"kontakt_form_submit": "إرسال",
+	"kontakt_form_success": "تم إرسال رسالتك بنجاح.",
+	"kontakt_form_error": "يرجى ملء جميع الحقول."
+}

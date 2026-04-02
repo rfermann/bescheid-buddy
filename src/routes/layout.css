@@ -24,11 +24,6 @@
         flex-direction: column;
     }
 
-    .main {
-        flex: 1;
-        flex-shrink: 0;
-    }
-
     .border-main {
         border: 1px solid rgba(160, 120, 255, 0.45);
     }

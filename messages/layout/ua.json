@@ -1,0 +1,11 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"footer_datenschutz": "Політика конфіденційності",
+	"footer_dsgvo": "🔒 Відповідає GDPR • Ваші дані захищені",
+	"footer_impressum": "Реквізити",
+	"nav_bescheidbuddy": "BescheidBuddy",
+	"nav_fragen_antworten": "Питання та відповіді",
+	"nav_fuer_partner": "Для партнерів",
+	"nav_kontakt": "Контакт",
+	"nav_ueber_uns": "Про нас"
+}
