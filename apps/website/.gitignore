@@ -1,0 +1,27 @@
+node_modules
+
+# Output
+.output
+/apps/website/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+# Playwright
+test-results
+# Paraglide
+src/lib/paraglide
+project.inlang/cache/
+.idea
+/.windsurf/

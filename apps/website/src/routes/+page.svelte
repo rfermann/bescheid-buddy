@@ -3,12 +3,12 @@
 	import CardContent from '$lib/components/ui/card/CardContent.svelte';
 	import CardHeader from '$lib/components/ui/card/CardHeader.svelte';
 	import { m } from '$lib/paraglide/messages.js';
+	import { env } from '$env/dynamic/public';
 </script>
 
 <svelte:head>
 	<title>MachKinfach</title>
 </svelte:head>
-
 <div
 	class="mb-5 rounded-xl border border-accent p-5 text-gray-200 shadow-[0_12px_30px_rgba(0,0,0,0.7),0_0_28px_rgba(0,255,238,0.2)] transition-shadow duration-300"
 >
