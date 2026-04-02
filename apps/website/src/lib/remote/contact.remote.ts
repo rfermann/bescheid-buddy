@@ -2,10 +2,10 @@ import * as v from 'valibot';
 import { form } from '$app/server';
 import { m } from '$lib/paraglide/messages.js';
 import { transporter } from '$lib/mail';
-import { APIError } from 'better-auth';
-import { getRequestEvent, query } from '$app/server';
+import { getRequestEvent } from '$app/server';
 import { getLocale } from '$lib/paraglide/runtime';
 import { SMTP_USER } from '$env/static/private';
+import { error } from '@sveltejs/kit';
 
 const contactSchema = v.object({
 	name: v.pipe(
@@ -48,12 +48,16 @@ const submitContact = form(contactSchema, async ({ name, email, message, type })
 		replyTo: email
 	});
 
-	if (!result.accepted.includes(email)) {
-		throw new APIError('BAD_REQUEST', {
-			message:
-				'Es trat ein unerwarteter Fehler auf. Bitte probiere es in einigen Minuten noch einmal.'
-		});
+	if (!result.accepted.includes(to)) {
+		error(
+			404,
+			'Es trat ein unerwarteter Fehler auf. Bitte probiere es in einigen Minuten noch einmal.'
+		);
 	}
+
+	return {
+		success: true
+	};
 });
 
 export { submitContact };

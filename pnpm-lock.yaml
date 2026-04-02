@@ -96,6 +96,9 @@ importers:
       svelte-check:
         specifier: ^4.4.2
         version: 4.4.6(picomatch@4.0.4)(svelte@5.55.1)(typescript@5.9.3)
+      svelte-sonner:
+        specifier: ^1.1.0
+        version: 1.1.0(svelte@5.55.1)
       tailwind-merge:
         specifier: ^3.5.0
         version: 3.5.0
@@ -2580,6 +2583,11 @@ packages:
     resolution: {integrity: sha512-DPe5pVFaAsinSaV6QjQ6gdiedWDcRCbUuiQfQa2wmWV7+xC9bGulGI8+TdRmoFkAPaBXk8CrAbnlY2ISniJ47Q==}
     engines: {node: '>=18'}
 
+  runed@0.28.0:
+    resolution: {integrity: sha512-k2xx7RuO9hWcdd9f+8JoBeqWtYrm5CALfgpkg2YDB80ds/QE4w0qqu34A7fqiAwiBBSBQOid7TLxwxVC27ymWQ==}
+    peerDependencies:
+      svelte: ^5.7.0
+
   sade@1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
     engines: {node: '>=6'}
@@ -2687,6 +2695,11 @@ packages:
     peerDependenciesMeta:
       svelte:
         optional: true
+
+  svelte-sonner@1.1.0:
+    resolution: {integrity: sha512-3lYM6ZIqWe+p9vwwWHGWP/ZdvHiUtzURsud2quIxivrX4rvpXh6i+geBGn0m3JS6KwW6W8VgbOl3xQMcDuh6gg==}
+    peerDependencies:
+      svelte: ^5.0.0
 
   svelte@5.55.1:
     resolution: {integrity: sha512-QjvU7EFemf6mRzdMGlAFttMWtAAVXrax61SZYHdkD6yoVGQ89VeyKfZD4H1JrV1WLmJBxWhFch9H6ig/87VGjw==}
@@ -5137,6 +5150,11 @@ snapshots:
 
   run-applescript@7.1.0: {}
 
+  runed@0.28.0(svelte@5.55.1):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.55.1
+
   sade@1.8.1:
     dependencies:
       mri: 1.2.0
@@ -5233,6 +5251,11 @@ snapshots:
       postcss-selector-parser: 7.1.1
       semver: 7.7.4
     optionalDependencies:
+      svelte: 5.55.1
+
+  svelte-sonner@1.1.0(svelte@5.55.1):
+    dependencies:
+      runed: 0.28.0(svelte@5.55.1)
       svelte: 5.55.1
 
   svelte@5.55.1:

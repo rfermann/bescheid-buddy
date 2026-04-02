@@ -1,24 +1,43 @@
 <script>
 	import { m } from '$lib/paraglide/messages.js';
+	import { Toaster, toast } from 'svelte-sonner';
 	import { submitContact } from '$lib/remote/contact.remote';
 	import { isHttpError } from '@sveltejs/kit';
 
 	let { type = 'general', key = 'default' } = $props();
-
 	const formAction = submitContact.for(key);
+
+	$effect(() => {
+		if (formAction.result?.success) {
+			toast.success(m.kontakt_form_success(), {
+				classes: {
+					success: '!bg-gray-800 !text-gray-400 !border-accent',
+					icon: '!text-emerald-400'
+				}
+			});
+		}
+	});
 </script>
 
-<form {...formAction.enhance(async ({ submit }) => {
-	submit()
-		.then(() => {
-			alert('success');
-		})
-		.catch((err) => {
-			console.log(err);
-			if (isHttpError(err)) {
-				alert(err.body.message);
-			}
-		});
+<Toaster position="bottom-center" richColors />
+<form {...formAction.enhance(async ({ form, submit }) => {
+	try {
+		await submit()
+	} catch (err) {
+		if (isHttpError(err)) {
+			toast.error(err.body.message, {
+				classes: {
+					error: '!bg-gray-800 !text-gray-400 !border-accent',
+					icon: '!text-red-400'
+				}
+			});
+		}
+
+		return
+	}
+
+	form.reset()
+
 })} class="space-y-4" oninput={() => formAction.validate()}>
 	<div>
 		<label for="name" class="block text-sm font-medium mb-1 text-gray-200">
@@ -28,6 +47,7 @@
 			{...formAction.fields.name.as('text')}
 			class="w-full px-3 py-2 rounded-xl border border-accent bg-gray-800/50 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 backdrop-blur-sm {formAction.fields.name.issues()?.length ? 'border-red-400' : ''}"
 			placeholder={m.kontakt_form_name()}
+			value="rene"
 		/>
 		{#each formAction.fields.name.issues() as issue}
 			<p class="mt-1 text-sm text-red-400">{issue.message}</p>
@@ -44,6 +64,7 @@
 			{...formAction.fields.email.as('email')}
 			class="w-full px-3 py-2 rounded-xl border border-accent bg-gray-800/50 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 backdrop-blur-sm {formAction.fields.email.issues()?.length ? 'border-red-400' : ''}"
 			placeholder={m.kontakt_form_email()}
+			value="rene.fermann@gmx.de"
 		/>
 		{#each formAction.fields.email.issues() as issue}
 			<p class="mt-1 text-sm text-red-400">{issue.message}</p>
