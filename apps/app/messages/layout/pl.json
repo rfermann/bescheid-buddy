@@ -1,0 +1,12 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"footer_agb": "Regulamin",
+	"footer_datenschutz": "Polityka prywatności",
+	"footer_dsgvo": "🔒 Zgodne z RODO • Twoje dane są chronione",
+	"footer_impressum": "Dane firmy",
+	"nav_bescheidbuddy": "BescheidBuddy",
+	"nav_fragen_antworten": "Pytania i odpowiedzi",
+	"nav_fuer_partner": "Dla partnerów",
+	"nav_kontakt": "Kontakt",
+	"nav_ueber_uns": "O nas"
+}

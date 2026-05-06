@@ -1,0 +1,16 @@
+{
+	"login_signInWithEmail": "Mit E-Mail anmelden",
+	"login_enterOTP": "OTP eingeben",
+	"login_sendOTPDescription": "Wir senden Ihnen ein Einmalkennwort",
+	"login_checkEmailForCode": "Prüfen Sie {email} auf Ihren Code",
+	"login_emailAddress": "E-Mail-Adresse",
+	"login_enterEmail": "Geben Sie Ihre E-Mail ein",
+	"login_sendOTP": "OTP senden",
+	"login_sending": "Wird gesendet...",
+	"login_resendCode": "Code erneut senden",
+	"login_resending": "Wird erneut gesendet...",
+	"login_oneTimePassword": "Einmalkennwort",
+	"login_enterCode": "6-stelligen Code eingeben",
+	"login_signIn": "Anmelden",
+	"login_verifying": "Wird überprüft..."
+}

@@ -1,0 +1,16 @@
+{
+	"login_signInWithEmail": "تسجيل الدخول بالبريد الإلكتروني",
+	"login_enterOTP": "إدخال OTP",
+	"login_sendOTPDescription": "سنرسل لك كلمة مرور لمرة واحدة",
+	"login_checkEmailForCode": "تحقق من {email} للحصول على الرمز",
+	"login_emailAddress": "عنوان البريد الإلكتروني",
+	"login_enterEmail": "أدخل بريدك الإلكتروني",
+	"login_sendOTP": "إرسال OTP",
+	"login_sending": "جاري الإرسال...",
+	"login_resendCode": "إعادة إرسال الرمز",
+	"login_resending": "جاري إعادة الإرسال...",
+	"login_oneTimePassword": "كلمة المرور لمرة واحدة",
+	"login_enterCode": "أدخل الرمز المكون من 6 أرقام",
+	"login_signIn": "تسجيل الدخول",
+	"login_verifying": "جاري التحقق..."
+}

@@ -1,0 +1,16 @@
+{
+	"login_signInWithEmail": "Войти по электронной почте",
+	"login_enterOTP": "Введите OTP",
+	"login_sendOTPDescription": "Мы отправим вам одноразовый пароль",
+	"login_checkEmailForCode": "Проверьте {email} на наличие кода",
+	"login_emailAddress": "Адрес электронной почты",
+	"login_enterEmail": "Введите вашу электронную почту",
+	"login_sendOTP": "Отправить OTP",
+	"login_sending": "Отправка...",
+	"login_resendCode": "Отправить код повторно",
+	"login_resending": "Повторная отправка...",
+	"login_oneTimePassword": "Одноразовый пароль",
+	"login_enterCode": "Введите 6-значный код",
+	"login_signIn": "Войти",
+	"login_verifying": "Проверка..."
+}

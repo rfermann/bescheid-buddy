@@ -1,0 +1,16 @@
+{
+	"login_signInWithEmail": "Sign in with Email",
+	"login_enterOTP": "Enter OTP",
+	"login_sendOTPDescription": "We'll send you a one-time password",
+	"login_checkEmailForCode": "Check {email} for your code",
+	"login_emailAddress": "Email address",
+	"login_enterEmail": "Enter your email",
+	"login_sendOTP": "Send OTP",
+	"login_sending": "Sending...",
+	"login_resendCode": "Resend code",
+	"login_resending": "Resending...",
+	"login_oneTimePassword": "One-Time Password",
+	"login_enterCode": "Enter 6-digit code",
+	"login_signIn": "Sign In",
+	"login_verifying": "Verifying..."
+}

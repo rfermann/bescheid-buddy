@@ -1,0 +1,12 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"footer_agb": "Shirouk wa Ahkam",
+	"footer_datenschutz": "سياسة الخصوصية",
+	"footer_dsgvo": "🔒 متوافق مع GDPR • بياناتك محمية",
+	"footer_impressum": "الطبعة",
+	"nav_bescheidbuddy": "BescheidBuddy",
+	"nav_fragen_antworten": "الأسئلة والأجوبة",
+	"nav_fuer_partner": "للشركاء",
+	"nav_kontakt": "اتصل",
+	"nav_ueber_uns": "من نحن"
+}

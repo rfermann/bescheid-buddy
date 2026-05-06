@@ -12,6 +12,9 @@ export const user = pgTable("user", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  telegramId: text("telegram_id"),
+  telegramPhoneNumber: text("telegram_phone_number"),
+  telegramUsername: text("telegram_username"),
 });
 
 export const session = pgTable(
@@ -53,6 +56,8 @@ export const account = pgTable(
     updatedAt: timestamp("updated_at")
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
+    telegramId: text("telegram_id"),
+    telegramUsername: text("telegram_username"),
   },
   (table) => [index("account_userId_idx").on(table.userId)],
 );

@@ -1,3 +1,17 @@
 @import 'tailwindcss';
+
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+@theme {
+    --color-primary: #00ffee;
+    --color-primary-bg: rgba(0, 255, 238, 0.10);
+    --color-accent: rgba(0, 255, 238, 0.45);
+    --color-accent-bg: rgba(0, 255, 238, 0.14);
+}
+
+body {
+    background: radial-gradient(1200px 800px at 70% 20%, rgba(0, 255, 238, 0.12), transparent 60%),
+    radial-gradient(900px 650px at 15% 75%, rgba(0, 255, 238, 0.09), transparent 55%),
+    linear-gradient(180deg, #040406 0%, #0a0a12 100%);
+}

@@ -1,0 +1,16 @@
+{
+	"login_signInWithEmail": "Zaloguj się e-mailem",
+	"login_enterOTP": "Wprowadź OTP",
+	"login_sendOTPDescription": "Wyślemy Ci jednorazowe hasło",
+	"login_checkEmailForCode": "Sprawdź {email} pod kątem kodu",
+	"login_emailAddress": "Adres e-mail",
+	"login_enterEmail": "Wprowadź swój e-mail",
+	"login_sendOTP": "Wyślij OTP",
+	"login_sending": "Wysyłanie...",
+	"login_resendCode": "Wyślij kod ponownie",
+	"login_resending": "Ponowne wysyłanie...",
+	"login_oneTimePassword": "Jednorazowe hasło",
+	"login_enterCode": "Wprowadź 6-cyfrowy kod",
+	"login_signIn": "Zaloguj się",
+	"login_verifying": "Weryfikacja..."
+}
