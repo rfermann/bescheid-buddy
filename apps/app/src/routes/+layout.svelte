@@ -2,6 +2,7 @@
 	import './layout.css';
 	import Footer from '$lib/components/Footer.svelte';
 	import Header from '$lib/components/Header.svelte';
+	import Navigation from '$lib/components/Navigation.svelte';
 	import { init } from '@tma.js/sdk-svelte';
 	import { browser } from '$app/environment';
 	import { onMount, type Snippet } from 'svelte';
@@ -50,7 +51,9 @@
 </script>
 <div class="min-h-screen flex flex-col pt-16">
 	<Header />
-
+	{#if data.user}
+		<Navigation />
+	{/if}
 	<main class="w-full max-w-300 py-5 text-white mx-auto flex-1">
 		{@render children()}
 	</main>

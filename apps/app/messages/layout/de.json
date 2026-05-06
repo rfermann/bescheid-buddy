@@ -8,5 +8,17 @@
 	"nav_fragen_antworten": "Fragen & Antworten",
 	"nav_fuer_partner": "Für Partner",
 	"nav_kontakt": "Kontakt",
-	"nav_ueber_uns": "Über uns"
+	"nav_ueber_uns": "Über uns",
+"nav_menu": "Menü",
+"nav_analysis": "Analyse",
+"nav_send_paper_letter": "Papierbrief senden",
+"nav_archive": "Archiv",
+"nav_reply_pdf": "Antwort & PDF",
+"nav_solutions": "Lösungen",
+"nav_partners": "Partner",
+"nav_soon": "Bald",
+"nav_expert_work": "In Bearbeitung mit Experte",
+"nav_datenschutz": "Datenschutz",
+"nav_support": "Support",
+"nav_data_delete": "Daten & Löschen"
 }

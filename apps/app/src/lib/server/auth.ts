@@ -17,8 +17,8 @@ export const auth = betterAuth({
 	plugins: [
 		emailOTP({
 			sendVerificationOTP: async ({ email, otp, type }) => {
-				// console.log(email, otp, type);
-				// console.log('sendVerificationOTP');
+				console.log(email, otp, type);
+				console.log('sendVerificationOTP');
 			}
 		}),
 		telegram({

@@ -8,5 +8,17 @@
 	"nav_fragen_antworten": "Вопросы и ответы",
 	"nav_fuer_partner": "Для партнёров",
 	"nav_kontakt": "Контакт",
-	"nav_ueber_uns": "О нас"
+	"nav_ueber_uns": "О нас",
+	"nav_menu": "Меню",
+	"nav_analysis": "Анализ",
+	"nav_send_paper_letter": "Отправить бумажное письмо",
+	"nav_archive": "Архив",
+	"nav_reply_pdf": "Ответ и PDF",
+	"nav_solutions": "Решения",
+	"nav_partners": "Партнёры",
+	"nav_soon": "Скоро",
+	"nav_expert_work": "В работе с экспертом",
+	"nav_datenschutz": "Защита данных",
+	"nav_support": "Поддержка",
+	"nav_data_delete": "Данные и удаление"
 }
