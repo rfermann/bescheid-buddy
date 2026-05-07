@@ -1,7 +1,6 @@
 <script lang="ts">
 	import NavDropdown from './NavDropdown.svelte';
 	import { m } from '$lib/paraglide/messages.js';
-	import { page } from '$app/state';
 
 	interface NavItem {
 		id: string;
@@ -48,7 +47,6 @@
 		{isOpen}
 		currentLabel={getCurrentLabel()}
 		{navItems}
-		currentHref={page.url.pathname}
 		menuLabel={m.nav_menu}
 		onToggle={toggleDropdown}
 	/>
