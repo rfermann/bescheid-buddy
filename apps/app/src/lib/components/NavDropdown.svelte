@@ -22,7 +22,7 @@
 </script>
 
 <button
-	class="w-full flex items-center gap-2.5 p-3.5 rounded-3xl border border-white/14 bg-zinc-950 text-white shadow-2xl cursor-pointer hover:border-white/20 transition-colors"
+	class="w-full flex items-center gap-2.5 p-3.5 rounded-2xl border border-white/14 bg-zinc-950 text-white shadow-2xl cursor-pointer hover:border-white/20 transition-colors"
 	type="button"
 	aria-haspopup="true"
 	aria-expanded={isOpen}

@@ -20,5 +20,8 @@
 	"nav_expert_work": "В роботі з експертом",
 	"nav_datenschutz": "Захист даних",
 	"nav_support": "Підтримка",
-	"nav_data_delete": "Дані та видалення"
+	"nav_data_delete": "Дані та видалення",
+	"header_buy_buddypoints": "Купити BuddyPoints",
+	"header_messages": "Повідомлення",
+	"header_logout": "Вийти"
 }

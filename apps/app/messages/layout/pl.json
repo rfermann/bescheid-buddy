@@ -20,5 +20,8 @@
 	"nav_expert_work": "W trakcie realizacji z ekspertem",
 	"nav_datenschutz": "Ochrona danych",
 	"nav_support": "Wsparcie",
-	"nav_data_delete": "Dane i usuwanie"
+	"nav_data_delete": "Dane i usuwanie",
+	"header_buy_buddypoints": "Kup BuddyPoints",
+	"header_messages": "Wiadomości",
+	"header_logout": "Wyloguj"
 }

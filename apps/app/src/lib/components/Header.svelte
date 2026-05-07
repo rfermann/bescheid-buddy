@@ -1,14 +1,40 @@
 <script lang="ts">
 	import logo from '$lib/assets/logo.png';
+	import { m } from '$lib/paraglide/messages.js';
+
+	let unreadCount = $state(0);
 </script>
 
-<div class="text-white border-b border-white/8 bg-black/35 fixed top-0 left-0 right-0 z-50 flex gap-3 py-3.5 px-4.5">
-	<div class="w-10 h-10 rounded-xl border border-accent flex items-center justify-center">
-		<img class="w-7 h-7" src={logo} alt="MachKinfach Logo">
-	</div>
-	<div>
-		<div class="font-extrabold text-sm tracking-widest">BescheidBuddy
+<div
+	class="text-white border-b border-white/8 bg-black/35 fixed top-0 left-0 right-0 z-50 flex items-center justify-between py-3.5 px-4.5">
+	<div class="flex gap-3 items-center">
+		<div class="w-10 h-10 rounded-xl border border-accent flex items-center justify-center">
+			<img class="w-7 h-7" src={logo} alt="MachKinfach Logo">
 		</div>
-		<div class="text-xs">Dein KI-Assistent</div>
+		<div>
+			<div class="font-extrabold text-sm tracking-widest">BescheidBuddy
+			</div>
+			<div class="text-xs">Dein KI-Assistent</div>
+		</div>
+	</div>
+	<div class="flex gap-2.5 items-center">
+		<button id="buyBpBtn"
+						class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
+			{m.header_buy_buddypoints()}
+		</button>
+		<button id="messagesFab"
+						class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
+			<span id="messagesFabLabel">{m.header_messages()}</span>
+			{#if unreadCount > 0}
+				<span id="messagesUnreadBadge"
+							class="absolute -top-1 -right-1 bg-[#ff4d6d] text-white text-xs rounded-full px-1.5 py-0.5 ml-2">
+					{unreadCount}
+				</span>
+			{/if}
+		</button>
+		<button
+			class="px-4 py-3 rounded-2xl border border-white/12 bg-white/4 text-white text-sm font-black hover:border-primary/22 hover:bg-white/7 transition-colors">
+			{m.header_logout()}
+		</button>
 	</div>
 </div>
