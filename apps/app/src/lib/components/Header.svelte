@@ -1,8 +1,15 @@
 <script lang="ts">
 	import logo from '$lib/assets/logo.png';
 	import { m } from '$lib/paraglide/messages.js';
+	import { goto } from '$app/navigation';
+	import { logout } from '../../routes/auth/auth.remote.ts';
 
 	let unreadCount = $state(0);
+
+	async function handleLogout() {
+		await logout({});
+		await goto('/');
+	}
 </script>
 
 <div
@@ -18,21 +25,22 @@
 		</div>
 	</div>
 	<div class="flex gap-2.5 items-center">
-		<button id="buyBpBtn"
-						class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
+		<button
+			class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
 			{m.header_buy_buddypoints()}
 		</button>
-		<button id="messagesFab"
-						class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
-			<span id="messagesFabLabel">{m.header_messages()}</span>
+		<button
+			class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
+			<span>{m.header_messages()}</span>
 			{#if unreadCount > 0}
-				<span id="messagesUnreadBadge"
-							class="absolute -top-1 -right-1 bg-[#ff4d6d] text-white text-xs rounded-full px-1.5 py-0.5 ml-2">
+				<span
+					class="absolute -top-1 -right-1 bg-[#ff4d6d] text-white text-xs rounded-full px-1.5 py-0.5 ml-2">
 					{unreadCount}
 				</span>
 			{/if}
 		</button>
 		<button
+			onclick={handleLogout}
 			class="px-4 py-3 rounded-2xl border border-white/12 bg-white/4 text-white text-sm font-black hover:border-primary/22 hover:bg-white/7 transition-colors">
 			{m.header_logout()}
 		</button>

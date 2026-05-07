@@ -1,4 +1,4 @@
-import { form } from '$app/server';
+import { command, form, getRequestEvent } from '$app/server';
 import { auth } from '$lib/server/auth';
 
 const getMessage = (error: unknown, fallback: string) => {
@@ -54,6 +54,24 @@ export const verifyOTP = form('unchecked', async ({ email, otp }) => {
 		return {
 			success: false,
 			message: getMessage(error, 'Unable to verify the one-time password.')
+		};
+	}
+});
+
+export const logout = command('unchecked', async () => {
+	try {
+		const event = getRequestEvent();
+		await auth.api.signOut({
+			headers: event.request.headers
+		});
+		return {
+			success: true,
+			message: 'Signed out successfully.'
+		};
+	} catch (error) {
+		return {
+			success: false,
+			message: getMessage(error, 'Unable to sign out.')
 		};
 	}
 });

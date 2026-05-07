@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { slide } from 'svelte/transition';
-	import { sendOTP, verifyOTP } from './auth.remote';
+	import { sendOTP, verifyOTP } from '../auth.remote';
 	import { m } from '$lib/paraglide/messages.js';
 	import type { PageProps } from './$types';
 
