@@ -1,15 +1,16 @@
 <script lang="ts">
 	import logo from '$lib/assets/logo.png';
 	import { m } from '$lib/paraglide/messages.js';
-	import { goto } from '$app/navigation';
 	import { logout } from '../../routes/auth/auth.remote.ts';
+	import type { User } from 'better-auth';
+
+	type Props = {
+		user?: User
+	}
+
+	let { user }: Props = $props();
 
 	let unreadCount = $state(0);
-
-	async function handleLogout() {
-		await logout({});
-		await goto('/');
-	}
 </script>
 
 <div
@@ -24,25 +25,28 @@
 			<div class="text-xs">Dein KI-Assistent</div>
 		</div>
 	</div>
-	<div class="flex gap-2.5 items-center">
-		<button
-			class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
-			{m.header_buy_buddypoints()}
-		</button>
-		<button
-			class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
-			<span>{m.header_messages()}</span>
-			{#if unreadCount > 0}
+	{#if user}
+		<div class="flex gap-2.5 items-center">
+			<button
+				class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
+				{m.header_buy_buddypoints()}
+			</button>
+			<button
+				class="px-3.5 py-2.5 rounded-2xl border border-primary/45 bg-primary/15 text-white text-sm font-black hover:border-primary/60 transition-colors relative">
+				<span>{m.header_messages()}</span>
+				{#if unreadCount > 0}
 				<span
 					class="absolute -top-1 -right-1 bg-[#ff4d6d] text-white text-xs rounded-full px-1.5 py-0.5 ml-2">
 					{unreadCount}
 				</span>
-			{/if}
-		</button>
-		<button
-			onclick={handleLogout}
-			class="px-4 py-3 rounded-2xl border border-white/12 bg-white/4 text-white text-sm font-black hover:border-primary/22 hover:bg-white/7 transition-colors">
-			{m.header_logout()}
-		</button>
-	</div>
+				{/if}
+			</button>
+			<form {...logout}>
+				<button
+					class="px-4 py-3 rounded-2xl border border-white/12 bg-white/4 text-white text-sm font-black hover:border-primary/22 hover:bg-white/7 transition-colors">
+					{m.header_logout()}
+				</button>
+			</form>
+		</div>
+	{/if}
 </div>

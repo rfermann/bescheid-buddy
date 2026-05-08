@@ -50,7 +50,7 @@
 	});
 </script>
 <div class="min-h-screen flex flex-col pt-16">
-	<Header />
+	<Header user={data.user} />
 	{#if data.user}
 		<Navigation />
 	{/if}

@@ -1,5 +1,6 @@
 import { command, form, getRequestEvent } from '$app/server';
 import { auth } from '$lib/server/auth';
+import { redirect } from '@sveltejs/kit';
 
 const getMessage = (error: unknown, fallback: string) => {
 	if (error instanceof Error && error.message) {
@@ -58,20 +59,9 @@ export const verifyOTP = form('unchecked', async ({ email, otp }) => {
 	}
 });
 
-export const logout = command('unchecked', async () => {
-	try {
-		const event = getRequestEvent();
-		await auth.api.signOut({
-			headers: event.request.headers
-		});
-		return {
-			success: true,
-			message: 'Signed out successfully.'
-		};
-	} catch (error) {
-		return {
-			success: false,
-			message: getMessage(error, 'Unable to sign out.')
-		};
-	}
+export const logout = form('unchecked', async () => {
+	await auth.api.signOut({
+		headers: getRequestEvent().request.headers
+	});
+	redirect(303, '/');
 });
