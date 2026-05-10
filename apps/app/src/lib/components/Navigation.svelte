@@ -36,14 +36,13 @@
 		isOpen = !isOpen;
 	};
 
-
 	const getCurrentLabel = () => {
 		const item = navItems.find((i) => i.href === page.url.pathname);
 		return item ? item.label() : m.nav_menu();
 	};
 </script>
 
-<aside class="fixed left-4 top-20 z-50 w-[min(320px,calc(100vw-36px))]">
+<aside class="fixed left-0 top-20 z-50 w-full px-4 md:left-4 md:w-[min(320px,calc(100vw-36px))] md:px-0">
 	<NavDropdown
 		{isOpen}
 		currentLabel={getCurrentLabel()}

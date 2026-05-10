@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { logout } from '../../routes/auth/auth.remote.ts';
+	import { m } from '$lib/paraglide/messages.js';
 
 	interface NavItem {
 		id: string;
@@ -19,6 +21,8 @@
 	}
 
 	let { isOpen, currentLabel, menuLabel, navItems, onToggle }: Props = $props();
+
+	let unreadCount = $state(2);
 </script>
 
 <button
@@ -59,6 +63,29 @@
 				</a>
 			{/if}
 		{/each}
+
+		<a href="/buddypoints-verwalten"
+			 class="w-full text-left flex items-center gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all md:hidden"
+			 role="menuitem">
+			<span class="flex-1 font-semibold">{m.header_buy_buddypoints()}</span>
+		</a>
+
+		<a href="/nachrichten"
+			 class="w-full text-left flex items-center justify-between gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all md:hidden"
+			 role="menuitem">
+			<span class="flex-1 font-semibold">{m.header_messages()}</span>
+			{#if unreadCount > 0}
+				<span class="bg-[#ff4d6d] text-white text-xs rounded-full px-1.5 py-0.5">{unreadCount}</span>
+			{/if}
+		</a>
+
+		<form {...logout.for("dropdown")} class="w-full md:hidden">
+			<button type="submit"
+							class="w-full text-left flex items-center gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all"
+							role="menuitem">
+				<span class="flex-1 font-semibold">{m.header_logout()}</span>
+			</button>
+		</form>
 	</div>
 {/if}
 
