@@ -7,14 +7,12 @@
 	<div>
 		<div
 			class="text-teal-100 mb-2.5 font-bold border-primary px-3 bg-primary-bg inline-flex items-center border rounded-full py-2.5">{m.footer_dsgvo()}</div>
-		<div class="flex justify-center flex-row gap-3">
-			<span class="text-primary">MachKInfach Media & Digital Services</span>
-			<span> | </span>
-			<a class="text-primary" href="/agb">{m.footer_agb()}</a>
-			<span> | </span>
-			<a class="text-primary" href="/datenschutz">{m.footer_datenschutz()}</a>
-			<span> | </span>
-			<a class="text-primary" href="/impressum">{m.footer_impressum()}</a>
+		<div class="flex justify-center flex-col gap-3 md:flex-row">
+			<span
+				class="text-primary ">MachKInfach Media & Digital Services</span>
+			<a class="text-primary border-t border-white/80 pt-3 md:border-t-0 md:pt-0 md:border-s md:border-white/80 md:ps-3" href="/agb">{m.footer_agb()}</a>
+			<a class="text-primary border-t border-white/80 pt-3 md:border-t-0 md:pt-0 md:border-s md:border-white/80 md:ps-3" href="/datenschutz">{m.footer_datenschutz()}</a>
+			<a class="text-primary border-t border-white/80 pt-3 md:border-t-0 md:pt-0 md:border-s md:border-white/80 md:ps-3" href="/impressum">{m.footer_impressum()}</a>
 		</div>
 	</div>
 	<LanguageSwitcher />
