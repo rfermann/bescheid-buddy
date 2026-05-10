@@ -11,11 +11,6 @@
 	import { goto } from '$app/navigation';
 
 	let { children, data }: { children: Snippet, data: PageData } = $props();
-	// const { bot, user } = data;
-
-	console.log('layout.svelte');
-
-	$inspect(data);
 
 	onMount(() => {
 		if (browser && data.bot && typeof data.user === 'undefined') {

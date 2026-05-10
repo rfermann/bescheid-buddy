@@ -12,5 +12,6 @@
 	"login_oneTimePassword": "Einmalkennwort",
 	"login_enterCode": "6-stelligen Code eingeben",
 	"login_signIn": "Anmelden",
-	"login_verifying": "Wird überprüft..."
+	"login_verifying": "Wird überprüft...",
+	"login_signInWithTelegram": "Mit Telegram anmelden"
 }

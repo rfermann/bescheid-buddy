@@ -12,5 +12,6 @@
 	"login_oneTimePassword": "One-Time Password",
 	"login_enterCode": "Enter 6-digit code",
 	"login_signIn": "Sign In",
-	"login_verifying": "Verifying..."
+	"login_verifying": "Verifying...",
+	"login_signInWithTelegram": "Sign in with Telegram"
 }

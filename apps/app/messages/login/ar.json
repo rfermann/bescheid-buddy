@@ -12,5 +12,6 @@
 	"login_oneTimePassword": "كلمة المرور لمرة واحدة",
 	"login_enterCode": "أدخل الرمز المكون من 6 أرقام",
 	"login_signIn": "تسجيل الدخول",
-	"login_verifying": "جاري التحقق..."
+	"login_verifying": "جاري التحقق...",
+	"login_signInWithTelegram": "تسجيل الدخول عبر تيليجرام"
 }

@@ -34,8 +34,8 @@ export const auth = betterAuth({
 		}),
 		telegram({
 			allowUserToLink: false,
-			botToken: '7486765220:AAG97zoOx0MseGkrlOewaE-5vsPAClBbwno',
-			botUsername: 'countdown2cuddle_bot',
+			botToken: env.TELEGRAM_BOT_TOKEN,
+			botUsername: env.TELEGRAM_BOT_USERNAME,
 			mapTelegramDataToUser: (data) => ({
 				name: data.username || data.first_name,
 				image: data.photo_url,

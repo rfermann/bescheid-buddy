@@ -12,5 +12,6 @@
 	"login_oneTimePassword": "Одноразовий пароль",
 	"login_enterCode": "Введіть 6-значний код",
 	"login_signIn": "Увійти",
-	"login_verifying": "Перевірка..."
+	"login_verifying": "Перевірка...",
+	"login_signInWithTelegram": "Увійти через Telegram"
 }
