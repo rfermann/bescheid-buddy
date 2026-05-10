@@ -4,7 +4,7 @@
 	import { sendOTP, verifyOTP } from '../auth.remote';
 	import { m } from '$lib/paraglide/messages.js';
 	import type { PageProps } from './$types';
-	import { env } from '$env/dynamic/private';
+	import { env } from '$env/dynamic/public';
 
 	let { data }: PageProps = $props();
 
@@ -189,7 +189,7 @@
 
 			<div class="mt-6 pt-6 border-t border-white/10">
 				<a
-					href={env.TELEGRAM_BOT_URL}
+					href={env.PUBLIC_TELEGRAM_BOT_URL}
 					target="_blank"
 					rel="noopener noreferrer"
 					class="inline-flex w-full items-center justify-center rounded-[14px] border border-[#0088cc]/40 bg-[#0088cc]/10 px-4 py-3 text-sm font-black text-[#0088cc] transition-all duration-150 hover:-translate-y-px hover:border-[#0088cc]/50"
