@@ -35,8 +35,6 @@ const handleBetterAuth: Handle = async ({ event, resolve }) => {
 		event.locals.bot = true;
 	}
 
-	console.log('hooks.server.ts');
-
 	if (!bot && !event.locals.session && !isAuthRoute && !isBetterAuthRoute) {
 		const redirectTo = pathname;
 		const queryParams = event.url.search.replace('?', '&');

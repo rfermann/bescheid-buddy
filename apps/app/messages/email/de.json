@@ -1,0 +1,4 @@
+{
+	"email_loginCodeSubject": "Ihr Anmeldecode",
+	"email_loginCodeText": "Ihr Einmalcode fuer den Login: {code}\n\nDieser Code ist {mins} Minuten gueltig.\n\nWenn Sie diesen Code nicht angefordert haben, ignorieren Sie diese E-Mail."
+}

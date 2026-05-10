@@ -1,0 +1,4 @@
+{
+	"email_loginCodeSubject": "Your login code",
+	"email_loginCodeText": "Your one-time code for login: {code}\n\nThis code is valid for {mins} minutes.\n\nIf you did not request this code, please ignore this email."
+}

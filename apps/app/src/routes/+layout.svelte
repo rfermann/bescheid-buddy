@@ -25,11 +25,8 @@
 					let attempts = 0;
 					while (attempts < 50) {
 						if ((window as any).Telegram?.WebApp) {
-							console.log('Telegram WebApp initialized');
-							console.log((window as any).Telegram?.WebApp);
 							try {
 								const result = await authClient.autoSignInFromMiniApp();
-								console.log('Auto signed in:', result);
 								await goto('/', {
 									invalidateAll: true
 								});

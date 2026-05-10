@@ -6,6 +6,11 @@ import { getRequestEvent } from '$app/server';
 import { db } from '$lib/server/db';
 import { telegram } from 'better-auth-telegram';
 import { emailOTP, openAPI } from 'better-auth/plugins';
+import { renderEmail } from '$lib/server/email-renderer';
+import { sendEmail } from '$lib/server/mailer';
+import OtpEmail from '$lib/emails/otp-email.svelte';
+import { m } from '$lib/paraglide/messages.js';
+import { getLocale } from '$lib/paraglide/runtime';
 
 console.log(env.ORIGIN);
 
@@ -17,8 +22,14 @@ export const auth = betterAuth({
 	plugins: [
 		emailOTP({
 			sendVerificationOTP: async ({ email, otp, type }) => {
-				console.log(email, otp, type);
-				console.log('sendVerificationOTP');
+				if (type === 'sign-in') {
+					const html = await renderEmail(OtpEmail, { code: otp, mins: 5 });
+					await sendEmail({
+						to: email,
+						subject: m.email_loginCodeSubject(),
+						html
+					});
+				}
 			}
 		}),
 		telegram({
