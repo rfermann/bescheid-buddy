@@ -61,7 +61,7 @@
 	{/if}
 
 	<button
-		class="w-11 h-11 rounded-2xl border border-accent bg-accent-bg flex items-center justify-center transition-colors"
+		class="w-11 h-11 rounded-2xl border border-accent bg-accent-bg flex items-center justify-center transition-colors cursor-pointer"
 		onclick={toggleDropdown}
 		aria-label="Change language"
 		aria-expanded={isOpen}
