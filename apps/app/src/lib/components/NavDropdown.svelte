@@ -67,7 +67,7 @@
 		<a href="/buddypoints-verwalten"
 			 class="w-full text-left flex items-center gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all md:hidden"
 			 role="menuitem">
-			<span class="flex-1 font-semibold">{m.header_buy_buddypoints()}</span>
+			<span class="flex-1 font-semibold">{m.header_manage_buddypoints()}</span>
 		</a>
 
 		<a href="/nachrichten"
