@@ -1,0 +1,21 @@
+server:
+  port: "8081"
+  host: "0.0.0.0"
+  read_timeout: 30
+  write_timeout: 30
+  graceful_shutdown: 30
+
+auth:
+  auth_server_url: "https://web-app.bored-template.orb.local"
+  cookie_name: "__Secure-better-auth.session_token"
+
+api:
+  title: "Bored Template"
+  version: "0.0.1"
+
+database:
+  host: "tricirc.de"
+  port: 5432
+  user: "postgres"
+  password: "WwTBnFvjxKDRhIapHI677pbXltvi9HAxk16TS9Ig3r2y1Nr32qEP2YWabiMxVj24"
+  dbname: "postgres"

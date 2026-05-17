@@ -1,0 +1,22 @@
+version: 3
+
+tasks:
+  tidy:
+    dir: "{{.TASKFILE_DIR}}"
+    cmds:
+      - go mod tidy
+    silent: true
+
+  run:
+    dir: "{{.TASKFILE_DIR}}"
+    cmds:
+      - go run cmd/server/main.go
+
+  dev:
+    dir: "{{.TASKFILE_DIR}}"
+    cmds:
+      - air -c {{.TASKFILE_DIR}}/air.toml
+
+  test:watch:
+    dir: "{{.TASKFILE_DIR}}"
+    cmd: watchexec --exts go -- go test -v ./...

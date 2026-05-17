@@ -1,0 +1,93 @@
+package server
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"github.com/bored-bots/bored-template/internal/config"
+	"github.com/bored-bots/bored-template/internal/handlers/health"
+	"github.com/bored-bots/bored-template/internal/middleware"
+	"github.com/bored-bots/bored-template/internal/services"
+	"github.com/bored-bots/bored-template/internal/store"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humachi"
+	"github.com/go-chi/chi/v5"
+)
+
+type Server struct {
+	httpServer *http.Server
+	Router     chi.Router
+	API        huma.API
+	Config     *config.Config
+	store      *store.Store
+}
+
+func NewServer(cfg *config.Config, services *services.Services, store *store.Store) *Server {
+	router := chi.NewRouter()
+
+	humaConfig := huma.DefaultConfig(cfg.API.Title, cfg.API.Version)
+	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
+		"cookieAuth": {
+			Type:        "http",
+			Scheme:      "Cookie",
+			Name:        "session-cookie",
+			Description: "cookie based authentication using session tokens.",
+		},
+	}
+	api := humachi.New(router, humaConfig)
+	api.UseMiddleware(middleware.NewAuthMiddleware(api, &cfg.Auth))
+	apiV1 := huma.NewGroup(api, "/v1")
+
+	healthHandler := health_handler.NewHealthHandler(services.HealthService)
+	healthHandler.RegisterRoutes(apiV1)
+
+	return &Server{
+		httpServer: &http.Server{
+			Addr:         cfg.GetAddr(),
+			Handler:      router,
+			ReadTimeout:  time.Duration(cfg.Server.ReadTimeout) * time.Second,
+			WriteTimeout: time.Duration(cfg.Server.WriteTimeout) * time.Second,
+		},
+		Router: router,
+		API:    api,
+		Config: cfg,
+		store:  store,
+	}
+}
+
+func (s *Server) Start() error {
+	fmt.Printf("Starting server on %s\n", s.Config.GetAddr())
+
+	go func() {
+		if err := s.httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			fmt.Printf("Server error: %v\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	<-quit
+
+	fmt.Println("Shutting down server…")
+
+	fmt.Printf("GracefulShutdown: %d", s.Config.Server.GracefulShutdown)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(s.Config.Server.GracefulShutdown)*time.Second)
+	defer cancel()
+	defer s.store.Close()
+
+	if err := s.httpServer.Shutdown(ctx); err != nil {
+		fmt.Printf("Server forced to shutdown: %v\n", err)
+		return err
+	}
+
+	fmt.Println("Server exited")
+	return nil
+}
