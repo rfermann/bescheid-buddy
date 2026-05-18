@@ -17,6 +17,10 @@ export const auth = betterAuth({
 	advanced: {
 		database: {
 			generateId: 'uuid'
+		},
+		crossSubDomainCookies: {
+			enabled: !!env.CROSS_DOMAIN_ORIGIN,
+			domain: env.CROSS_DOMAIN_ORIGIN
 		}
 	},
 	plugins: [
