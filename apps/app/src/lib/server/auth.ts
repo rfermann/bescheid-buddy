@@ -14,6 +14,22 @@ export const auth = betterAuth({
 	baseURL: env.ORIGIN,
 	secret: env.BETTER_AUTH_SECRET,
 	database: drizzleAdapter(db, { provider: 'pg' }),
+	user: {
+		additionalFields: {
+			monthlyPoints: {
+				input: false,
+				defaultValue: 5,
+				required: true,
+				type: 'number'
+			},
+			lifetimePoints: {
+				input: false,
+				defaultValue: 0,
+				required: true,
+				type: 'number'
+			}
+		}
+	},
 	advanced: {
 		database: {
 			generateId: 'uuid'
