@@ -61,6 +61,11 @@ func LoadConfig(configPath string) (*Config, error) {
 	v.BindEnv("server.graceful_shutdown")
 	v.BindEnv("api.title")
 	v.BindEnv("api.version")
+	v.BindEnv("database.host")
+	v.BindEnv("database.user")
+	v.BindEnv("database.password")
+	v.BindEnv("database.port")
+	v.BindEnv("database.dbname")
 
 	v.SetConfigFile(configPath)
 	if err := v.ReadInConfig(); err != nil {

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/bored-bots/bored-template/internal/config"
+	"github.com/bored-bots/bored-template/internal/handlers/buddy_package"
 	"github.com/bored-bots/bored-template/internal/handlers/health"
 	"github.com/bored-bots/bored-template/internal/middleware"
 	"github.com/bored-bots/bored-template/internal/services"
@@ -46,6 +47,9 @@ func NewServer(cfg *config.Config, services *services.Services, store *store.Sto
 
 	healthHandler := health_handler.NewHealthHandler(services.HealthService)
 	healthHandler.RegisterRoutes(apiV1)
+
+	buddyPackageHandler := buddy_package_handler.NewHandler(services.BuddyPackageService)
+	buddyPackageHandler.RegisterRoutes(api)
 
 	return &Server{
 		httpServer: &http.Server{

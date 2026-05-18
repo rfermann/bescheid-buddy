@@ -1,0 +1,29 @@
+version: "2"
+sql:
+  - schema: "../../migrations"
+    queries: "internal/store/queries"
+    engine: "postgresql"
+    gen:
+      go:
+        package: "db"
+        out: "internal/store/db"
+        sql_package: "pgx/v5"
+        emit_pointers_for_null_types: false
+        emit_result_struct_pointers: true
+        emit_interface: true
+        emit_all_enum_values: true
+        query_parameter_limit: 0
+overrides:
+  go:
+    overrides:
+      - db_type: "uuid"
+        go_type:
+          import: "github.com/google/uuid"
+          type: "UUID"
+      - db_type: "timestamptz"
+        go_type: "time.Time"
+      - db_type: "timestamptz"
+        go_type:
+          type: "time.Time"
+          pointer: true
+        nullable: true

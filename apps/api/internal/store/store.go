@@ -5,11 +5,13 @@ import (
 	"fmt"
 
 	"github.com/bored-bots/bored-template/internal/config"
+	"github.com/bored-bots/bored-template/internal/store/db"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Store struct {
-	Pool *pgxpool.Pool
+	Pool    *pgxpool.Pool
+	Queries *db.Queries
 }
 
 func NewStore(dbConfig config.DatabaseConfig) (*Store, error) {
@@ -32,7 +34,8 @@ func NewStore(dbConfig config.DatabaseConfig) (*Store, error) {
 	}
 
 	return &Store{
-		Pool: pool,
+		Pool:    pool,
+		Queries: db.New(pool),
 	}, nil
 }
 
