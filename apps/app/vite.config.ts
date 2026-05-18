@@ -13,7 +13,9 @@ export default defineConfig({
 		paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
 	],
 	server: {
-		allowedHosts: ['dev.app.bb.tricirc.de']
+		allowedHosts: ['dev.app.bb.tricirc.de'],
+		host: '0.0.0.0',
+		port: 5173
 	},
 	test: {
 		expect: { requireAssertions: true },
