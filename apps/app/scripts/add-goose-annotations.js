@@ -1,32 +1,27 @@
-import { readFileSync, writeFileSync, readdirSync, existsSync, unlinkSync } from 'fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { createHash } from 'crypto';
 
 const drizzleDir = './drizzle';
 const outputDir = '../../migrations';
+const manifestFile = join(outputDir, '.goose-manifest.json');
 
-// Ensure output directory exists
-import { mkdirSync } from 'fs';
 try {
 	mkdirSync(outputDir, { recursive: true });
 } catch (e) {}
 
-// Read all SQL files from drizzle directory
-const files = readdirSync(drizzleDir).filter((f) => f.endsWith('.sql'));
-
-// Sort files to ensure consistent ordering
-files.sort();
-
-// Delete all existing auth migration files before creating new ones
-if (existsSync(outputDir)) {
-	const existingFiles = readdirSync(outputDir).filter(
-		(f) => f.includes('init_auth') || f.includes('update_auth')
-	);
-	for (const existingFile of existingFiles) {
-		const existingPath = join(outputDir, existingFile);
-		unlinkSync(existingPath);
-		console.log(`Deleted existing file: ${existingFile}`);
+let manifest = {};
+if (existsSync(manifestFile)) {
+	try {
+		manifest = JSON.parse(readFileSync(manifestFile, 'utf-8'));
+	} catch (e) {
+		console.warn('Could not read manifest, starting fresh');
 	}
 }
+
+const files = readdirSync(drizzleDir).filter((f) => f.endsWith('.sql'));
+
+files.sort();
 
 for (let i = 0; i < files.length; i++) {
 	const file = files[i];
@@ -34,10 +29,20 @@ for (let i = 0; i < files.length; i++) {
 
 	let sql = readFileSync(inputPath, 'utf-8');
 
-	// Remove Drizzle's statement-breakpoint markers
 	sql = sql.replace(/--> statement-breakpoint/g, '');
 
-	// Generate migration name based on file index
+	const hash = createHash('sha256').update(sql).digest('hex');
+
+	const existingEntry = manifest[file];
+	if (
+		existingEntry &&
+		existingEntry.hash === hash &&
+		existsSync(join(outputDir, existingEntry.gooseFile))
+	) {
+		console.log(`Skipping ${file} - already processed as ${existingEntry.gooseFile}`);
+		continue;
+	}
+
 	let migrationName;
 	if (i === 0) {
 		migrationName = 'init_auth';
@@ -45,7 +50,6 @@ for (let i = 0; i < files.length; i++) {
 		migrationName = `update_auth_${i}`;
 	}
 
-	// Generate timestamp-based filename with descriptive name
 	const timestamp = new Date()
 		.toISOString()
 		.replace(/[-:]/g, '')
@@ -54,16 +58,12 @@ for (let i = 0; i < files.length; i++) {
 	const outputFileName = `${timestamp}_${migrationName}.sql`;
 	const outputPath = join(outputDir, outputFileName);
 
-	// Split into individual statements
 	const statements = sql.split(';').filter((s) => s.trim());
 
-	// Build the up migration wrapped in StatementBegin/StatementEnd
 	const upSql = statements.join(';\n');
 
-	// Build the down migration (reverse of up)
 	const downSql = generateDownMigration(statements);
 
-	// Wrap with Goose annotations
 	const gooseSql = `-- +goose Up
 -- +goose StatementBegin
 ${upSql};
@@ -77,11 +77,17 @@ ${downSql};
 
 	writeFileSync(outputPath, gooseSql);
 	console.log(`Processed ${file} -> ${outputPath}`);
+
+	manifest[file] = {
+		hash,
+		gooseFile: outputFileName
+	};
 }
 
+writeFileSync(manifestFile, JSON.stringify(manifest, null, 2));
+console.log(`Updated manifest at ${manifestFile}`);
+
 function generateDownMigration(statements) {
-	// Simple heuristic: reverse CREATE statements to DROP
-	// This is basic - you may need to enhance based on your needs
 	const reversed = [...statements].reverse();
 
 	return reversed
@@ -111,26 +117,4 @@ function generateDownMigration(statements) {
 			throw new Error(`Unsupported SQL statement for down migration: ${trimmed}`);
 		})
 		.join(';\n');
-}
-
-function generateMigrationName(sql) {
-	// Since this is for auth tables and will only be one file, use simple naming
-	const createTableMatches = [...sql.matchAll(/CREATE TABLE\s+"?(\w+)"?/gi)];
-
-	if (createTableMatches.length > 0) {
-		const tables = createTableMatches.map((m) => m[1]).sort();
-		const isInitialAuth =
-			tables.includes('user') &&
-			tables.includes('session') &&
-			tables.includes('account') &&
-			tables.includes('verification');
-
-		if (isInitialAuth) {
-			return 'init_auth';
-		}
-
-		return 'create_' + tables.join('_');
-	}
-
-	return 'auth_migration';
 }
