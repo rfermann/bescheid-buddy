@@ -1,0 +1,16 @@
+diff --git a/package.json b/package.json
+index c75fac6255a271505fa2635f10ed00a066c34b0f..325a3b1960837310043a04d40b7b105a32ce1ffd 100644
+--- a/package.json
++++ b/package.json
+@@ -65,6 +65,11 @@
+       "types": "./dist/error/index.d.mts",
+       "default": "./dist/error/index.mjs"
+     },
++    "./utils/error-codes": {
++      "dev-source": "./src/utils/error-codes.ts",
++      "types": "./dist/utils/error-codes.d.mts",
++      "default": "./dist/utils/error-codes.mjs"
++    },
+     "./utils/*": {
+       "dev-source": "./src/utils/*.ts",
+       "types": "./dist/utils/*.d.mts",

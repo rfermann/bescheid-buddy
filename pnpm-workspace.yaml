@@ -3,3 +3,6 @@ packages:
 
 onlyBuiltDependencies:
   - esbuild
+
+patchedDependencies:
+  '@better-auth/core@1.6.10': patches/@better-auth__core@1.6.10.patch
