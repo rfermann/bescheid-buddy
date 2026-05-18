@@ -2,3 +2,4 @@
 /apps/website/.svelte-kit
 .windsurf
 .idea
+/.env

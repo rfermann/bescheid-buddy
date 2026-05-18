@@ -1,0 +1,79 @@
+version: 3
+
+vars:
+  DOCKER_PROJECT: bored-hosting
+
+includes:
+  backend: apps/api/taskfile.yaml
+  db: Taskfile.db.yaml
+
+tasks:
+  default:
+    desc: "List all available tasks"
+    cmds:
+      - task --list-all
+
+  docker-manager:build:
+    dir: "tools/docker-manager"
+    sources:
+      - "**/*.go"
+      - "go.mod"
+      - "go.sum"
+    cmds:
+      - go build ./main.go
+
+  docker:start:
+    deps:
+      - docker-manager:build
+    dir: "tools/docker-manager"
+    cmds:
+      - ./main start --projectName {{.DOCKER_PROJECT}}
+
+  docker:start:all:
+    deps:
+      - docker-manager:build
+    dir: "tools/docker-manager"
+    cmds:
+      - ./main start --all --projectName {{.DOCKER_PROJECT}}
+
+  docker:stop:
+    deps:
+      - docker-manager:build
+    dir: "tools/docker-manager"
+    cmds:
+      - ./main stop --projectName {{.DOCKER_PROJECT}}
+
+  docker:stop:all:
+    deps:
+      - docker-manager:build
+    dir: "tools/docker-manager"
+    cmds:
+      - ./main stop --all --projectName {{.DOCKER_PROJECT}}
+
+  docker:rebuild:
+    deps:
+      - docker-manager:build
+    dir: "tools/docker-manager"
+    cmds:
+      - ./main rebuild --projectName {{.DOCKER_PROJECT}}
+
+  docker:rebuild:all:
+    deps:
+      - docker-manager:build
+    dir: "tools/docker-manager"
+    cmds:
+      - ./main rebuild --all --projectName {{.DOCKER_PROJECT}}
+
+  docker:restart:
+    deps:
+      - docker-manager:build
+    dir: "tools/docker-manager"
+    cmds:
+      - ./main restart --projectName {{.DOCKER_PROJECT}}
+
+  docker:restart:all:
+    deps:
+      - docker-manager:build
+    dir: "tools/docker-manager"
+    cmds:
+      - ./main restart --all --projectName {{.DOCKER_PROJECT}}

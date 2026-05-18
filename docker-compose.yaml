@@ -1,0 +1,25 @@
+services:
+  goose:
+    build:
+      context: ./dockerfiles
+      dockerfile: goose.dockerfile
+    volumes:
+      - ./migrations:/migrations
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=postgres://postgres:${DB_PASSWORD}@45.129.183.29:5432/postgres
+    command: [ "--version" ]
+
+  sqlc:
+    build:
+      context: ./dockerfiles
+      dockerfile: sqlc.dockerfile
+    volumes:
+      - .:/src
+    command: [ "version" ]
+
+volumes:
+  postgres_data:
+  go-mod-cache:
+  go-build-cache:
+  node_modules:
