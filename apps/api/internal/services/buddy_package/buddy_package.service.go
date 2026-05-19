@@ -3,15 +3,15 @@ package buddy_package
 import (
 	"context"
 
-	"github.com/bored-bots/bored-template/internal/repository"
+	"github.com/bored-bots/bored-template/internal/repository/buddy_package"
 	"github.com/bored-bots/bored-template/internal/store/db"
 )
 
 type Service struct {
-	repository repository.BuddyPackageRepository
+	repository buddy_package.BuddyPackageRepository
 }
 
-func NewService(repository repository.BuddyPackageRepository) *Service {
+func NewService(repository buddy_package.BuddyPackageRepository) *Service {
 	return &Service{
 		repository: repository,
 	}
