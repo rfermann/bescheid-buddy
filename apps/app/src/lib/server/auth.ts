@@ -9,6 +9,8 @@ import { emailOTP, openAPI } from 'better-auth/plugins';
 import { getOtpEmail, renderEmail } from '$lib/server/email-renderer';
 import { sendEmail } from '$lib/server/mailer';
 import { m } from '$lib/paraglide/messages.js';
+import { stripeClient } from '$lib/stripe';
+import { stripe } from '@better-auth/stripe';
 
 export const auth = betterAuth({
 	baseURL: env.ORIGIN,
@@ -74,6 +76,11 @@ export const auth = betterAuth({
 			}
 		}),
 		openAPI(),
+		stripe({
+			stripeClient,
+			stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
+			createCustomerOnSignUp: true
+		}),
 		sveltekitCookies(getRequestEvent) // make sure this is the last plugin in the array
 	]
 });

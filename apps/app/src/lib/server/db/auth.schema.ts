@@ -25,6 +25,7 @@ export const user = pgTable("user", {
   telegramId: text("telegram_id"),
   telegramPhoneNumber: text("telegram_phone_number"),
   telegramUsername: text("telegram_username"),
+  stripeCustomerId: text("stripe_customer_id"),
   monthlyPoints: integer("monthly_points").default(5).notNull(),
   lifetimePoints: integer("lifetime_points").default(0).notNull(),
 });

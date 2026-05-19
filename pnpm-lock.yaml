@@ -18,6 +18,9 @@ importers:
 
   apps/app:
     dependencies:
+      '@better-auth/stripe':
+        specifier: ^1.6.11
+        version: 1.6.11(@better-auth/core@1.6.10(patch_hash=b4cd6f16208a43d4c45721b61b25608b1f94f231d4b8db0b23ccaf68efb1a664)(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(better-auth@1.6.10(7548a052cde38b1f63be215bd2353f34))(better-call@1.3.5(zod@4.4.3))(stripe@22.1.1(@types/node@24.12.3))
       '@better-svelte-email/components':
         specifier: ^2.0.0
         version: 2.0.0(@sveltejs/kit@2.59.1(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.55.5(@typescript-eslint/types@8.59.2))(vite@7.3.3(@types/node@24.12.3)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))(typescript@5.9.3)(vite@7.3.3(@types/node@24.12.3)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.21.0)))(svelte@5.55.5(@typescript-eslint/types@8.59.2))
@@ -36,6 +39,9 @@ importers:
       nodemailer:
         specifier: ^8.0.4
         version: 8.0.7
+      stripe:
+        specifier: ^22.1.1
+        version: 22.1.1(@types/node@24.12.3)
       valibot:
         specifier: ^1.3.1
         version: 1.4.0(typescript@5.9.3)
@@ -513,6 +519,14 @@ packages:
         optional: true
       prisma:
         optional: true
+
+  '@better-auth/stripe@1.6.11':
+    resolution: {integrity: sha512-P1qHlBpJKRP68zhj4ka2W01Dq/4GrbSHbtuY62cqRMQ++CJdYSSg/FvVb7sAEtg3dfjJ06EEmwW6f9n2CoCtPQ==}
+    peerDependencies:
+      '@better-auth/core': ^1.6.11
+      better-auth: ^1.6.11
+      better-call: 1.3.5
+      stripe: ^18 || ^19 || ^20 || ^21 || ^22
 
   '@better-auth/telemetry@1.4.21':
     resolution: {integrity: sha512-LX+FGMZnhR2KQZ0idHH1+UwlXvkOl6P8w3Gne4TtjvUCt3QjG9FKIuP9JD3MAmEEkwGt0SoAPHPJEGTjUl3ydg==}
@@ -3569,6 +3583,15 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
+  stripe@22.1.1:
+    resolution: {integrity: sha512-cmodIYP27tBkJ8G7DuGgWw0PFuemlFZbuF3Wwr1TrjFjUa3T7NIgCe6TVwX8BO2ynu+xtTuDGfHafNDCPt9lXA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
@@ -4271,6 +4294,15 @@ snapshots:
     optionalDependencies:
       '@prisma/client': 5.22.0(prisma@7.8.0(@types/react@19.2.14)(better-sqlite3@12.9.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.9.3))
       prisma: 7.8.0(@types/react@19.2.14)(better-sqlite3@12.9.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.9.3)
+
+  '@better-auth/stripe@1.6.11(@better-auth/core@1.6.10(patch_hash=b4cd6f16208a43d4c45721b61b25608b1f94f231d4b8db0b23ccaf68efb1a664)(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))(better-auth@1.6.10(7548a052cde38b1f63be215bd2353f34))(better-call@1.3.5(zod@4.4.3))(stripe@22.1.1(@types/node@24.12.3))':
+    dependencies:
+      '@better-auth/core': 1.6.10(patch_hash=b4cd6f16208a43d4c45721b61b25608b1f94f231d4b8db0b23ccaf68efb1a664)(@better-auth/utils@0.4.0)(@better-fetch/fetch@1.1.21)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0)
+      better-auth: 1.6.10(7548a052cde38b1f63be215bd2353f34)
+      better-call: 1.3.5(zod@4.4.3)
+      defu: 6.1.7
+      stripe: 22.1.1(@types/node@24.12.3)
+      zod: 4.4.3
 
   '@better-auth/telemetry@1.4.21(@better-auth/core@1.4.21(@better-auth/utils@0.3.0)(@better-fetch/fetch@1.1.21)(better-call@1.3.5(zod@4.4.3))(jose@6.2.3)(kysely@0.28.17)(nanostores@1.3.0))':
     dependencies:
@@ -6940,6 +6972,10 @@ snapshots:
   strip-json-comments@2.0.1: {}
 
   strip-json-comments@3.1.1: {}
+
+  stripe@22.1.1(@types/node@24.12.3):
+    optionalDependencies:
+      '@types/node': 24.12.3
 
   supports-color@7.2.0:
     dependencies:

@@ -2,5 +2,13 @@
   "0000_worried_sandman.sql": {
     "hash": "089bf7cd48e27cdfeeb48442c7c2eb737c56a4c39169e43de5fc074fb00dc165",
     "gooseFile": "20260517185849_init_auth.sql"
+  },
+  "0001_breezy_the_stranger.sql": {
+    "hash": "a475300ff134c9901ad3680dfd03f9a70b98dfb9940e81d565700775638999a3",
+    "gooseFile": "20260518171428_update_auth_1.sql"
+  },
+  "0002_dusty_red_hulk.sql": {
+    "hash": "07628a43af0161be5ac0726d60d4521ab2998de74a379d6728b22cbde5daf449",
+    "gooseFile": "20260518173744_update_auth_2.sql"
   }
 }
