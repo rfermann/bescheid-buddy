@@ -10,6 +10,9 @@ import (
 
 type Querier interface {
 	GetAllBuddyPackages(ctx context.Context) ([]*BuddyPackage, error)
+	GetUserByID(ctx context.Context, arg GetUserByIDParams) (*User, error)
+	GetUserByStripeCustomerID(ctx context.Context, arg GetUserByStripeCustomerIDParams) (*User, error)
+	UpdateUserPoints(ctx context.Context, arg UpdateUserPointsParams) error
 }
 
 var _ Querier = (*Queries)(nil)

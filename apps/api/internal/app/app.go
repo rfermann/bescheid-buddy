@@ -8,6 +8,7 @@ import (
 	"github.com/bored-bots/bored-template/internal/server"
 	"github.com/bored-bots/bored-template/internal/services"
 	s "github.com/bored-bots/bored-template/internal/store"
+	"github.com/stripe/stripe-go/v85"
 )
 
 type App struct {
@@ -23,8 +24,8 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	svc := services.NewService(store)
-
+	stripeClient := stripe.NewClient(cfg.Stripe.SecretKey)
+	svc := services.NewService(cfg, store, stripeClient)
 	srv := server.NewServer(cfg, svc, store)
 
 	return &App{

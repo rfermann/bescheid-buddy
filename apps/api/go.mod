@@ -9,6 +9,7 @@ require (
 	github.com/jackc/pgx/v5 v5.9.1
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
+	github.com/stripe/stripe-go/v85 v85.1.0
 )
 
 require (

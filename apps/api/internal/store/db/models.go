@@ -12,62 +12,65 @@ import (
 )
 
 type Account struct {
-	ID                    uuid.UUID
-	AccountID             string
-	ProviderID            string
-	UserID                uuid.UUID
-	AccessToken           pgtype.Text
-	RefreshToken          pgtype.Text
-	IDToken               pgtype.Text
-	AccessTokenExpiresAt  pgtype.Timestamp
-	RefreshTokenExpiresAt pgtype.Timestamp
-	Scope                 pgtype.Text
-	Password              pgtype.Text
-	CreatedAt             pgtype.Timestamp
-	UpdatedAt             pgtype.Timestamp
-	TelegramID            pgtype.Text
-	TelegramUsername      pgtype.Text
+	ID                    uuid.UUID        `json:"id"`
+	AccountID             string           `json:"account_id"`
+	ProviderID            string           `json:"provider_id"`
+	UserID                uuid.UUID        `json:"user_id"`
+	AccessToken           pgtype.Text      `json:"access_token"`
+	RefreshToken          pgtype.Text      `json:"refresh_token"`
+	IDToken               pgtype.Text      `json:"id_token"`
+	AccessTokenExpiresAt  pgtype.Timestamp `json:"access_token_expires_at"`
+	RefreshTokenExpiresAt pgtype.Timestamp `json:"refresh_token_expires_at"`
+	Scope                 pgtype.Text      `json:"scope"`
+	Password              pgtype.Text      `json:"password"`
+	CreatedAt             pgtype.Timestamp `json:"created_at"`
+	UpdatedAt             pgtype.Timestamp `json:"updated_at"`
+	TelegramID            pgtype.Text      `json:"telegram_id"`
+	TelegramUsername      pgtype.Text      `json:"telegram_username"`
 }
 
 type BuddyPackage struct {
-	ID            uuid.UUID
-	Name          string
-	Points        int32
-	PriceInCents  int32
-	StripePriceID string
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID            uuid.UUID `json:"id"`
+	Name          string    `json:"name"`
+	Points        int32     `json:"points"`
+	PriceInCents  int32     `json:"price_in_cents"`
+	StripePriceID string    `json:"stripe_price_id"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 type Session struct {
-	ID        uuid.UUID
-	ExpiresAt pgtype.Timestamp
-	Token     string
-	CreatedAt pgtype.Timestamp
-	UpdatedAt pgtype.Timestamp
-	IpAddress pgtype.Text
-	UserAgent pgtype.Text
-	UserID    uuid.UUID
+	ID        uuid.UUID        `json:"id"`
+	ExpiresAt pgtype.Timestamp `json:"expires_at"`
+	Token     string           `json:"token"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	UpdatedAt pgtype.Timestamp `json:"updated_at"`
+	IpAddress pgtype.Text      `json:"ip_address"`
+	UserAgent pgtype.Text      `json:"user_agent"`
+	UserID    uuid.UUID        `json:"user_id"`
 }
 
 type User struct {
-	ID                  uuid.UUID
-	Name                string
-	Email               string
-	EmailVerified       bool
-	Image               pgtype.Text
-	CreatedAt           pgtype.Timestamp
-	UpdatedAt           pgtype.Timestamp
-	TelegramID          pgtype.Text
-	TelegramPhoneNumber pgtype.Text
-	TelegramUsername    pgtype.Text
+	ID                  uuid.UUID        `json:"id"`
+	Name                string           `json:"name"`
+	Email               string           `json:"email"`
+	EmailVerified       bool             `json:"email_verified"`
+	Image               pgtype.Text      `json:"image"`
+	CreatedAt           pgtype.Timestamp `json:"created_at"`
+	UpdatedAt           pgtype.Timestamp `json:"updated_at"`
+	TelegramID          pgtype.Text      `json:"telegram_id"`
+	TelegramPhoneNumber pgtype.Text      `json:"telegram_phone_number"`
+	TelegramUsername    pgtype.Text      `json:"telegram_username"`
+	MonthlyPoints       int32            `json:"monthly_points"`
+	LifetimePoints      int32            `json:"lifetime_points"`
+	StripeCustomerID    pgtype.Text      `json:"stripe_customer_id"`
 }
 
 type Verification struct {
-	ID         uuid.UUID
-	Identifier string
-	Value      string
-	ExpiresAt  pgtype.Timestamp
-	CreatedAt  pgtype.Timestamp
-	UpdatedAt  pgtype.Timestamp
+	ID         uuid.UUID        `json:"id"`
+	Identifier string           `json:"identifier"`
+	Value      string           `json:"value"`
+	ExpiresAt  pgtype.Timestamp `json:"expires_at"`
+	CreatedAt  pgtype.Timestamp `json:"created_at"`
+	UpdatedAt  pgtype.Timestamp `json:"updated_at"`
 }

@@ -13,6 +13,7 @@ type Config struct {
 	Auth     AuthConfig     `mapstructure:"auth"`
 	API      APIConfig      `mapstructure:"api"`
 	Database DatabaseConfig `mapstructure:"database"`
+	Stripe   StripeConfig   `mapstructure:"stripe"`
 }
 
 // ServerConfig holds server-related configuration
@@ -32,6 +33,11 @@ type AuthConfig struct {
 type APIConfig struct {
 	Title   string `mapstructure:"title"`
 	Version string `mapstructure:"version"`
+}
+
+type StripeConfig struct {
+	WebhookSecret string `mapstructure:"webhook_secret"`
+	SecretKey     string `mapstructure:"secret_key"`
 }
 
 type DatabaseConfig struct {
@@ -66,6 +72,8 @@ func LoadConfig(configPath string) (*Config, error) {
 	v.BindEnv("database.password")
 	v.BindEnv("database.port")
 	v.BindEnv("database.dbname")
+	v.BindEnv("stripe.webhook_secret")
+	v.BindEnv("stripe.secret_key")
 
 	v.SetConfigFile(configPath)
 	if err := v.ReadInConfig(); err != nil {
