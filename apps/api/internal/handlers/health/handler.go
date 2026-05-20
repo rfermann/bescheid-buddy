@@ -3,15 +3,15 @@ package health_handler
 import (
 	"net/http"
 
-	"github.com/bored-bots/bored-template/internal/services/health"
+	"github.com/bored-bots/bored-template/internal/services/health_service"
 	"github.com/danielgtaylor/huma/v2"
 )
 
 type HealthHandler struct {
-	healthService *health.Service
+	healthService *health_service.Service
 }
 
-func NewHealthHandler(healthService *health.Service) *HealthHandler {
+func NewHealthHandler(healthService *health_service.Service) *HealthHandler {
 	return &HealthHandler{
 		healthService: healthService,
 	}

@@ -1,4 +1,4 @@
-package health
+package health_service
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type HealthCheckResponse struct {
 	Database  string `json:"database"`
 }
 
-func NewService(store *store.Store) *Service {
+func New(store *store.Store) *Service {
 	return &Service{
 		store: store,
 	}

@@ -1,4 +1,4 @@
-package buddy_package
+package buddy_package_repo
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/bored-bots/bored-template/internal/store/db"
 )
 
-type BuddyPackageRepository interface {
+type Repository interface {
 	GetAllBuddyPackages(ctx context.Context) ([]*db.BuddyPackage, error)
 }
 
@@ -15,7 +15,7 @@ type buddyPackageRepository struct {
 	store *store.Store
 }
 
-func NewBuddyPackageRepository(store *store.Store) BuddyPackageRepository {
+func New(store *store.Store) Repository {
 	return &buddyPackageRepository{
 		store: store,
 	}
