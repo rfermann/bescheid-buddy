@@ -10,10 +10,14 @@ import (
 )
 
 type Repository interface {
+	BeginTx(ctx context.Context) (pgx.Tx, error)
 	GetBuddyPointsByUserID(ctx context.Context, params db.GetBuddyPointsByUserIDParams) (*db.GetBuddyPointsByUserIDRow, error)
+	GetBuddyPointsLedgerByUserID(ctx context.Context, userID uuid.UUID) ([]*db.BuddyPointsLedger, error)
 	GetUserByID(ctx context.Context, userID uuid.UUID) (*db.User, error)
 	GetUserByStripeCustomerID(ctx context.Context, params db.GetUserByStripeCustomerIDParams) (*db.User, error)
+	InsertBuddyPointsLedger(ctx context.Context, params db.InsertBuddyPointsLedgerParams) error
 	UpdateUserPoints(ctx context.Context, params db.UpdateUserPointsParams) error
+	WithTx(tx pgx.Tx) Repository
 }
 
 type UserRepository struct {
@@ -26,12 +30,27 @@ func New(store *store.Store) Repository {
 	}
 }
 
+func (r *UserRepository) WithTx(tx pgx.Tx) Repository {
+	return &UserRepository{
+		Store: &store.Store{
+			Pool:    r.Store.Pool,
+			Queries: db.New(tx),
+		},
+	}
+}
+
 func (r *UserRepository) BeginTx(ctx context.Context) (pgx.Tx, error) {
 	return r.Store.Pool.Begin(ctx)
 }
 
 func (r *UserRepository) GetBuddyPointsByUserID(ctx context.Context, params db.GetBuddyPointsByUserIDParams) (*db.GetBuddyPointsByUserIDRow, error) {
 	return r.Store.Queries.GetBuddyPointsByUserID(ctx, params)
+}
+
+func (r *UserRepository) GetBuddyPointsLedgerByUserID(ctx context.Context, userID uuid.UUID) ([]*db.BuddyPointsLedger, error) {
+	return r.Store.Queries.GetBuddyPointsLedgerByUserID(ctx, db.GetBuddyPointsLedgerByUserIDParams{
+		UserID: userID,
+	})
 }
 
 func (r *UserRepository) GetUserByID(ctx context.Context, userID uuid.UUID) (*db.User, error) {
@@ -42,6 +61,10 @@ func (r *UserRepository) GetUserByStripeCustomerID(ctx context.Context, params d
 	return r.Store.Queries.GetUserByStripeCustomerID(ctx, db.GetUserByStripeCustomerIDParams{
 		StripeCustomerID: params.StripeCustomerID,
 	})
+}
+
+func (r *UserRepository) InsertBuddyPointsLedger(ctx context.Context, params db.InsertBuddyPointsLedgerParams) error {
+	return r.Store.Queries.InsertBuddyPointsLedger(ctx, params)
 }
 
 func (r *UserRepository) UpdateUserPoints(ctx context.Context, params db.UpdateUserPointsParams) error {

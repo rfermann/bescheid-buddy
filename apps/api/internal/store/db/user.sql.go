@@ -35,6 +35,61 @@ func (q *Queries) GetBuddyPointsByUserID(ctx context.Context, arg GetBuddyPoints
 	return &i, err
 }
 
+const getBuddyPointsLedgerByUserID = `-- name: GetBuddyPointsLedgerByUserID :many
+SELECT id,
+       user_id,
+       transaction_type,
+       amount,
+       monthly_points_before,
+       lifetime_points_before,
+       monthly_points_after,
+       lifetime_points_after,
+       description,
+       related_entity_id,
+       related_entity_type,
+       created_at
+FROM buddy_points_ledger
+WHERE user_id = $1
+ORDER BY created_at DESC
+`
+
+type GetBuddyPointsLedgerByUserIDParams struct {
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) GetBuddyPointsLedgerByUserID(ctx context.Context, arg GetBuddyPointsLedgerByUserIDParams) ([]*BuddyPointsLedger, error) {
+	rows, err := q.db.Query(ctx, getBuddyPointsLedgerByUserID, arg.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*BuddyPointsLedger
+	for rows.Next() {
+		var i BuddyPointsLedger
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.TransactionType,
+			&i.Amount,
+			&i.MonthlyPointsBefore,
+			&i.LifetimePointsBefore,
+			&i.MonthlyPointsAfter,
+			&i.LifetimePointsAfter,
+			&i.Description,
+			&i.RelatedEntityID,
+			&i.RelatedEntityType,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUserByID = `-- name: GetUserByID :one
 SELECT id,
        name,
@@ -119,6 +174,61 @@ func (q *Queries) GetUserByStripeCustomerID(ctx context.Context, arg GetUserBySt
 		&i.StripeCustomerID,
 	)
 	return &i, err
+}
+
+const insertBuddyPointsLedger = `-- name: InsertBuddyPointsLedger :exec
+INSERT INTO buddy_points_ledger (
+    user_id,
+    transaction_type,
+    amount,
+    monthly_points_before,
+    lifetime_points_before,
+    monthly_points_after,
+    lifetime_points_after,
+    description,
+    related_entity_id,
+    related_entity_type
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7,
+    $8,
+    $9,
+    $10
+)
+`
+
+type InsertBuddyPointsLedgerParams struct {
+	UserID               uuid.UUID             `json:"user_id"`
+	TransactionType      TransactionType       `json:"transaction_type"`
+	Amount               int32                 `json:"amount"`
+	MonthlyPointsBefore  int32                 `json:"monthly_points_before"`
+	LifetimePointsBefore int32                 `json:"lifetime_points_before"`
+	MonthlyPointsAfter   int32                 `json:"monthly_points_after"`
+	LifetimePointsAfter  int32                 `json:"lifetime_points_after"`
+	Description          string                `json:"description"`
+	RelatedEntityID      pgtype.UUID           `json:"related_entity_id"`
+	RelatedEntityType    NullRelatedEntityType `json:"related_entity_type"`
+}
+
+func (q *Queries) InsertBuddyPointsLedger(ctx context.Context, arg InsertBuddyPointsLedgerParams) error {
+	_, err := q.db.Exec(ctx, insertBuddyPointsLedger,
+		arg.UserID,
+		arg.TransactionType,
+		arg.Amount,
+		arg.MonthlyPointsBefore,
+		arg.LifetimePointsBefore,
+		arg.MonthlyPointsAfter,
+		arg.LifetimePointsAfter,
+		arg.Description,
+		arg.RelatedEntityID,
+		arg.RelatedEntityType,
+	)
+	return err
 }
 
 const updateUserPoints = `-- name: UpdateUserPoints :exec

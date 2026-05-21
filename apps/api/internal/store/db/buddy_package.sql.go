@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const getAllBuddyPackages = `-- name: GetAllBuddyPackages :many
@@ -41,4 +43,29 @@ func (q *Queries) GetAllBuddyPackages(ctx context.Context) ([]*BuddyPackage, err
 		return nil, err
 	}
 	return items, nil
+}
+
+const getBuddyPackageByID = `-- name: GetBuddyPackageByID :one
+SELECT id, name, points, price_in_cents, stripe_price_id, created_at, updated_at
+FROM buddy_package
+WHERE id = $1
+`
+
+type GetBuddyPackageByIDParams struct {
+	ID uuid.UUID `json:"id"`
+}
+
+func (q *Queries) GetBuddyPackageByID(ctx context.Context, arg GetBuddyPackageByIDParams) (*BuddyPackage, error) {
+	row := q.db.QueryRow(ctx, getBuddyPackageByID, arg.ID)
+	var i BuddyPackage
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Points,
+		&i.PriceInCents,
+		&i.StripePriceID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
 }

@@ -9,6 +9,7 @@ import (
 
 type Repository interface {
 	GetAllBuddyPackages(ctx context.Context) ([]*db.BuddyPackage, error)
+	GetBuddyPackageByID(ctx context.Context, params db.GetBuddyPackageByIDParams) (*db.BuddyPackage, error)
 }
 
 type buddyPackageRepository struct {
@@ -23,4 +24,8 @@ func New(store *store.Store) Repository {
 
 func (r *buddyPackageRepository) GetAllBuddyPackages(ctx context.Context) ([]*db.BuddyPackage, error) {
 	return r.store.Queries.GetAllBuddyPackages(ctx)
+}
+
+func (r *buddyPackageRepository) GetBuddyPackageByID(ctx context.Context, params db.GetBuddyPackageByIDParams) (*db.BuddyPackage, error) {
+	return r.store.Queries.GetBuddyPackageByID(ctx, params)
 }

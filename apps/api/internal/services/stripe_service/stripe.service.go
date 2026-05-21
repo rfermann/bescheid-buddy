@@ -80,17 +80,48 @@ func (s *Service) HandleCheckoutSessionCompleted(ctx context.Context, event stri
 			break
 		}
 	}
-
 	if purchasedPackage == nil {
 		return fmt.Errorf("buddy package not found for stripe_price_id: %s", stripePriceID)
 	}
 
-	err = s.userRepo.UpdateUserPoints(ctx, db.UpdateUserPointsParams{
+	tx, err := s.userRepo.BeginTx(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	userRepo := s.userRepo.WithTx(tx)
+
+	err = userRepo.UpdateUserPoints(ctx, db.UpdateUserPointsParams{
 		ID:             user.ID,
 		LifetimePoints: purchasedPackage.Points,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to update user points: %w", err)
+	}
+
+	err = userRepo.InsertBuddyPointsLedger(ctx, db.InsertBuddyPointsLedgerParams{
+		UserID:               user.ID,
+		TransactionType:      db.TransactionTypePurchase,
+		Amount:               purchasedPackage.Points,
+		MonthlyPointsBefore:  user.MonthlyPoints,
+		LifetimePointsBefore: user.LifetimePoints,
+		MonthlyPointsAfter:   user.MonthlyPoints,
+		LifetimePointsAfter:  user.LifetimePoints + purchasedPackage.Points,
+		Description:          purchasedPackage.Name,
+		RelatedEntityID: pgtype.UUID{
+			Bytes: purchasedPackage.ID,
+			Valid: true,
+		},
+		RelatedEntityType: db.NullRelatedEntityType{
+			RelatedEntityType: db.RelatedEntityTypeBuddyPackage,
+			Valid:             true,
+		},
+	})
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return err
 	}
 
 	return nil

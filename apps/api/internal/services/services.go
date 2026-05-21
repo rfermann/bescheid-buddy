@@ -27,6 +27,6 @@ func NewService(config *config.Config, store *store.Store, stripeClient *stripe.
 		HealthService:       health_service.New(store),
 		BuddyPackageService: buddy_package_service.New(buddyPackageRepo),
 		StripeService:       stripe_service.New(buddyPackageRepo, userRepo, stripeClient, &config.Stripe),
-		UserService:         user_service.New(userRepo),
+		UserService:         user_service.New(userRepo, buddyPackageRepo),
 	}
 }
