@@ -2,18 +2,14 @@ package middleware
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/bored-bots/bored-template/internal/config"
+	"github.com/bored-bots/bored-template/internal/context"
 	"github.com/bored-bots/bored-template/internal/errorcodes"
 	"github.com/danielgtaylor/huma/v2"
-)
-
-type contextKey string
-
-var (
-	ContextKeyUserID = contextKey("user-id")
 )
 
 type SessionResponse struct {
@@ -99,7 +95,8 @@ func NewAuthMiddleware(api huma.API, authConfig *config.AuthConfig) func(ctx hum
 				Name:  sessionResp.User.Name,
 			}
 
-			ctx = huma.WithValue(ctx, ContextKeyUserID, userCtx.ID)
+			fmt.Println("userCtx", userCtx.ID)
+			ctx = context.WithUserID(ctx, userCtx.ID)
 		}
 
 		next(ctx)

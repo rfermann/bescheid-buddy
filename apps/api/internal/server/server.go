@@ -14,6 +14,7 @@ import (
 	"github.com/bored-bots/bored-template/internal/handlers/buddy_package"
 	"github.com/bored-bots/bored-template/internal/handlers/health"
 	"github.com/bored-bots/bored-template/internal/handlers/stripe"
+	"github.com/bored-bots/bored-template/internal/handlers/user"
 	"github.com/bored-bots/bored-template/internal/middleware"
 	"github.com/bored-bots/bored-template/internal/services"
 	"github.com/bored-bots/bored-template/internal/store"
@@ -54,6 +55,9 @@ func NewServer(cfg *config.Config, services *services.Services, store *store.Sto
 
 	stripeHandler := stripe_handler.NewHandler(services.StripeService)
 	stripeHandler.RegisterRoutes(api)
+
+	userHandler := user_handler.NewHandler(services.UserService)
+	userHandler.RegisterRoutes(api)
 
 	return &Server{
 		httpServer: &http.Server{

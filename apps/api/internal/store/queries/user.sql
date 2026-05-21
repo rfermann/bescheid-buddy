@@ -37,3 +37,9 @@ SELECT id,
        stripe_customer_id
 FROM "user"
 WHERE stripe_customer_id = $1;
+
+-- name: GetBuddyPointsByUserID :one
+SELECT monthly_points,
+       lifetime_points
+FROM "user"
+WHERE id = $1;

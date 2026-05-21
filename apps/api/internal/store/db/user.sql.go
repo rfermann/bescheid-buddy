@@ -12,6 +12,29 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const getBuddyPointsByUserID = `-- name: GetBuddyPointsByUserID :one
+SELECT monthly_points,
+       lifetime_points
+FROM "user"
+WHERE id = $1
+`
+
+type GetBuddyPointsByUserIDParams struct {
+	ID uuid.UUID `json:"id"`
+}
+
+type GetBuddyPointsByUserIDRow struct {
+	MonthlyPoints  int32 `json:"monthly_points"`
+	LifetimePoints int32 `json:"lifetime_points"`
+}
+
+func (q *Queries) GetBuddyPointsByUserID(ctx context.Context, arg GetBuddyPointsByUserIDParams) (*GetBuddyPointsByUserIDRow, error) {
+	row := q.db.QueryRow(ctx, getBuddyPointsByUserID, arg.ID)
+	var i GetBuddyPointsByUserIDRow
+	err := row.Scan(&i.MonthlyPoints, &i.LifetimePoints)
+	return &i, err
+}
+
 const getUserByID = `-- name: GetUserByID :one
 SELECT id,
        name,

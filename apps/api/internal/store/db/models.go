@@ -5,11 +5,117 @@
 package db
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type RelatedEntityType string
+
+const (
+	RelatedEntityTypeBuddyPackage RelatedEntityType = "buddy_package"
+	RelatedEntityTypeUser         RelatedEntityType = "user"
+	RelatedEntityTypeNull         RelatedEntityType = "null"
+)
+
+func (e *RelatedEntityType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = RelatedEntityType(s)
+	case string:
+		*e = RelatedEntityType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for RelatedEntityType: %T", src)
+	}
+	return nil
+}
+
+type NullRelatedEntityType struct {
+	RelatedEntityType RelatedEntityType `json:"related_entity_type"`
+	Valid             bool              `json:"valid"` // Valid is true if RelatedEntityType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullRelatedEntityType) Scan(value interface{}) error {
+	if value == nil {
+		ns.RelatedEntityType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.RelatedEntityType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullRelatedEntityType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.RelatedEntityType), nil
+}
+
+func AllRelatedEntityTypeValues() []RelatedEntityType {
+	return []RelatedEntityType{
+		RelatedEntityTypeBuddyPackage,
+		RelatedEntityTypeUser,
+		RelatedEntityTypeNull,
+	}
+}
+
+type TransactionType string
+
+const (
+	TransactionTypePurchase     TransactionType = "purchase"
+	TransactionTypeReferral     TransactionType = "referral"
+	TransactionTypeMonthlyReset TransactionType = "monthly_reset"
+	TransactionTypeUsage        TransactionType = "usage"
+)
+
+func (e *TransactionType) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = TransactionType(s)
+	case string:
+		*e = TransactionType(s)
+	default:
+		return fmt.Errorf("unsupported scan type for TransactionType: %T", src)
+	}
+	return nil
+}
+
+type NullTransactionType struct {
+	TransactionType TransactionType `json:"transaction_type"`
+	Valid           bool            `json:"valid"` // Valid is true if TransactionType is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullTransactionType) Scan(value interface{}) error {
+	if value == nil {
+		ns.TransactionType, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.TransactionType.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullTransactionType) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.TransactionType), nil
+}
+
+func AllTransactionTypeValues() []TransactionType {
+	return []TransactionType{
+		TransactionTypePurchase,
+		TransactionTypeReferral,
+		TransactionTypeMonthlyReset,
+		TransactionTypeUsage,
+	}
+}
 
 type Account struct {
 	ID                    uuid.UUID        `json:"id"`
@@ -37,6 +143,21 @@ type BuddyPackage struct {
 	StripePriceID string    `json:"stripe_price_id"`
 	CreatedAt     time.Time `json:"created_at"`
 	UpdatedAt     time.Time `json:"updated_at"`
+}
+
+type BuddyPointsLedger struct {
+	ID                   uuid.UUID             `json:"id"`
+	UserID               uuid.UUID             `json:"user_id"`
+	TransactionType      TransactionType       `json:"transaction_type"`
+	Amount               int32                 `json:"amount"`
+	MonthlyPointsBefore  int32                 `json:"monthly_points_before"`
+	LifetimePointsBefore int32                 `json:"lifetime_points_before"`
+	MonthlyPointsAfter   int32                 `json:"monthly_points_after"`
+	LifetimePointsAfter  int32                 `json:"lifetime_points_after"`
+	Description          string                `json:"description"`
+	RelatedEntityID      pgtype.UUID           `json:"related_entity_id"`
+	RelatedEntityType    NullRelatedEntityType `json:"related_entity_type"`
+	CreatedAt            time.Time             `json:"created_at"`
 }
 
 type Session struct {
