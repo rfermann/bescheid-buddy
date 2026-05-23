@@ -8,6 +8,7 @@
 	import { authClient } from '$lib';
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
+	import { Toaster } from 'svelte-sonner';
 
 	let { children, data }: { children: Snippet, data: PageData } = $props();
 
@@ -49,4 +50,5 @@
 	</main>
 
 	<Footer />
+	<Toaster richColors position="top-center" />
 </div>
