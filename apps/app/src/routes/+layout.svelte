@@ -45,7 +45,7 @@
 	{#if data.user}
 		<Navigation />
 	{/if}
-	<main class="w-full max-w-300 py-5 md:py-5 pt-24 md:pt-5 text-white mx-auto flex-1">
+	<main class="w-full max-w-300 py-15 md:py-15 pt-24 md:pt-24 text-white mx-auto flex-1">
 		{@render children()}
 	</main>
 
