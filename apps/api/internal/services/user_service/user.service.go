@@ -28,18 +28,19 @@ type GetBuddyPointsResult struct {
 }
 
 type LedgerEntry struct {
-	ID                   uuid.UUID `json:"id"`
-	TransactionType      string    `json:"transaction_type"`
-	Amount               int32     `json:"amount"`
-	MonthlyPointsBefore  int32     `json:"monthly_points_before"`
-	LifetimePointsBefore int32     `json:"lifetime_points_before"`
-	MonthlyPointsAfter   int32     `json:"monthly_points_after"`
-	LifetimePointsAfter  int32     `json:"lifetime_points_after"`
-	Description          string    `json:"description"`
-	RelatedEntityID      *string   `json:"related_entity_id,omitempty"`
-	RelatedEntityType    *string   `json:"related_entity_type,omitempty"`
-	RelatedEntityName    *string   `json:"related_entity_name,omitempty"`
-	CreatedAt            string    `json:"created_at"`
+	ID uuid.UUID `json:"id"`
+	// enum values must match db.TransactionType constants in models.go
+	TransactionType      db.TransactionType `json:"transaction_type" enum:"purchase,referral,monthly_reset,usage"`
+	Amount               int32              `json:"amount"`
+	MonthlyPointsBefore  int32              `json:"monthly_points_before"`
+	LifetimePointsBefore int32              `json:"lifetime_points_before"`
+	MonthlyPointsAfter   int32              `json:"monthly_points_after"`
+	LifetimePointsAfter  int32              `json:"lifetime_points_after"`
+	Description          string             `json:"description"`
+	RelatedEntityID      *string            `json:"related_entity_id,omitempty"`
+	RelatedEntityType    *string            `json:"related_entity_type,omitempty"`
+	RelatedEntityName    *string            `json:"related_entity_name,omitempty"`
+	CreatedAt            string             `json:"created_at"`
 }
 
 type GetBuddyPointsLedgerResult struct {
@@ -70,7 +71,7 @@ func (s *Service) GetBuddyPointsLedger(ctx context.Context, userID uuid.UUID) (*
 	for _, entry := range ledger {
 		ledgerEntry := LedgerEntry{
 			ID:                   entry.ID,
-			TransactionType:      string(entry.TransactionType),
+			TransactionType:      entry.TransactionType,
 			Amount:               entry.Amount,
 			MonthlyPointsBefore:  entry.MonthlyPointsBefore,
 			LifetimePointsBefore: entry.LifetimePointsBefore,
