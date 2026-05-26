@@ -247,3 +247,20 @@ func (q *Queries) UpdateUserPoints(ctx context.Context, arg UpdateUserPointsPara
 	_, err := q.db.Exec(ctx, updateUserPoints, arg.ID, arg.LifetimePoints)
 	return err
 }
+
+const updateUserStripeCustomerID = `-- name: UpdateUserStripeCustomerID :exec
+UPDATE "user"
+SET stripe_customer_id = $2,
+    updated_at = NOW()
+WHERE id = $1
+`
+
+type UpdateUserStripeCustomerIDParams struct {
+	ID               uuid.UUID   `json:"id"`
+	StripeCustomerID pgtype.Text `json:"stripe_customer_id"`
+}
+
+func (q *Queries) UpdateUserStripeCustomerID(ctx context.Context, arg UpdateUserStripeCustomerIDParams) error {
+	_, err := q.db.Exec(ctx, updateUserStripeCustomerID, arg.ID, arg.StripeCustomerID)
+	return err
+}

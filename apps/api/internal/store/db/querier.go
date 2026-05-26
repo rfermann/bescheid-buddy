@@ -17,6 +17,7 @@ type Querier interface {
 	GetUserByStripeCustomerID(ctx context.Context, arg GetUserByStripeCustomerIDParams) (*User, error)
 	InsertBuddyPointsLedger(ctx context.Context, arg InsertBuddyPointsLedgerParams) error
 	UpdateUserPoints(ctx context.Context, arg UpdateUserPointsParams) error
+	UpdateUserStripeCustomerID(ctx context.Context, arg UpdateUserStripeCustomerIDParams) error
 }
 
 var _ Querier = (*Queries)(nil)

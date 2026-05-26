@@ -38,6 +38,7 @@ type APIConfig struct {
 type StripeConfig struct {
 	WebhookSecret string `mapstructure:"webhook_secret"`
 	SecretKey     string `mapstructure:"secret_key"`
+	Origin        string `mapstructure:"origin"`
 }
 
 type DatabaseConfig struct {
@@ -74,6 +75,7 @@ func LoadConfig(configPath string) (*Config, error) {
 	v.BindEnv("database.dbname")
 	v.BindEnv("stripe.webhook_secret")
 	v.BindEnv("stripe.secret_key")
+	v.BindEnv("stripe.origin")
 
 	v.SetConfigFile(configPath)
 	if err := v.ReadInConfig(); err != nil {

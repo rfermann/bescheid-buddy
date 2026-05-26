@@ -18,3 +18,6 @@ database:
   port: 5432
   user: "postgres"
   dbname: "postgres"
+
+stripe:
+  origin: "https://dev.app.bb.tricirc.de"

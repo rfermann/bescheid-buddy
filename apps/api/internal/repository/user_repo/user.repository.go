@@ -13,10 +13,11 @@ type Repository interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
 	GetBuddyPointsByUserID(ctx context.Context, params db.GetBuddyPointsByUserIDParams) (*db.GetBuddyPointsByUserIDRow, error)
 	GetBuddyPointsLedgerByUserID(ctx context.Context, userID uuid.UUID) ([]*db.BuddyPointsLedger, error)
-	GetUserByID(ctx context.Context, userID uuid.UUID) (*db.User, error)
+	GetUserByID(ctx context.Context, userID db.GetUserByIDParams) (*db.User, error)
 	GetUserByStripeCustomerID(ctx context.Context, params db.GetUserByStripeCustomerIDParams) (*db.User, error)
 	InsertBuddyPointsLedger(ctx context.Context, params db.InsertBuddyPointsLedgerParams) error
 	UpdateUserPoints(ctx context.Context, params db.UpdateUserPointsParams) error
+	UpdateUserStripeCustomerID(ctx context.Context, params db.UpdateUserStripeCustomerIDParams) error
 	WithTx(tx pgx.Tx) Repository
 }
 
@@ -53,8 +54,8 @@ func (r *UserRepository) GetBuddyPointsLedgerByUserID(ctx context.Context, userI
 	})
 }
 
-func (r *UserRepository) GetUserByID(ctx context.Context, userID uuid.UUID) (*db.User, error) {
-	return r.Store.Queries.GetUserByID(ctx, db.GetUserByIDParams{ID: userID})
+func (r *UserRepository) GetUserByID(ctx context.Context, params db.GetUserByIDParams) (*db.User, error) {
+	return r.Store.Queries.GetUserByID(ctx, params)
 }
 
 func (r *UserRepository) GetUserByStripeCustomerID(ctx context.Context, params db.GetUserByStripeCustomerIDParams) (*db.User, error) {
@@ -71,5 +72,12 @@ func (r *UserRepository) UpdateUserPoints(ctx context.Context, params db.UpdateU
 	return r.Store.Queries.UpdateUserPoints(ctx, db.UpdateUserPointsParams{
 		ID:             params.ID,
 		LifetimePoints: params.LifetimePoints,
+	})
+}
+
+func (r *UserRepository) UpdateUserStripeCustomerID(ctx context.Context, params db.UpdateUserStripeCustomerIDParams) error {
+	return r.Store.Queries.UpdateUserStripeCustomerID(ctx, db.UpdateUserStripeCustomerIDParams{
+		ID:               params.ID,
+		StripeCustomerID: params.StripeCustomerID,
 	})
 }

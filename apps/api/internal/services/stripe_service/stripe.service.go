@@ -10,6 +10,7 @@ import (
 	"github.com/bored-bots/bored-template/internal/repository/buddy_package_repo"
 	"github.com/bored-bots/bored-template/internal/repository/user_repo"
 	"github.com/bored-bots/bored-template/internal/store/db"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stripe/stripe-go/v85"
 	"github.com/stripe/stripe-go/v85/webhook"
@@ -125,4 +126,66 @@ func (s *Service) HandleCheckoutSessionCompleted(ctx context.Context, event stri
 	}
 
 	return nil
+}
+
+type CreateCheckoutSessionInput struct {
+	UserID        uuid.UUID
+	StripePriceID string
+	PackageName   string
+}
+
+type CreateCheckoutSessionResult struct {
+	URL string
+}
+
+func (s *Service) CreateCheckoutSession(ctx context.Context, input CreateCheckoutSessionInput) (*CreateCheckoutSessionResult, error) {
+	user, err := s.userRepo.GetUserByID(ctx, db.GetUserByIDParams{
+		ID: input.UserID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	stripeCustomerID := user.StripeCustomerID.String
+	if !user.StripeCustomerID.Valid || stripeCustomerID == "" {
+		customer, err := s.stripeClient.V1Customers.Create(ctx, &stripe.CustomerCreateParams{
+			Name:  stripe.String(user.Name),
+			Email: stripe.String(user.Email),
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create stripe customer: %w", err)
+		}
+
+		stripeCustomerID = customer.ID
+
+		err = s.userRepo.UpdateUserStripeCustomerID(ctx, db.UpdateUserStripeCustomerIDParams{
+			ID:               user.ID,
+			StripeCustomerID: pgtype.Text{String: stripeCustomerID, Valid: true},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to update user stripe customer id: %w", err)
+		}
+	}
+
+	params := &stripe.CheckoutSessionCreateParams{
+		Customer: stripe.String(stripeCustomerID),
+		LineItems: []*stripe.CheckoutSessionCreateLineItemParams{
+			{
+				Price:    stripe.String(input.StripePriceID),
+				Quantity: stripe.Int64(1),
+			},
+		},
+		Mode:       stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL: stripe.String(fmt.Sprintf("%s/buddypoints-verwalten?package_name=%s", s.stripeConfig.Origin, input.PackageName)),
+		CancelURL:  stripe.String(fmt.Sprintf("%s/buddypoints-verwalten?canceled=true", s.stripeConfig.Origin)),
+	}
+
+	session, err := s.stripeClient.V1CheckoutSessions.Create(ctx, params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create checkout session: %w", err)
+	}
+
+	return &CreateCheckoutSessionResult{
+		URL: session.URL,
+	}, nil
 }

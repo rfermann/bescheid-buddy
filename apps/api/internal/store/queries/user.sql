@@ -4,6 +4,12 @@ SET lifetime_points = lifetime_points + $2,
     updated_at      = NOW()
 WHERE id = $1;
 
+-- name: UpdateUserStripeCustomerID :exec
+UPDATE "user"
+SET stripe_customer_id = $2,
+    updated_at         = NOW()
+WHERE id = $1;
+
 -- name: GetUserByID :one
 SELECT id,
        name,
@@ -45,29 +51,26 @@ FROM "user"
 WHERE id = $1;
 
 -- name: InsertBuddyPointsLedger :exec
-INSERT INTO buddy_points_ledger (
-    user_id,
-    transaction_type,
-    amount,
-    monthly_points_before,
-    lifetime_points_before,
-    monthly_points_after,
-    lifetime_points_after,
-    description,
-    related_entity_id,
-    related_entity_type
-) VALUES (
-    $1,
-    $2,
-    $3,
-    $4,
-    $5,
-    $6,
-    $7,
-    $8,
-    $9,
-    $10
-);
+INSERT INTO buddy_points_ledger (user_id,
+                                 transaction_type,
+                                 amount,
+                                 monthly_points_before,
+                                 lifetime_points_before,
+                                 monthly_points_after,
+                                 lifetime_points_after,
+                                 description,
+                                 related_entity_id,
+                                 related_entity_type)
+VALUES ($1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        $7,
+        $8,
+        $9,
+        $1 0);
 
 -- name: GetBuddyPointsLedgerByUserID :many
 SELECT id,
