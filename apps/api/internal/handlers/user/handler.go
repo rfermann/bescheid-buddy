@@ -2,7 +2,6 @@ package user_handler
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	appContext "github.com/bored-bots/bored-template/internal/context"
@@ -61,7 +60,6 @@ func (h *Handler) RegisterRoutes(api huma.API) {
 
 func (h *Handler) getBuddyPoints(ctx context.Context, input *struct{}) (*GetBuddyPointsOutput, error) {
 	userID, ok := appContext.UserIDFromContext(ctx)
-	fmt.Println("userID", userID)
 	if !ok {
 		return nil, huma.Error401Unauthorized(http.StatusText(http.StatusUnauthorized))
 	}
