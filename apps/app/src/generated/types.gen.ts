@@ -14,6 +14,23 @@ export type BuddyPackage = {
     updated_at: Date;
 };
 
+export type CreateCheckoutSessionInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    package_name: string;
+    stripe_price_id: string;
+};
+
+export type CreateCheckoutSessionOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    url: string;
+};
+
 export type ErrorDetail = {
     /**
      * Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
@@ -108,6 +125,15 @@ export type LedgerEntry = {
     related_entity_name?: string;
     related_entity_type?: string;
     transaction_type: 'purchase' | 'referral' | 'monthly_reset' | 'usage';
+};
+
+export type CreateCheckoutSessionInputBodyWritable = {
+    package_name: string;
+    stripe_price_id: string;
+};
+
+export type CreateCheckoutSessionOutputBodyWritable = {
+    url: string;
 };
 
 export type ErrorModelWritable = {
@@ -205,6 +231,31 @@ export type HealthCheckResponses = {
 };
 
 export type HealthCheckResponse = HealthCheckResponses[keyof HealthCheckResponses];
+
+export type CreateCheckoutSessionData = {
+    body: CreateCheckoutSessionInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/v1/stripe/checkout-sessions';
+};
+
+export type CreateCheckoutSessionErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type CreateCheckoutSessionError = CreateCheckoutSessionErrors[keyof CreateCheckoutSessionErrors];
+
+export type CreateCheckoutSessionResponses = {
+    /**
+     * OK
+     */
+    200: CreateCheckoutSessionOutputBody;
+};
+
+export type CreateCheckoutSessionResponse = CreateCheckoutSessionResponses[keyof CreateCheckoutSessionResponses];
 
 export type GetBuddyPointsData = {
     body?: never;

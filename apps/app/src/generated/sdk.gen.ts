@@ -3,7 +3,7 @@
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
 import { getAllBuddyPackagesResponseTransformer } from './transformers.gen';
-import type { GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses } from './types.gen';
+import type { CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -36,6 +36,20 @@ export const getAllBuddyPackages = <ThrowOnError extends boolean = false>(option
  * Returns the health status of the API
  */
 export const healthCheck = <ThrowOnError extends boolean = false>(options?: Options<HealthCheckData, ThrowOnError>) => (options?.client ?? client).get<HealthCheckResponses, HealthCheckErrors, ThrowOnError>({ url: '/v1/health', ...options });
+
+/**
+ * Create Stripe checkout session
+ *
+ * Creates a Stripe checkout session for purchasing buddy points
+ */
+export const createCheckoutSession = <ThrowOnError extends boolean = false>(options: Options<CreateCheckoutSessionData, ThrowOnError>) => (options.client ?? client).post<CreateCheckoutSessionResponses, CreateCheckoutSessionErrors, ThrowOnError>({
+    url: '/v1/stripe/checkout-sessions',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get buddy points

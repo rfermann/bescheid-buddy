@@ -3,7 +3,6 @@ import { getAllBuddyPackages } from '../../generated';
 import { getClientConfig } from '$lib/server/apiClient';
 
 export const load: PageServerLoad = async ({ url }) => {
-	const sessionId = url.searchParams.get('session_id');
 	const packageName = url.searchParams.get('name');
 	const canceled = url.searchParams.get('canceled');
 
@@ -27,7 +26,6 @@ export const load: PageServerLoad = async ({ url }) => {
 	}
 
 	return {
-		purchaseSuccess: sessionId !== null && packageName !== null,
 		packageName: packageName || null,
 		packagePoints,
 		purchaseCanceled: canceled === 'true'

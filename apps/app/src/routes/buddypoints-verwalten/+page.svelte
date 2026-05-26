@@ -7,7 +7,7 @@
 		getBuddyPackagesQuery,
 		getBuddyPointsQuery,
 		getBuddyPointsLedgerQuery,
-		getCheckoutSessionUrlQuery
+		createCheckoutSessionUrlForm
 	} from './points.remote.ts';
 	import { onMount, tick } from 'svelte';
 	import { toast } from 'svelte-sonner';
@@ -23,12 +23,12 @@
 	const ledger = $derived(await getBuddyPointsLedgerQuery({}));
 
 	const useModal = true;
-	let modalOpen = $derived.by(() => data.purchaseSuccess && useModal);
+	let modalOpen = $derived.by(() => data.packageName && useModal);
 
 	onMount(async () => {
 		await tick();
 
-		if (data.purchaseSuccess && data.packageName) {
+		if (data.packageName) {
 			if (!useModal) {
 				toast.success(m.buddypoints_purchase_success_toast({ name: data.packageName }));
 			}
@@ -42,32 +42,23 @@
 		modalOpen = false;
 	};
 
-	let selectedPlan = $state<string | null>('Buddy Package');
+	let selectedPlan = $derived<string>(packages && packages.packages && packages.packages[0].name || '');
+	let selectedStripePriceId = $state<string>(packages && packages.packages && packages.packages[0].stripe_price_id || '');
+
 
 	const selectPlan = (planName: string) => {
 		selectedPlan = planName;
-	};
-
-	let isLoading = $state(false);
-	const handleBuy = async () => {
-		isLoading = true;
-		const pkg = packages?.packages?.find((p) => p.name === selectedPlan);
-		if (!pkg) {
+		if (!packages || !packages.packages) {
 			return;
 		}
-		const url = await getCheckoutSessionUrlQuery({ name: pkg.name, stripePriceId: pkg.stripe_price_id }).run();
-		if (!url) {
-			return;
-		}
-		window.location.href = url;
-	};
 
+		selectedStripePriceId = packages.packages.find((p) => p.name === planName)?.stripe_price_id || '';
+	};
 </script>
 
 <svelte:head>
 	<title>{m.buddypoints_page_title()} - BescheidBuddy</title>
 </svelte:head>
-
 
 <PageHeading title={m.buddypoints_page_title()} />
 
@@ -114,33 +105,35 @@
 	</div>
 	<div class="text-xs text-[rgba(183,183,200,0.9)] mt-3"></div>
 	<div class="flex justify-end mt-3.5">
-
-		<button
-			class="inline-flex items-center gap-2.5 py-3 px-3.5 border border-solid border-primary/40 rounded-[14px] text-primary bg-primary/[0.161] text-[13.333px] font-black tracking-[0.267px] leading-normal transition-all duration-150 cursor-pointer whitespace-nowrap select-none hover:-translate-y-px text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
-			onclick={() => handleBuy()}
-			disabled={isLoading}
-			type="button">
-			{#if isLoading}
-				<svg
-					class="animate-spin h-4 w-4"
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24">
-					<circle
-						class="opacity-25"
-						cx="12"
-						cy="12"
-						r="10"
-						stroke="currentColor"
-						stroke-width="4"></circle>
-					<path
-						class="opacity-75"
-						fill="currentColor"
-						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-				</svg>
-			{/if}
-			{m.buddypoints_create_purchase_request()}
-		</button>
+		<form {...createCheckoutSessionUrlForm}>
+			<input {...createCheckoutSessionUrlForm.fields.package_name.as("hidden", selectedPlan)} />
+			<input {...createCheckoutSessionUrlForm.fields.stripe_price_id.as("hidden", selectedStripePriceId)} />
+			<button
+				class="inline-flex items-center gap-2.5 py-3 px-3.5 border border-solid border-primary/40 rounded-[14px] text-primary bg-primary/[0.161] text-[13.333px] font-black tracking-[0.267px] leading-normal transition-all duration-150 cursor-pointer whitespace-nowrap select-none hover:-translate-y-px text-center disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+				disabled={false}
+				type="submit">
+				{#if createCheckoutSessionUrlForm.pending}
+					<svg
+						class="animate-spin h-4 w-4"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24">
+						<circle
+							class="opacity-25"
+							cx="12"
+							cy="12"
+							r="10"
+							stroke="currentColor"
+							stroke-width="4"></circle>
+						<path
+							class="opacity-75"
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+					</svg>
+				{/if}
+				{m.buddypoints_create_purchase_request()}
+			</button>
+		</form>
 	</div>
 </Section>
 

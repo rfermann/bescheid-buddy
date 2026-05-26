@@ -12,6 +12,17 @@ export const vBuddyPackage = v.strictObject({
     updated_at: v.pipe(v.string(), v.isoTimestamp())
 });
 
+export const vCreateCheckoutSessionInputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    package_name: v.string(),
+    stripe_price_id: v.string()
+});
+
+export const vCreateCheckoutSessionOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    url: v.string()
+});
+
 export const vErrorDetail = v.strictObject({
     location: v.optional(v.string()),
     message: v.optional(v.string()),
@@ -75,6 +86,15 @@ export const vGetBuddyPointsLedgerOutputBody = v.strictObject({
     entries: v.nullable(v.array(vLedgerEntry))
 });
 
+export const vCreateCheckoutSessionInputBodyWritable = v.strictObject({
+    package_name: v.string(),
+    stripe_price_id: v.string()
+});
+
+export const vCreateCheckoutSessionOutputBodyWritable = v.strictObject({
+    url: v.string()
+});
+
 export const vErrorModelWritable = v.strictObject({
     detail: v.optional(v.string()),
     errors: v.nullish(v.array(vErrorDetail)),
@@ -116,6 +136,13 @@ export const vGetAllBuddyPackagesResponse = vGetAllBuddyPackagesOutputBody;
  * OK
  */
 export const vHealthCheckResponse = vHealthCheckResponseBody;
+
+export const vCreateCheckoutSessionBody = vCreateCheckoutSessionInputBodyWritable;
+
+/**
+ * OK
+ */
+export const vCreateCheckoutSessionResponse = vCreateCheckoutSessionOutputBody;
 
 /**
  * OK
