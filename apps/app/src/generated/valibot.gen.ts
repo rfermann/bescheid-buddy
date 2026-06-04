@@ -86,6 +86,19 @@ export const vGetBuddyPointsLedgerOutputBody = v.strictObject({
     entries: v.nullable(v.array(vLedgerEntry))
 });
 
+export const vSendEmailInputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    html: v.string(),
+    receiver: v.string(),
+    sender: v.string(),
+    subject: v.string()
+});
+
+export const vSendEmailOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    message: v.string()
+});
+
 export const vCreateCheckoutSessionInputBodyWritable = v.strictObject({
     package_name: v.string(),
     stripe_price_id: v.string()
@@ -127,10 +140,28 @@ export const vHealthCheckResponseBodyWritable = v.strictObject({
     timestamp: v.string()
 });
 
+export const vSendEmailInputBodyWritable = v.strictObject({
+    html: v.string(),
+    receiver: v.string(),
+    sender: v.string(),
+    subject: v.string()
+});
+
+export const vSendEmailOutputBodyWritable = v.strictObject({
+    message: v.string()
+});
+
 /**
  * OK
  */
 export const vGetAllBuddyPackagesResponse = vGetAllBuddyPackagesOutputBody;
+
+export const vSendEmailBody = vSendEmailInputBodyWritable;
+
+/**
+ * OK
+ */
+export const vSendEmailResponse = vSendEmailOutputBody;
 
 /**
  * OK

@@ -127,6 +127,25 @@ export type LedgerEntry = {
     transaction_type: 'purchase' | 'referral' | 'monthly_reset' | 'usage';
 };
 
+export type SendEmailInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    html: string;
+    receiver: string;
+    sender: string;
+    subject: string;
+};
+
+export type SendEmailOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    message: string;
+};
+
 export type CreateCheckoutSessionInputBodyWritable = {
     package_name: string;
     stripe_price_id: string;
@@ -182,6 +201,17 @@ export type HealthCheckResponseBodyWritable = {
     timestamp: string;
 };
 
+export type SendEmailInputBodyWritable = {
+    html: string;
+    receiver: string;
+    sender: string;
+    subject: string;
+};
+
+export type SendEmailOutputBodyWritable = {
+    message: string;
+};
+
 export type GetAllBuddyPackagesData = {
     body?: never;
     path?: never;
@@ -206,6 +236,31 @@ export type GetAllBuddyPackagesResponses = {
 };
 
 export type GetAllBuddyPackagesResponse = GetAllBuddyPackagesResponses[keyof GetAllBuddyPackagesResponses];
+
+export type SendEmailData = {
+    body: SendEmailInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/v1/email/send';
+};
+
+export type SendEmailErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type SendEmailError = SendEmailErrors[keyof SendEmailErrors];
+
+export type SendEmailResponses = {
+    /**
+     * OK
+     */
+    200: SendEmailOutputBody;
+};
+
+export type SendEmailResponse = SendEmailResponses[keyof SendEmailResponses];
 
 export type HealthCheckData = {
     body?: never;

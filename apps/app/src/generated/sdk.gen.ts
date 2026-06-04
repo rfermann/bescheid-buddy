@@ -3,7 +3,7 @@
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
 import { getAllBuddyPackagesResponseTransformer } from './transformers.gen';
-import type { CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses } from './types.gen';
+import type { CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, SendEmailData, SendEmailErrors, SendEmailResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -28,6 +28,21 @@ export const getAllBuddyPackages = <ThrowOnError extends boolean = false>(option
     responseTransformer: getAllBuddyPackagesResponseTransformer,
     url: '/v1/buddy-packages',
     ...options
+});
+
+/**
+ * Send email
+ *
+ * Receives email details and logs them to console
+ */
+export const sendEmail = <ThrowOnError extends boolean = false>(options: Options<SendEmailData, ThrowOnError>) => (options.client ?? client).post<SendEmailResponses, SendEmailErrors, ThrowOnError>({
+    security: [{ name: 'X-API-Key', type: 'apiKey' }],
+    url: '/v1/email/send',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
