@@ -14,6 +14,7 @@ type Config struct {
 	API      APIConfig      `mapstructure:"api"`
 	Database DatabaseConfig `mapstructure:"database"`
 	Stripe   StripeConfig   `mapstructure:"stripe"`
+	SMTP     SMTPConfig     `mapstructure:"smtp"`
 }
 
 // ServerConfig holds server-related configuration
@@ -49,6 +50,14 @@ type DatabaseConfig struct {
 	DBName   string `mapstructure:"dbname"`
 }
 
+type SMTPConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+	UseSSL   bool   `mapstructure:"use_ssl"`
+}
+
 // LoadConfig loads configuration using Viper
 func LoadConfig(configPath string) (*Config, error) {
 	v := viper.New()
@@ -76,6 +85,11 @@ func LoadConfig(configPath string) (*Config, error) {
 	v.BindEnv("stripe.webhook_secret")
 	v.BindEnv("stripe.secret_key")
 	v.BindEnv("stripe.origin")
+	v.BindEnv("smtp.host")
+	v.BindEnv("smtp.port")
+	v.BindEnv("smtp.username")
+	v.BindEnv("smtp.password")
+	v.BindEnv("smtp.use_ssl")
 
 	v.SetConfigFile(configPath)
 	if err := v.ReadInConfig(); err != nil {

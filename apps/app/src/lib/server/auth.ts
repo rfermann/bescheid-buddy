@@ -1,4 +1,5 @@
 import { betterAuth } from 'better-auth/minimal';
+import { apiKey } from '@better-auth/api-key';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { env } from '$env/dynamic/private';
@@ -7,10 +8,13 @@ import { db } from '$lib/server/db';
 import { telegram } from 'better-auth-telegram';
 import { emailOTP, openAPI } from 'better-auth/plugins';
 import { getOtpEmail, renderEmail } from '$lib/server/email-renderer';
-import { sendEmail } from '$lib/server/mailer';
 import { m } from '$lib/paraglide/messages.js';
 import { stripeClient } from '$lib/stripe';
 import { stripe } from '@better-auth/stripe';
+import { sendEmail } from '../../generated';
+import { user } from '$lib/server/db/auth.schema';
+import { sendEmail as sendEmail1 } from './mailer';
+import { eq } from 'drizzle-orm';
 
 export const auth = betterAuth({
 	baseURL: env.ORIGIN,
@@ -45,12 +49,25 @@ export const auth = betterAuth({
 		emailOTP({
 			sendVerificationOTP: async ({ email, otp, type }) => {
 				if (type === 'sign-in') {
+					const accessKey = await getAdminApiKey();
+					if (!accessKey) {
+						return;
+					}
+
 					const OtpEmailComponent = await getOtpEmail();
 					const html = await renderEmail(OtpEmailComponent, { code: otp, mins: 5 });
-					await sendEmail({
-						to: email,
-						subject: m.email_loginCodeSubject(),
-						html
+
+					// intentionally not awaited
+					sendEmail({
+						headers: {
+							'X-API-Key': accessKey
+						},
+						body: {
+							html,
+							receiver: email,
+							sender: env.SMTP_USER,
+							subject: m.email_loginCodeSubject()
+						}
 					});
 				}
 			}
@@ -75,6 +92,9 @@ export const auth = betterAuth({
 				})
 			}
 		}),
+		apiKey({
+			enableSessionForAPIKeys: true
+		}),
 		openAPI(),
 		stripe({
 			stripeClient,
@@ -84,3 +104,26 @@ export const auth = betterAuth({
 		sveltekitCookies(getRequestEvent) // make sure this is the last plugin in the array
 	]
 });
+
+const getAdminApiKey = async () => {
+	const userId = await db
+		.select({ id: user.id })
+		.from(user)
+		.where(eq(user.email, 'admin@admin.dev'))
+		.limit(1);
+
+	if (!userId.length) {
+		return null;
+	}
+
+	const res = await auth.api.createApiKey({
+		body: {
+			name: 'key',
+			userId: userId[0].id, // server-only
+			prefix: 'ak_',
+			remaining: 2
+		}
+	});
+
+	return res.key;
+};

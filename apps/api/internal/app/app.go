@@ -25,7 +25,10 @@ func New() (*App, error) {
 	}
 
 	stripeClient := stripe.NewClient(cfg.Stripe.SecretKey)
-	svc := services.NewService(cfg, store, stripeClient)
+	svc, err := services.NewService(cfg, store, stripeClient)
+	if err != nil {
+		return nil, err
+	}
 	srv := server.NewServer(cfg, svc, store)
 
 	return &App{

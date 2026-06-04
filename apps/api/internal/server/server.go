@@ -12,6 +12,7 @@ import (
 
 	"github.com/bored-bots/bored-template/internal/config"
 	"github.com/bored-bots/bored-template/internal/handlers/buddy_package"
+	"github.com/bored-bots/bored-template/internal/handlers/email"
 	"github.com/bored-bots/bored-template/internal/handlers/health"
 	"github.com/bored-bots/bored-template/internal/handlers/stripe"
 	"github.com/bored-bots/bored-template/internal/handlers/user"
@@ -42,6 +43,12 @@ func NewServer(cfg *config.Config, services *services.Services, store *store.Sto
 			Name:        "session-cookie",
 			Description: "cookie based authentication using session tokens.",
 		},
+		"apiKeyAuth": {
+			Type:        "apiKey",
+			Name:        "X-API-Key",
+			In:          "header",
+			Description: "API key authentication using X-API-Key header.",
+		},
 	}
 	api := humachi.New(router, humaConfig)
 	api.UseMiddleware(middleware.NewAuthMiddleware(api, &cfg.Auth))
@@ -58,6 +65,9 @@ func NewServer(cfg *config.Config, services *services.Services, store *store.Sto
 
 	userHandler := user_handler.NewHandler(services.UserService)
 	userHandler.RegisterRoutes(api)
+
+	emailHandler := email_handler.NewHandler(services.EmailService)
+	emailHandler.RegisterRoutes(api)
 
 	return &Server{
 		httpServer: &http.Server{
