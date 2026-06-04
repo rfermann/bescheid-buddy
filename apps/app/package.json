@@ -23,6 +23,7 @@
 		"openapi-ts": "openapi-ts"
 	},
 	"devDependencies": {
+		"@better-auth/api-key": "^1.6.11",
 		"@better-auth/cli": "^1.4.21",
 		"@eslint/compat": "^2.0.3",
 		"@eslint/js": "^10.0.1",
