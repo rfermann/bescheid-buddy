@@ -14,5 +14,9 @@
   "0003_lonely_doctor_faustus.sql": {
     "hash": "e3ca8de7c1bf13692e21adf9cf0988b21eebb1553a6838b3b7deb1d684e81b26",
     "gooseFile": "20260527120030_update_auth_3.sql"
+  },
+  "0004_careless_tinkerer.sql": {
+    "hash": "9cca3c6810e424fce6b64ee5f23d5dd61b872a5ad1a56d92e8c2c42f3f6bc27a",
+    "gooseFile": "20260622193905_update_auth_4.sql"
   }
 }

@@ -12,7 +12,7 @@ import { m } from '$lib/paraglide/messages.js';
 import { stripeClient } from '$lib/stripe';
 import { stripe } from '@better-auth/stripe';
 import { sendEmail } from '../../generated';
-import { user } from '$lib/server/db/auth.schema';
+import { users } from '$lib/server/db/auth.schema';
 import { sendEmail as sendEmail1 } from './mailer';
 import { eq } from 'drizzle-orm';
 
@@ -20,7 +20,14 @@ export const auth = betterAuth({
 	baseURL: env.ORIGIN,
 	secret: env.BETTER_AUTH_SECRET,
 	database: drizzleAdapter(db, { provider: 'pg' }),
+	account: {
+		modelName: 'accounts'
+	},
+	session: {
+		modelName: 'sessions'
+	},
 	user: {
+		modelName: 'users',
 		additionalFields: {
 			monthlyPoints: {
 				input: false,
@@ -35,6 +42,9 @@ export const auth = betterAuth({
 				type: 'number'
 			}
 		}
+	},
+	verification: {
+		modelName: 'verifications'
 	},
 	advanced: {
 		database: {
@@ -93,7 +103,12 @@ export const auth = betterAuth({
 			}
 		}),
 		apiKey({
-			enableSessionForAPIKeys: true
+			enableSessionForAPIKeys: true,
+			schema: {
+				apikey: {
+					modelName: 'apikeys'
+				}
+			}
 		}),
 		openAPI(),
 		stripe({
@@ -107,9 +122,9 @@ export const auth = betterAuth({
 
 const getAdminApiKey = async () => {
 	const userId = await db
-		.select({ id: user.id })
-		.from(user)
-		.where(eq(user.email, 'admin@admin.dev'))
+		.select({ id: users.id })
+		.from(users)
+		.where(eq(users.email, 'admin@admin.dev'))
 		.limit(1);
 
 	if (!userId.length) {
@@ -127,3 +142,5 @@ const getAdminApiKey = async () => {
 
 	return res.key;
 };
+
+export { getAdminApiKey };

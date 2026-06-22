@@ -9,7 +9,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 
-export const user = pgTable("user", {
+export const users = pgTable("users", {
   id: uuid("id")
     .default(sql`pg_catalog.gen_random_uuid()`)
     .primaryKey(),
@@ -30,8 +30,8 @@ export const user = pgTable("user", {
   lifetimePoints: integer("lifetime_points").default(0).notNull(),
 });
 
-export const session = pgTable(
-  "session",
+export const sessions = pgTable(
+  "sessions",
   {
     id: uuid("id")
       .default(sql`pg_catalog.gen_random_uuid()`)
@@ -46,13 +46,13 @@ export const session = pgTable(
     userAgent: text("user_agent"),
     userId: uuid("user_id")
       .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
+      .references(() => users.id, { onDelete: "cascade" }),
   },
-  (table) => [index("session_userId_idx").on(table.userId)],
+  (table) => [index("sessions_userId_idx").on(table.userId)],
 );
 
-export const account = pgTable(
-  "account",
+export const accounts = pgTable(
+  "accounts",
   {
     id: uuid("id")
       .default(sql`pg_catalog.gen_random_uuid()`)
@@ -61,7 +61,7 @@ export const account = pgTable(
     providerId: text("provider_id").notNull(),
     userId: uuid("user_id")
       .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
+      .references(() => users.id, { onDelete: "cascade" }),
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
@@ -76,11 +76,11 @@ export const account = pgTable(
     telegramId: text("telegram_id"),
     telegramUsername: text("telegram_username"),
   },
-  (table) => [index("account_userId_idx").on(table.userId)],
+  (table) => [index("accounts_userId_idx").on(table.userId)],
 );
 
-export const verification = pgTable(
-  "verification",
+export const verifications = pgTable(
+  "verifications",
   {
     id: uuid("id")
       .default(sql`pg_catalog.gen_random_uuid()`)
@@ -94,11 +94,11 @@ export const verification = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("verification_identifier_idx").on(table.identifier)],
+  (table) => [index("verifications_identifier_idx").on(table.identifier)],
 );
 
-export const apikey = pgTable(
-  "apikey",
+export const apikeys = pgTable(
+  "apikeys",
   {
     id: uuid("id")
       .default(sql`pg_catalog.gen_random_uuid()`)
@@ -126,27 +126,27 @@ export const apikey = pgTable(
     metadata: text("metadata"),
   },
   (table) => [
-    index("apikey_configId_idx").on(table.configId),
-    index("apikey_referenceId_idx").on(table.referenceId),
-    index("apikey_key_idx").on(table.key),
+    index("apikeys_configId_idx").on(table.configId),
+    index("apikeys_referenceId_idx").on(table.referenceId),
+    index("apikeys_key_idx").on(table.key),
   ],
 );
 
-export const userRelations = relations(user, ({ many }) => ({
-  sessions: many(session),
-  accounts: many(account),
+export const usersRelations = relations(users, ({ many }) => ({
+  sessionss: many(sessions),
+  accountss: many(accounts),
 }));
 
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  users: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
   }),
 }));
 
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
+export const accountsRelations = relations(accounts, ({ one }) => ({
+  users: one(users, {
+    fields: [accounts.userId],
+    references: [users.id],
   }),
 }));

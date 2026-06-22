@@ -58,11 +58,18 @@ for (let i = 0; i < files.length; i++) {
 	const outputFileName = `${timestamp}_${migrationName}.sql`;
 	const outputPath = join(outputDir, outputFileName);
 
-	const statements = sql.split(';').filter((s) => s.trim());
+	// Split into up and down sections
+	const upSection = sql.split('-- +goose Down')[0];
+	const downSection = sql.split('-- +goose Down')[1] || '';
+	
+	// Extract up statements (before any existing down section)
+	// Remove any existing goose annotations from up section
+	const cleanUpSection = upSection.replace(/-- \+goose.*$/gm, '').trim();
+	const upStatements = cleanUpSection.split(';').filter((s) => s.trim());
+	
+	const upSql = upStatements.join(';\n');
 
-	const upSql = statements.join(';\n');
-
-	const downSql = generateDownMigration(statements);
+	const downSql = generateDownMigration(upStatements);
 
 	const gooseSql = `-- +goose Up
 -- +goose StatementBegin
@@ -101,6 +108,10 @@ function generateDownMigration(statements) {
 				const indexName = trimmed.match(/CREATE INDEX\s+"?(\w+)"?/i)?.[1];
 				return `DROP INDEX IF EXISTS "${indexName}"`;
 			}
+			if (trimmed.startsWith('DROP INDEX')) {
+				const indexName = trimmed.match(/DROP INDEX\s+"?(\w+)"?/i)?.[1];
+				return `CREATE INDEX "${indexName}"`;
+			}
 			if (trimmed.startsWith('ALTER TABLE')) {
 				const tableName = trimmed.match(/ALTER TABLE\s+"?(\w+)"?/i)?.[1];
 				const constraintMatch = trimmed.match(/ADD CONSTRAINT\s+"?(\w+)"?/i);
@@ -108,10 +119,20 @@ function generateDownMigration(statements) {
 					const constraintName = constraintMatch[1];
 					return `ALTER TABLE "${tableName}" DROP CONSTRAINT "${constraintName}"`;
 				}
+				const dropConstraintMatch = trimmed.match(/DROP CONSTRAINT\s+"?(\w+)"?/i);
+				if (dropConstraintMatch) {
+					const constraintName = dropConstraintMatch[1];
+					return `ALTER TABLE "${tableName}" ADD CONSTRAINT "${constraintName}"`;
+				}
 				const columnMatch = trimmed.match(/ADD COLUMN\s+"?(\w+)"?/i);
 				if (columnMatch) {
 					const columnName = columnMatch[1];
 					return `ALTER TABLE "${tableName}" DROP COLUMN "${columnName}"`;
+				}
+				const renameMatch = trimmed.match(/RENAME TO\s+"?(\w+)"?/i);
+				if (renameMatch) {
+					const newName = renameMatch[1];
+					return `ALTER TABLE "${newName}" RENAME TO "${tableName}"`;
 				}
 			}
 			throw new Error(`Unsupported SQL statement for down migration: ${trimmed}`);
