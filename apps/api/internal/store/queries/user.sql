@@ -1,11 +1,11 @@
 -- name: UpdateUserPoints :exec
-UPDATE "user"
+UPDATE "users"
 SET lifetime_points = lifetime_points + $2,
     updated_at      = NOW()
 WHERE id = $1;
 
 -- name: UpdateUserStripeCustomerID :exec
-UPDATE "user"
+UPDATE "users"
 SET stripe_customer_id = $2,
     updated_at         = NOW()
 WHERE id = $1;
@@ -24,7 +24,7 @@ SELECT id,
        monthly_points,
        lifetime_points,
        stripe_customer_id
-FROM "user"
+FROM "users"
 WHERE id = $1;
 
 -- name: GetUserByStripeCustomerID :one
@@ -41,17 +41,17 @@ SELECT id,
        monthly_points,
        lifetime_points,
        stripe_customer_id
-FROM "user"
+FROM "users"
 WHERE stripe_customer_id = $1;
 
 -- name: GetBuddyPointsByUserID :one
 SELECT monthly_points,
        lifetime_points
-FROM "user"
+FROM "users"
 WHERE id = $1;
 
 -- name: InsertBuddyPointsLedger :exec
-INSERT INTO buddy_points_ledger (user_id,
+INSERT INTO buddy_points_ledgers (user_id,
                                  transaction_type,
                                  amount,
                                  monthly_points_before,
@@ -70,7 +70,7 @@ VALUES ($1,
         $7,
         $8,
         $9,
-        $1 0);
+        $10);
 
 -- name: GetBuddyPointsLedgerByUserID :many
 SELECT id,
@@ -85,6 +85,6 @@ SELECT id,
        related_entity_id,
        related_entity_type,
        created_at
-FROM buddy_points_ledger
+FROM buddy_points_ledgers
 WHERE user_id = $1
 ORDER BY created_at DESC;

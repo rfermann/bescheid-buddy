@@ -16,9 +16,9 @@ import (
 type RelatedEntityType string
 
 const (
-	RelatedEntityTypeBuddyPackage RelatedEntityType = "buddy_package"
-	RelatedEntityTypeUser         RelatedEntityType = "user"
-	RelatedEntityTypeNull         RelatedEntityType = "null"
+	RelatedEntityTypeBuddyPackages RelatedEntityType = "buddy_packages"
+	RelatedEntityTypeUser          RelatedEntityType = "user"
+	RelatedEntityTypeNull          RelatedEntityType = "null"
 )
 
 func (e *RelatedEntityType) Scan(src interface{}) error {
@@ -58,9 +58,115 @@ func (ns NullRelatedEntityType) Value() (driver.Value, error) {
 
 func AllRelatedEntityTypeValues() []RelatedEntityType {
 	return []RelatedEntityType{
-		RelatedEntityTypeBuddyPackage,
+		RelatedEntityTypeBuddyPackages,
 		RelatedEntityTypeUser,
 		RelatedEntityTypeNull,
+	}
+}
+
+type SupportCaseCategory string
+
+const (
+	SupportCaseCategoryGeneral        SupportCaseCategory = "general"
+	SupportCaseCategoryTechnical      SupportCaseCategory = "technical"
+	SupportCaseCategoryBilling        SupportCaseCategory = "billing"
+	SupportCaseCategoryFeatureRequest SupportCaseCategory = "feature_request"
+)
+
+func (e *SupportCaseCategory) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = SupportCaseCategory(s)
+	case string:
+		*e = SupportCaseCategory(s)
+	default:
+		return fmt.Errorf("unsupported scan type for SupportCaseCategory: %T", src)
+	}
+	return nil
+}
+
+type NullSupportCaseCategory struct {
+	SupportCaseCategory SupportCaseCategory `json:"support_case_category"`
+	Valid               bool                `json:"valid"` // Valid is true if SupportCaseCategory is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullSupportCaseCategory) Scan(value interface{}) error {
+	if value == nil {
+		ns.SupportCaseCategory, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.SupportCaseCategory.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullSupportCaseCategory) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.SupportCaseCategory), nil
+}
+
+func AllSupportCaseCategoryValues() []SupportCaseCategory {
+	return []SupportCaseCategory{
+		SupportCaseCategoryGeneral,
+		SupportCaseCategoryTechnical,
+		SupportCaseCategoryBilling,
+		SupportCaseCategoryFeatureRequest,
+	}
+}
+
+type SupportCaseStatus string
+
+const (
+	SupportCaseStatusOpen       SupportCaseStatus = "open"
+	SupportCaseStatusInProgress SupportCaseStatus = "in_progress"
+	SupportCaseStatusResolved   SupportCaseStatus = "resolved"
+	SupportCaseStatusClosed     SupportCaseStatus = "closed"
+)
+
+func (e *SupportCaseStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = SupportCaseStatus(s)
+	case string:
+		*e = SupportCaseStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for SupportCaseStatus: %T", src)
+	}
+	return nil
+}
+
+type NullSupportCaseStatus struct {
+	SupportCaseStatus SupportCaseStatus `json:"support_case_status"`
+	Valid             bool              `json:"valid"` // Valid is true if SupportCaseStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullSupportCaseStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.SupportCaseStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.SupportCaseStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullSupportCaseStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.SupportCaseStatus), nil
+}
+
+func AllSupportCaseStatusValues() []SupportCaseStatus {
+	return []SupportCaseStatus{
+		SupportCaseStatusOpen,
+		SupportCaseStatusInProgress,
+		SupportCaseStatusResolved,
+		SupportCaseStatusClosed,
 	}
 }
 
@@ -135,6 +241,31 @@ type Account struct {
 	TelegramUsername      pgtype.Text      `json:"telegram_username"`
 }
 
+type Apikey struct {
+	ID                  uuid.UUID        `json:"id"`
+	ConfigID            string           `json:"config_id"`
+	Name                pgtype.Text      `json:"name"`
+	Start               pgtype.Text      `json:"start"`
+	ReferenceID         string           `json:"reference_id"`
+	Prefix              pgtype.Text      `json:"prefix"`
+	Key                 string           `json:"key"`
+	RefillInterval      pgtype.Int4      `json:"refill_interval"`
+	RefillAmount        pgtype.Int4      `json:"refill_amount"`
+	LastRefillAt        pgtype.Timestamp `json:"last_refill_at"`
+	Enabled             pgtype.Bool      `json:"enabled"`
+	RateLimitEnabled    pgtype.Bool      `json:"rate_limit_enabled"`
+	RateLimitTimeWindow pgtype.Int4      `json:"rate_limit_time_window"`
+	RateLimitMax        pgtype.Int4      `json:"rate_limit_max"`
+	RequestCount        pgtype.Int4      `json:"request_count"`
+	Remaining           pgtype.Int4      `json:"remaining"`
+	LastRequest         pgtype.Timestamp `json:"last_request"`
+	ExpiresAt           pgtype.Timestamp `json:"expires_at"`
+	CreatedAt           pgtype.Timestamp `json:"created_at"`
+	UpdatedAt           pgtype.Timestamp `json:"updated_at"`
+	Permissions         pgtype.Text      `json:"permissions"`
+	Metadata            pgtype.Text      `json:"metadata"`
+}
+
 type BuddyPackage struct {
 	ID            uuid.UUID `json:"id"`
 	Name          string    `json:"name"`
@@ -169,6 +300,30 @@ type Session struct {
 	IpAddress pgtype.Text      `json:"ip_address"`
 	UserAgent pgtype.Text      `json:"user_agent"`
 	UserID    uuid.UUID        `json:"user_id"`
+}
+
+type SupportCase struct {
+	ID         uuid.UUID           `json:"id"`
+	UserID     uuid.UUID           `json:"user_id"`
+	Subject    string              `json:"subject"`
+	Status     SupportCaseStatus   `json:"status"`
+	Category   SupportCaseCategory `json:"category"`
+	UpdatedBy  pgtype.UUID         `json:"updated_by"`
+	CreatedAt  time.Time           `json:"created_at"`
+	UpdatedAt  time.Time           `json:"updated_at"`
+	ResolvedAt *time.Time          `json:"resolved_at"`
+}
+
+type SupportMessage struct {
+	ID         uuid.UUID   `json:"id"`
+	CaseID     uuid.UUID   `json:"case_id"`
+	UserID     uuid.UUID   `json:"user_id"`
+	Content    string      `json:"content"`
+	IsInternal bool        `json:"is_internal"`
+	IsRead     bool        `json:"is_read"`
+	UpdatedBy  pgtype.UUID `json:"updated_by"`
+	CreatedAt  time.Time   `json:"created_at"`
+	UpdatedAt  time.Time   `json:"updated_at"`
 }
 
 type User struct {

@@ -15,7 +15,7 @@ import (
 const getBuddyPointsByUserID = `-- name: GetBuddyPointsByUserID :one
 SELECT monthly_points,
        lifetime_points
-FROM "user"
+FROM "users"
 WHERE id = $1
 `
 
@@ -48,7 +48,7 @@ SELECT id,
        related_entity_id,
        related_entity_type,
        created_at
-FROM buddy_points_ledger
+FROM buddy_points_ledgers
 WHERE user_id = $1
 ORDER BY created_at DESC
 `
@@ -104,7 +104,7 @@ SELECT id,
        monthly_points,
        lifetime_points,
        stripe_customer_id
-FROM "user"
+FROM "users"
 WHERE id = $1
 `
 
@@ -147,7 +147,7 @@ SELECT id,
        monthly_points,
        lifetime_points,
        stripe_customer_id
-FROM "user"
+FROM "users"
 WHERE stripe_customer_id = $1
 `
 
@@ -177,29 +177,26 @@ func (q *Queries) GetUserByStripeCustomerID(ctx context.Context, arg GetUserBySt
 }
 
 const insertBuddyPointsLedger = `-- name: InsertBuddyPointsLedger :exec
-INSERT INTO buddy_points_ledger (
-    user_id,
-    transaction_type,
-    amount,
-    monthly_points_before,
-    lifetime_points_before,
-    monthly_points_after,
-    lifetime_points_after,
-    description,
-    related_entity_id,
-    related_entity_type
-) VALUES (
-    $1,
-    $2,
-    $3,
-    $4,
-    $5,
-    $6,
-    $7,
-    $8,
-    $9,
-    $10
-)
+INSERT INTO buddy_points_ledgers (user_id,
+                                 transaction_type,
+                                 amount,
+                                 monthly_points_before,
+                                 lifetime_points_before,
+                                 monthly_points_after,
+                                 lifetime_points_after,
+                                 description,
+                                 related_entity_id,
+                                 related_entity_type)
+VALUES ($1,
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        $7,
+        $8,
+        $9,
+        $10)
 `
 
 type InsertBuddyPointsLedgerParams struct {
@@ -232,7 +229,7 @@ func (q *Queries) InsertBuddyPointsLedger(ctx context.Context, arg InsertBuddyPo
 }
 
 const updateUserPoints = `-- name: UpdateUserPoints :exec
-UPDATE "user"
+UPDATE "users"
 SET lifetime_points = lifetime_points + $2,
     updated_at      = NOW()
 WHERE id = $1
@@ -249,9 +246,9 @@ func (q *Queries) UpdateUserPoints(ctx context.Context, arg UpdateUserPointsPara
 }
 
 const updateUserStripeCustomerID = `-- name: UpdateUserStripeCustomerID :exec
-UPDATE "user"
+UPDATE "users"
 SET stripe_customer_id = $2,
-    updated_at = NOW()
+    updated_at         = NOW()
 WHERE id = $1
 `
 
