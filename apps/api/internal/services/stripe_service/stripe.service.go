@@ -7,8 +7,8 @@ import (
 	"fmt"
 
 	"github.com/bored-bots/bored-template/internal/config"
-	"github.com/bored-bots/bored-template/internal/repository/buddy_package_repo"
-	"github.com/bored-bots/bored-template/internal/repository/user_repo"
+	"github.com/bored-bots/bored-template/internal/repository/buddy_packages_repository"
+	"github.com/bored-bots/bored-template/internal/repository/users_repository"
 	"github.com/bored-bots/bored-template/internal/store/db"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -17,13 +17,13 @@ import (
 )
 
 type Service struct {
-	buddyPackageRepo buddy_package_repo.Repository
-	userRepo         user_repo.Repository
+	buddyPackageRepo buddy_packages_repository.Repository
+	userRepo         users_repository.Repository
 	stripeClient     *stripe.Client
 	stripeConfig     *config.StripeConfig
 }
 
-func New(buddyPackageRepo buddy_package_repo.Repository, userRepo user_repo.Repository, stripeClient *stripe.Client, stripeConfig *config.StripeConfig) *Service {
+func New(buddyPackageRepo buddy_packages_repository.Repository, userRepo users_repository.Repository, stripeClient *stripe.Client, stripeConfig *config.StripeConfig) *Service {
 	return &Service{
 		buddyPackageRepo: buddyPackageRepo,
 		userRepo:         userRepo,
@@ -115,7 +115,7 @@ func (s *Service) HandleCheckoutSessionCompleted(ctx context.Context, event stri
 			Valid: true,
 		},
 		RelatedEntityType: db.NullRelatedEntityType{
-			RelatedEntityType: db.RelatedEntityTypeBuddyPackage,
+			RelatedEntityType: db.RelatedEntityTypeBuddyPackages,
 			Valid:             true,
 		},
 	})

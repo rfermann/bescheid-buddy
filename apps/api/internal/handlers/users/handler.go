@@ -1,19 +1,19 @@
-package user_handler
+package users_handler
 
 import (
 	"context"
 	"net/http"
 
 	appContext "github.com/bored-bots/bored-template/internal/context"
-	"github.com/bored-bots/bored-template/internal/services/user_service"
+	"github.com/bored-bots/bored-template/internal/services/users_service"
 	"github.com/danielgtaylor/huma/v2"
 )
 
 type Handler struct {
-	service *user_service.Service
+	service *users_service.Service
 }
 
-func NewHandler(service *user_service.Service) *Handler {
+func NewHandler(service *users_service.Service) *Handler {
 	return &Handler{
 		service: service,
 	}
@@ -29,7 +29,7 @@ type GetBuddyPointsOutput struct {
 }
 
 type GetBuddyPointsLedgerOutputBody struct {
-	Entries []user_service.LedgerEntry `json:"entries"`
+	Entries []users_service.LedgerEntry `json:"entries"`
 }
 
 type GetBuddyPointsLedgerOutput struct {

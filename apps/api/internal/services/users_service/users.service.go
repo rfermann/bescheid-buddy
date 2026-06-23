@@ -1,21 +1,21 @@
-package user_service
+package users_service
 
 import (
 	"context"
 	"time"
 
-	"github.com/bored-bots/bored-template/internal/repository/buddy_package_repo"
-	"github.com/bored-bots/bored-template/internal/repository/user_repo"
+	"github.com/bored-bots/bored-template/internal/repository/buddy_packages_repository"
+	"github.com/bored-bots/bored-template/internal/repository/users_repository"
 	"github.com/bored-bots/bored-template/internal/store/db"
 	"github.com/google/uuid"
 )
 
 type Service struct {
-	userRepo         user_repo.Repository
-	buddyPackageRepo buddy_package_repo.Repository
+	userRepo         users_repository.Repository
+	buddyPackageRepo buddy_packages_repository.Repository
 }
 
-func New(userRepo user_repo.Repository, buddyPackageRepo buddy_package_repo.Repository) *Service {
+func New(userRepo users_repository.Repository, buddyPackageRepo buddy_packages_repository.Repository) *Service {
 	return &Service{
 		userRepo:         userRepo,
 		buddyPackageRepo: buddyPackageRepo,
@@ -91,7 +91,7 @@ func (s *Service) GetBuddyPointsLedger(ctx context.Context, userID uuid.UUID) (*
 			relatedEntityType := string(entry.RelatedEntityType.RelatedEntityType)
 			ledgerEntry.RelatedEntityType = &relatedEntityType
 
-			if entry.RelatedEntityType.RelatedEntityType == db.RelatedEntityTypeBuddyPackage && entry.RelatedEntityID.Valid {
+			if entry.RelatedEntityType.RelatedEntityType == db.RelatedEntityTypeBuddyPackages && entry.RelatedEntityID.Valid {
 				relatedEntityUUID, _ := uuid.FromBytes(entry.RelatedEntityID.Bytes[:])
 				buddyPackage, err := s.buddyPackageRepo.GetBuddyPackageByID(ctx, db.GetBuddyPackageByIDParams{
 					ID: relatedEntityUUID,

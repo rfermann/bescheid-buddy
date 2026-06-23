@@ -1,4 +1,4 @@
-package user_repo
+package users_repository
 
 import (
 	"context"

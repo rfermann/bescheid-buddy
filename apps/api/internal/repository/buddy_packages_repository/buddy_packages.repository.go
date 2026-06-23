@@ -1,4 +1,4 @@
-package buddy_package_repo
+package buddy_packages_repository
 
 import (
 	"context"

@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/bored-bots/bored-template/internal/config"
-	"github.com/bored-bots/bored-template/internal/handlers/buddy_package"
+	"github.com/bored-bots/bored-template/internal/handlers/buddy_packages"
 	"github.com/bored-bots/bored-template/internal/handlers/email"
 	"github.com/bored-bots/bored-template/internal/handlers/health"
 	"github.com/bored-bots/bored-template/internal/handlers/stripe"
-	"github.com/bored-bots/bored-template/internal/handlers/user"
+	"github.com/bored-bots/bored-template/internal/handlers/users"
 	"github.com/bored-bots/bored-template/internal/middleware"
 	"github.com/bored-bots/bored-template/internal/services"
 	"github.com/bored-bots/bored-template/internal/store"
@@ -57,13 +57,13 @@ func NewServer(cfg *config.Config, services *services.Services, store *store.Sto
 	healthHandler := health_handler.NewHealthHandler(services.HealthService)
 	healthHandler.RegisterRoutes(apiV1)
 
-	buddyPackageHandler := buddy_package_handler.NewHandler(services.BuddyPackageService)
+	buddyPackageHandler := buddy_packages_handler.NewHandler(services.BuddyPackageService)
 	buddyPackageHandler.RegisterRoutes(api)
 
 	stripeHandler := stripe_handler.NewHandler(services.StripeService)
 	stripeHandler.RegisterRoutes(api)
 
-	userHandler := user_handler.NewHandler(services.UserService)
+	userHandler := users_handler.NewHandler(services.UserService)
 	userHandler.RegisterRoutes(api)
 
 	emailHandler := email_handler.NewHandler(services.EmailService)

@@ -1,19 +1,19 @@
-package buddy_package_handler
+package buddy_packages_handler
 
 import (
 	"context"
 	"net/http"
 
-	"github.com/bored-bots/bored-template/internal/services/buddy_package_service"
+	"github.com/bored-bots/bored-template/internal/services/buddy_packages_service"
 	"github.com/bored-bots/bored-template/internal/store/db"
 	"github.com/danielgtaylor/huma/v2"
 )
 
 type Handler struct {
-	service *buddy_package_service.Service
+	service *buddy_packages_service.Service
 }
 
-func NewHandler(service *buddy_package_service.Service) *Handler {
+func NewHandler(service *buddy_packages_service.Service) *Handler {
 	return &Handler{
 		service: service,
 	}
