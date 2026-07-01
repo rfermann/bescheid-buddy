@@ -308,22 +308,23 @@ type SupportCase struct {
 	Subject    string              `json:"subject"`
 	Status     SupportCaseStatus   `json:"status"`
 	Category   SupportCaseCategory `json:"category"`
-	UpdatedBy  pgtype.UUID         `json:"updated_by"`
+	UpdatedBy  uuid.UUID           `json:"updated_by"`
 	CreatedAt  time.Time           `json:"created_at"`
 	UpdatedAt  time.Time           `json:"updated_at"`
 	ResolvedAt *time.Time          `json:"resolved_at"`
 }
 
-type SupportMessage struct {
-	ID         uuid.UUID   `json:"id"`
-	CaseID     uuid.UUID   `json:"case_id"`
-	UserID     uuid.UUID   `json:"user_id"`
-	Content    string      `json:"content"`
-	IsInternal bool        `json:"is_internal"`
-	IsRead     bool        `json:"is_read"`
-	UpdatedBy  pgtype.UUID `json:"updated_by"`
-	CreatedAt  time.Time   `json:"created_at"`
-	UpdatedAt  time.Time   `json:"updated_at"`
+type SupportCaseMessage struct {
+	ID            uuid.UUID `json:"id"`
+	CaseID        uuid.UUID `json:"case_id"`
+	UserID        uuid.UUID `json:"user_id"`
+	Message       string    `json:"message"`
+	IsUserMessage bool      `json:"is_user_message"`
+	IsInternal    bool      `json:"is_internal"`
+	IsRead        bool      `json:"is_read"`
+	UpdatedBy     uuid.UUID `json:"updated_by"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 type User struct {

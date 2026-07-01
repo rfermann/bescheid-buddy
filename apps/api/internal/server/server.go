@@ -15,6 +15,7 @@ import (
 	"github.com/bored-bots/bored-template/internal/handlers/email"
 	"github.com/bored-bots/bored-template/internal/handlers/health"
 	"github.com/bored-bots/bored-template/internal/handlers/stripe"
+	support_cases_handler "github.com/bored-bots/bored-template/internal/handlers/support_cases"
 	"github.com/bored-bots/bored-template/internal/handlers/users"
 	"github.com/bored-bots/bored-template/internal/middleware"
 	"github.com/bored-bots/bored-template/internal/services"
@@ -68,6 +69,9 @@ func NewServer(cfg *config.Config, services *services.Services, store *store.Sto
 
 	emailHandler := email_handler.NewHandler(services.EmailService)
 	emailHandler.RegisterRoutes(api)
+
+	supportCasesHandler := support_cases_handler.NewHandler(services.SupportCasesService)
+	supportCasesHandler.RegisterRoutes(apiV1)
 
 	return &Server{
 		httpServer: &http.Server{
