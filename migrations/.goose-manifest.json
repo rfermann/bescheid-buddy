@@ -18,5 +18,9 @@
   "0004_careless_tinkerer.sql": {
     "hash": "9cca3c6810e424fce6b64ee5f23d5dd61b872a5ad1a56d92e8c2c42f3f6bc27a",
     "gooseFile": "20260622193905_update_auth_4.sql"
+  },
+  "0005_natural_morph.sql": {
+    "hash": "88934fa0be30d02698fa58de5b9a7bec987d579e9dbcb7739e8b52fe14d454ba",
+    "gooseFile": "20260701082956_update_auth_5.sql"
   }
 }

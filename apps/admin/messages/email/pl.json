@@ -1,0 +1,4 @@
+{
+	"email_loginCodeSubject": "Twój kod logowania",
+	"email_loginCodeText": "Twój kod jednorazowy do logowania: {code}\n\nTen kod jest ważny przez {mins} minut.\n\nJeśli nie prosiłeś o ten kod, zignoruj tę wiadomość."
+}

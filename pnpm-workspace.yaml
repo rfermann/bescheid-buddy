@@ -3,6 +3,7 @@ packages:
 
 onlyBuiltDependencies:
   - esbuild
+  - '@tailwindcss/oxide'
 
 patchedDependencies:
   '@better-auth/core@1.6.10': patches/@better-auth__core@1.6.10.patch
