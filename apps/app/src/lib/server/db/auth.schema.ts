@@ -26,6 +26,10 @@ export const users = pgTable("users", {
   telegramPhoneNumber: text("telegram_phone_number"),
   telegramUsername: text("telegram_username"),
   stripeCustomerId: text("stripe_customer_id"),
+  role: text("role"),
+  banned: boolean("banned").default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires"),
   monthlyPoints: integer("monthly_points").default(5).notNull(),
   lifetimePoints: integer("lifetime_points").default(0).notNull(),
 });
@@ -47,6 +51,7 @@ export const sessions = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    impersonatedBy: text("impersonated_by"),
   },
   (table) => [index("sessions_userId_idx").on(table.userId)],
 );

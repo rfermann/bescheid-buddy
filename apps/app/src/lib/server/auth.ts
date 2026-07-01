@@ -6,7 +6,7 @@ import { env } from '$env/dynamic/private';
 import { getRequestEvent } from '$app/server';
 import { db } from '$lib/server/db';
 import { telegram } from 'better-auth-telegram';
-import { emailOTP, openAPI } from 'better-auth/plugins';
+import { admin, emailOTP, openAPI } from 'better-auth/plugins';
 import { getOtpEmail, renderEmail } from '$lib/server/email-renderer';
 import { m } from '$lib/paraglide/messages.js';
 import { stripeClient } from '$lib/stripe';
@@ -115,6 +115,9 @@ export const auth = betterAuth({
 			stripeClient,
 			stripeWebhookSecret: env.STRIPE_WEBHOOK_SECRET,
 			createCustomerOnSignUp: true
+		}),
+		admin({
+			defaultRole: 'admin'
 		}),
 		sveltekitCookies(getRequestEvent) // make sure this is the last plugin in the array
 	]
