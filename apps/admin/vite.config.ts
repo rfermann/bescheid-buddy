@@ -15,7 +15,9 @@ export default defineConfig(({ mode }) => {
 			paraglideVitePlugin({ project: './project.inlang', outdir: './src/lib/paraglide' })
 		],
 		server: {
-			allowedHosts: env.ADMIN_ALLOWED_HOST ? [env.ADMIN_ALLOWED_HOST] : undefined
+			allowedHosts: env.ADMIN_ALLOWED_HOST ? [env.ADMIN_ALLOWED_HOST] : undefined,
+			host: '0.0.0.0',
+			port: 5173
 		},
 		test: {
 			expect: { requireAssertions: true },
