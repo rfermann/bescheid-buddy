@@ -103,6 +103,14 @@ export type GetAllBuddyPackagesOutputBody = {
     packages: Array<BuddyPackage> | null;
 };
 
+export type GetAllSupportCasesOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    cases: Array<SupportCase> | null;
+};
+
 export type GetBuddyPointsLedgerOutputBody = {
     /**
      * A URL to the JSON Schema for this object.
@@ -263,6 +271,10 @@ export type GetAllBuddyPackagesOutputBodyWritable = {
     packages: Array<BuddyPackage> | null;
 };
 
+export type GetAllSupportCasesOutputBodyWritable = {
+    cases: Array<SupportCase> | null;
+};
+
 export type GetBuddyPointsLedgerOutputBodyWritable = {
     entries: Array<LedgerEntry> | null;
 };
@@ -300,6 +312,31 @@ export type SendEmailInputBodyWritable = {
 export type SendEmailOutputBodyWritable = {
     message: string;
 };
+
+export type GetAllSupportCasesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/support-cases';
+};
+
+export type GetAllSupportCasesErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetAllSupportCasesError = GetAllSupportCasesErrors[keyof GetAllSupportCasesErrors];
+
+export type GetAllSupportCasesResponses = {
+    /**
+     * OK
+     */
+    200: GetAllSupportCasesOutputBody;
+};
+
+export type GetAllSupportCasesResponse = GetAllSupportCasesResponses[keyof GetAllSupportCasesResponses];
 
 export type GetAllBuddyPackagesData = {
     body?: never;

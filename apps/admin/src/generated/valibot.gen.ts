@@ -128,6 +128,11 @@ export const vCreateSupportCaseOutputBody = v.strictObject({
     case: vSupportCase
 });
 
+export const vGetAllSupportCasesOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    cases: v.nullable(v.array(vSupportCase))
+});
+
 export const vGetSupportCaseByIdOutputBody = v.strictObject({
     $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
     supportCase: vSupportCase
@@ -197,6 +202,10 @@ export const vGetAllBuddyPackagesOutputBodyWritable = v.strictObject({
     packages: v.nullable(v.array(vBuddyPackage))
 });
 
+export const vGetAllSupportCasesOutputBodyWritable = v.strictObject({
+    cases: v.nullable(v.array(vSupportCase))
+});
+
 export const vGetBuddyPointsLedgerOutputBodyWritable = v.strictObject({
     entries: v.nullable(v.array(vLedgerEntry))
 });
@@ -234,6 +243,11 @@ export const vSendEmailInputBodyWritable = v.strictObject({
 export const vSendEmailOutputBodyWritable = v.strictObject({
     message: v.string()
 });
+
+/**
+ * OK
+ */
+export const vGetAllSupportCasesResponse = vGetAllSupportCasesOutputBody;
 
 /**
  * OK
