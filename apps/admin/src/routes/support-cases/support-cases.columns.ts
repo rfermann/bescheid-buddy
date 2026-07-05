@@ -21,16 +21,21 @@ const formatDate = (date: Date) => {
 		day: 'numeric',
 		year: 'numeric',
 		hour: '2-digit',
-		minute: '2-digit'
+		minute: '2-digit',
+		hourCycle: 'h24'
 	});
 };
 
 export const createColumns = (snippets: {
 	statusSnippet: Snippet<[{ status: string }]>;
+	subjectSnippet: Snippet<[{ subject: string }]>;
+	actionsSnippet: Snippet<[{ id: string }]>;
 }) => [
 	columnHelper.accessor('subject', {
 		header: 'Subject',
-		cell: (info) => info.getValue()
+		cell: (info) => {
+			return renderSnippet(snippets.subjectSnippet, { subject: info.getValue() });
+		}
 	}),
 	columnHelper.accessor('status', {
 		header: 'Status',
@@ -53,5 +58,13 @@ export const createColumns = (snippets: {
 	columnHelper.accessor('updated_at', {
 		header: 'Updated',
 		cell: (info) => formatDate(info.getValue())
+	}),
+	columnHelper.display({
+		id: 'actions',
+		header: 'Actions',
+		cell: (info) => {
+			const id = info.row.original.id;
+			return renderSnippet(snippets.actionsSnippet, { id });
+		}
 	})
 ];

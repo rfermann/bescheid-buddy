@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import * as Table from '$lib/components/ui/table';
 	import * as Select from '$lib/components/ui/select';
-	import * as Card from '$lib/components/ui/card';
+	import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '$lib/components/ui/card';
 	import RefreshCwIcon from '@lucide/svelte/icons/refresh-cw';
 	import { getSupportCases } from './support-cases.remote';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table';
@@ -39,7 +39,9 @@
 	};
 
 	const columns = createColumns({
-		statusSnippet
+		statusSnippet,
+		subjectSnippet,
+		actionsSnippet
 	});
 
 	const table = $derived(
@@ -60,13 +62,23 @@
 	</span>
 {/snippet}
 
+{#snippet subjectSnippet(params: { subject: string })}
+	<span class="font-medium">{params.subject}</span>
+{/snippet}
+
+{#snippet actionsSnippet(params: { id: string })}
+	<Button variant="default" size="sm" href="/support-cases/{params.id}">
+		Details
+	</Button>
+{/snippet}
+
 <div class="space-y-4">
-	<Card.Root>
-		<Card.Header>
-			<Card.Title>Support Cases</Card.Title>
-			<Card.Description>View and manage all support cases</Card.Description>
-		</Card.Header>
-		<Card.Content class="space-y-4">
+	<Card>
+		<CardHeader>
+			<CardTitle>Support Cases</CardTitle>
+			<CardDescription>View and manage all support cases</CardDescription>
+		</CardHeader>
+		<CardContent class="space-y-4">
 			<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<div class="flex flex-col gap-2 sm:flex-row sm:gap-4">
 					<div class="flex flex-col gap-1">
@@ -169,6 +181,6 @@
 				support
 				cases
 			</div>
-		</Card.Content>
-	</Card.Root>
+		</CardContent>
+	</Card>
 </div>

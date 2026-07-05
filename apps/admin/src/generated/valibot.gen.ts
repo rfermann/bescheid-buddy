@@ -35,6 +35,13 @@ export const vCreateSupportCaseInputBody = v.strictObject({
     subject: v.pipe(v.string(), v.maxLength(255))
 });
 
+export const vCreateSupportCaseMessageInputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    isInternal: v.nullish(v.boolean(), false),
+    isUserMessage: v.nullish(v.boolean(), true),
+    message: v.pipe(v.string(), v.maxLength(255))
+});
+
 export const vErrorDetail = v.strictObject({
     location: v.optional(v.string()),
     message: v.optional(v.string()),
@@ -156,9 +163,28 @@ export const vSupportCaseMessage = v.strictObject({
     user_id: v.string()
 });
 
+export const vCreateSupportCaseMessageOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    message: vSupportCaseMessage
+});
+
 export const vGetSupportCaseMessagesBySupportCaseIdOutputBody = v.strictObject({
     $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
     messages: v.nullable(v.array(vSupportCaseMessage))
+});
+
+export const vUpdateSupportCaseStatusInputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    status: v.picklist([
+        'in_progress',
+        'resolved',
+        'closed'
+    ])
+});
+
+export const vUpdateSupportCaseStatusOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    case: vSupportCase
 });
 
 export const vCreateCheckoutSessionInputBodyWritable = v.strictObject({
@@ -179,6 +205,16 @@ export const vCreateSupportCaseInputBodyWritable = v.strictObject({
     ]),
     message: v.pipe(v.string(), v.maxLength(255)),
     subject: v.pipe(v.string(), v.maxLength(255))
+});
+
+export const vCreateSupportCaseMessageInputBodyWritable = v.strictObject({
+    isInternal: v.nullish(v.boolean(), false),
+    isUserMessage: v.nullish(v.boolean(), true),
+    message: v.pipe(v.string(), v.maxLength(255))
+});
+
+export const vCreateSupportCaseMessageOutputBodyWritable = v.strictObject({
+    message: vSupportCaseMessage
 });
 
 export const vCreateSupportCaseOutputBodyWritable = v.strictObject({
@@ -244,6 +280,18 @@ export const vSendEmailOutputBodyWritable = v.strictObject({
     message: v.string()
 });
 
+export const vUpdateSupportCaseStatusInputBodyWritable = v.strictObject({
+    status: v.picklist([
+        'in_progress',
+        'resolved',
+        'closed'
+    ])
+});
+
+export const vUpdateSupportCaseStatusOutputBodyWritable = v.strictObject({
+    case: vSupportCase
+});
+
 /**
  * OK
  */
@@ -294,6 +342,17 @@ export const vGetSupportCaseMessagesByCaseIdPath = v.object({
  */
 export const vGetSupportCaseMessagesByCaseIdResponse = vGetSupportCaseMessagesBySupportCaseIdOutputBody;
 
+export const vCreateSupportCaseMessageBody = vCreateSupportCaseMessageInputBodyWritable;
+
+export const vCreateSupportCaseMessagePath = v.object({
+    caseId: v.string()
+});
+
+/**
+ * OK
+ */
+export const vCreateSupportCaseMessageResponse = vCreateSupportCaseMessageOutputBody;
+
 export const vGetSupportCaseByIdPath = v.object({
     id: v.string()
 });
@@ -302,6 +361,17 @@ export const vGetSupportCaseByIdPath = v.object({
  * OK
  */
 export const vGetSupportCaseByIdResponse = vGetSupportCaseByIdOutputBody;
+
+export const vUpdateSupportCaseStatusBody = vUpdateSupportCaseStatusInputBodyWritable;
+
+export const vUpdateSupportCaseStatusPath = v.object({
+    id: v.string()
+});
+
+/**
+ * OK
+ */
+export const vUpdateSupportCaseStatusResponse = vUpdateSupportCaseStatusOutputBody;
 
 /**
  * OK

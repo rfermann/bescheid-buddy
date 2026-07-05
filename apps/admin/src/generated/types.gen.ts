@@ -41,6 +41,24 @@ export type CreateSupportCaseInputBody = {
     subject: string;
 };
 
+export type CreateSupportCaseMessageInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    isInternal: boolean | null;
+    isUserMessage: boolean | null;
+    message: string;
+};
+
+export type CreateSupportCaseMessageOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    message: SupportCaseMessage;
+};
+
 export type CreateSupportCaseOutputBody = {
     /**
      * A URL to the JSON Schema for this object.
@@ -221,6 +239,22 @@ export type SupportCaseMessage = {
     user_id: string;
 };
 
+export type UpdateSupportCaseStatusInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    status: 'in_progress' | 'resolved' | 'closed';
+};
+
+export type UpdateSupportCaseStatusOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    case: SupportCase;
+};
+
 export type CreateCheckoutSessionInputBodyWritable = {
     package_name: string;
     stripe_price_id: string;
@@ -234,6 +268,16 @@ export type CreateSupportCaseInputBodyWritable = {
     category: 'general' | 'technical' | 'billing' | 'feature_request';
     message: string;
     subject: string;
+};
+
+export type CreateSupportCaseMessageInputBodyWritable = {
+    isInternal: boolean | null;
+    isUserMessage: boolean | null;
+    message: string;
+};
+
+export type CreateSupportCaseMessageOutputBodyWritable = {
+    message: SupportCaseMessage;
 };
 
 export type CreateSupportCaseOutputBodyWritable = {
@@ -311,6 +355,14 @@ export type SendEmailInputBodyWritable = {
 
 export type SendEmailOutputBodyWritable = {
     message: string;
+};
+
+export type UpdateSupportCaseStatusInputBodyWritable = {
+    status: 'in_progress' | 'resolved' | 'closed';
+};
+
+export type UpdateSupportCaseStatusOutputBodyWritable = {
+    case: SupportCase;
 };
 
 export type GetAllSupportCasesData = {
@@ -515,6 +567,33 @@ export type GetSupportCaseMessagesByCaseIdResponses = {
 
 export type GetSupportCaseMessagesByCaseIdResponse = GetSupportCaseMessagesByCaseIdResponses[keyof GetSupportCaseMessagesByCaseIdResponses];
 
+export type CreateSupportCaseMessageData = {
+    body: CreateSupportCaseMessageInputBodyWritable;
+    path: {
+        caseId: string;
+    };
+    query?: never;
+    url: '/v1/support-cases/{caseId}/messages';
+};
+
+export type CreateSupportCaseMessageErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type CreateSupportCaseMessageError = CreateSupportCaseMessageErrors[keyof CreateSupportCaseMessageErrors];
+
+export type CreateSupportCaseMessageResponses = {
+    /**
+     * OK
+     */
+    200: CreateSupportCaseMessageOutputBody;
+};
+
+export type CreateSupportCaseMessageResponse = CreateSupportCaseMessageResponses[keyof CreateSupportCaseMessageResponses];
+
 export type GetSupportCaseByIdData = {
     body?: never;
     path: {
@@ -541,6 +620,33 @@ export type GetSupportCaseByIdResponses = {
 };
 
 export type GetSupportCaseByIdResponse = GetSupportCaseByIdResponses[keyof GetSupportCaseByIdResponses];
+
+export type UpdateSupportCaseStatusData = {
+    body: UpdateSupportCaseStatusInputBodyWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/support-cases/{id}/status';
+};
+
+export type UpdateSupportCaseStatusErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UpdateSupportCaseStatusError = UpdateSupportCaseStatusErrors[keyof UpdateSupportCaseStatusErrors];
+
+export type UpdateSupportCaseStatusResponses = {
+    /**
+     * OK
+     */
+    200: UpdateSupportCaseStatusOutputBody;
+};
+
+export type UpdateSupportCaseStatusResponse = UpdateSupportCaseStatusResponses[keyof UpdateSupportCaseStatusResponses];
 
 export type GetBuddyPointsData = {
     body?: never;

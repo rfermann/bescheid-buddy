@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import { createSupportCaseResponseTransformer, getAllBuddyPackagesResponseTransformer, getAllSupportCasesResponseTransformer, getSupportCaseByIdResponseTransformer, getSupportCaseMessagesByCaseIdResponseTransformer, getSupportCasesByUserResponseTransformer } from './transformers.gen';
-import type { CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, CreateSupportCaseData, CreateSupportCaseErrors, CreateSupportCaseResponses, GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetAllSupportCasesData, GetAllSupportCasesErrors, GetAllSupportCasesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, GetSupportCaseByIdData, GetSupportCaseByIdErrors, GetSupportCaseByIdResponses, GetSupportCaseMessagesByCaseIdData, GetSupportCaseMessagesByCaseIdErrors, GetSupportCaseMessagesByCaseIdResponses, GetSupportCasesByUserData, GetSupportCasesByUserErrors, GetSupportCasesByUserResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, SendEmailData, SendEmailErrors, SendEmailResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses } from './types.gen';
+import { createSupportCaseMessageResponseTransformer, createSupportCaseResponseTransformer, getAllBuddyPackagesResponseTransformer, getAllSupportCasesResponseTransformer, getSupportCaseByIdResponseTransformer, getSupportCaseMessagesByCaseIdResponseTransformer, getSupportCasesByUserResponseTransformer, updateSupportCaseStatusResponseTransformer } from './transformers.gen';
+import type { CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, CreateSupportCaseData, CreateSupportCaseErrors, CreateSupportCaseMessageData, CreateSupportCaseMessageErrors, CreateSupportCaseMessageResponses, CreateSupportCaseResponses, GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetAllSupportCasesData, GetAllSupportCasesErrors, GetAllSupportCasesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, GetSupportCaseByIdData, GetSupportCaseByIdErrors, GetSupportCaseByIdResponses, GetSupportCaseMessagesByCaseIdData, GetSupportCaseMessagesByCaseIdErrors, GetSupportCaseMessagesByCaseIdResponses, GetSupportCasesByUserData, GetSupportCasesByUserErrors, GetSupportCasesByUserResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, SendEmailData, SendEmailErrors, SendEmailResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses, UpdateSupportCaseStatusData, UpdateSupportCaseStatusErrors, UpdateSupportCaseStatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -115,6 +115,21 @@ export const getSupportCaseMessagesByCaseId = <ThrowOnError extends boolean = fa
 });
 
 /**
+ * Create support case message
+ *
+ * Create a new message for a support case
+ */
+export const createSupportCaseMessage = <ThrowOnError extends boolean = false>(options: Options<CreateSupportCaseMessageData, ThrowOnError>) => (options.client ?? client).post<CreateSupportCaseMessageResponses, CreateSupportCaseMessageErrors, ThrowOnError>({
+    responseTransformer: createSupportCaseMessageResponseTransformer,
+    url: '/v1/support-cases/{caseId}/messages',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Get support case by ID
  *
  * Get support case by ID
@@ -123,6 +138,21 @@ export const getSupportCaseById = <ThrowOnError extends boolean = false>(options
     responseTransformer: getSupportCaseByIdResponseTransformer,
     url: '/v1/support-cases/{id}',
     ...options
+});
+
+/**
+ * Update support case status
+ *
+ * Update the status of a support case
+ */
+export const updateSupportCaseStatus = <ThrowOnError extends boolean = false>(options: Options<UpdateSupportCaseStatusData, ThrowOnError>) => (options.client ?? client).patch<UpdateSupportCaseStatusResponses, UpdateSupportCaseStatusErrors, ThrowOnError>({
+    responseTransformer: updateSupportCaseStatusResponseTransformer,
+    url: '/v1/support-cases/{id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
 });
 
 /**
