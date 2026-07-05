@@ -292,14 +292,15 @@ type BuddyPointsLedger struct {
 }
 
 type Session struct {
-	ID        uuid.UUID        `json:"id"`
-	ExpiresAt pgtype.Timestamp `json:"expires_at"`
-	Token     string           `json:"token"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
-	UpdatedAt pgtype.Timestamp `json:"updated_at"`
-	IpAddress pgtype.Text      `json:"ip_address"`
-	UserAgent pgtype.Text      `json:"user_agent"`
-	UserID    uuid.UUID        `json:"user_id"`
+	ID             uuid.UUID        `json:"id"`
+	ExpiresAt      pgtype.Timestamp `json:"expires_at"`
+	Token          string           `json:"token"`
+	CreatedAt      pgtype.Timestamp `json:"created_at"`
+	UpdatedAt      pgtype.Timestamp `json:"updated_at"`
+	IpAddress      pgtype.Text      `json:"ip_address"`
+	UserAgent      pgtype.Text      `json:"user_agent"`
+	UserID         uuid.UUID        `json:"user_id"`
+	ImpersonatedBy pgtype.Text      `json:"impersonated_by"`
 }
 
 type SupportCase struct {
@@ -341,6 +342,10 @@ type User struct {
 	MonthlyPoints       int32            `json:"monthly_points"`
 	LifetimePoints      int32            `json:"lifetime_points"`
 	StripeCustomerID    pgtype.Text      `json:"stripe_customer_id"`
+	Role                pgtype.Text      `json:"role"`
+	Banned              pgtype.Bool      `json:"banned"`
+	BanReason           pgtype.Text      `json:"ban_reason"`
+	BanExpires          pgtype.Timestamp `json:"ban_expires"`
 }
 
 type Verification struct {

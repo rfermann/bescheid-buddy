@@ -3,6 +3,7 @@ package support_cases_handler
 import (
 	"net/http"
 
+	"github.com/bored-bots/bored-template/internal/middleware"
 	"github.com/bored-bots/bored-template/internal/services/support_cases_service"
 	"github.com/danielgtaylor/huma/v2"
 )
@@ -57,4 +58,34 @@ func (h *Handler) RegisterRoutes(api huma.API) {
 		Tags:        []string{"Support Cases"},
 		Security:    []map[string][]string{{"session-cookie": {}}},
 	}, h.GetSupportCaseMessagesBySupportCaseID)
+
+	huma.Register(api, huma.Operation{
+		OperationID: "create-support-case-message",
+		Method:      http.MethodPost,
+		Path:        "/support-cases/{caseId}/messages",
+		Summary:     "Create support case message",
+		Description: "Create a new message for a support case",
+		Tags:        []string{"Support Cases"},
+		Security:    []map[string][]string{{"session-cookie": {}}},
+	}, h.CreateSupportCaseMessage)
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-all-support-cases",
+		Method:      http.MethodGet,
+		Path:        "/admin/support-cases",
+		Summary:     "Get all support cases",
+		Description: "Get all support cases (admin only)",
+		Tags:        []string{"Support Cases"},
+		Security:    []map[string][]string{{"session-cookie": {middleware.RoleAdmin}}},
+	}, h.GetAllSupportCases)
+
+	huma.Register(api, huma.Operation{
+		OperationID: "update-support-case-status",
+		Method:      http.MethodPatch,
+		Path:        "/support-cases/{id}/status",
+		Summary:     "Update support case status",
+		Description: "Update the status of a support case",
+		Tags:        []string{"Support Cases"},
+		Security:    []map[string][]string{{"session-cookie": {}}},
+	}, h.UpdateSupportCaseStatus)
 }

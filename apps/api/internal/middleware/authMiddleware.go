@@ -11,6 +11,8 @@ import (
 	"github.com/danielgtaylor/huma/v2"
 )
 
+const RoleAdmin = "admin"
+
 type SessionResponse struct {
 	Session struct {
 		UserID string `json:"userId"`
@@ -21,6 +23,7 @@ type SessionResponse struct {
 		ID    string `json:"id"`
 		Email string `json:"email"`
 		Name  string `json:"name"`
+		Role  string `json:"role"`
 	} `json:"user"`
 }
 
@@ -28,6 +31,7 @@ type UserContext struct {
 	ID    string
 	Email string
 	Name  string
+	Role  string
 }
 
 func NewAuthMiddleware(api huma.API, authConfig *config.AuthConfig) func(ctx huma.Context, next func(ctx2 huma.Context)) {
@@ -116,9 +120,34 @@ func NewAuthMiddleware(api huma.API, authConfig *config.AuthConfig) func(ctx hum
 			ID:    sessionResp.User.ID,
 			Email: sessionResp.User.Email,
 			Name:  sessionResp.User.Name,
+			Role:  sessionResp.User.Role,
 		}
 
 		ctx = context.WithUserID(ctx, userCtx.ID)
+
+		for _, schemeMap := range schemes {
+			if requiredRoles, exists := schemeMap["session-cookie"]; exists {
+				if len(requiredRoles) > 0 {
+
+					if userCtx.Role == RoleAdmin {
+						break
+					}
+
+					hasRequiredRole := false
+					for _, requiredRole := range requiredRoles {
+						if userCtx.Role == requiredRole {
+							hasRequiredRole = true
+							break
+						}
+					}
+					if !hasRequiredRole {
+						log.Printf("User %s does not have required role. User role: %s, Required roles: %v", userCtx.ID, userCtx.Role, requiredRoles)
+						huma.WriteErr(api, ctx, http.StatusForbidden, "Insufficient permissions")
+						return
+					}
+				}
+			}
+		}
 
 		next(ctx)
 	}

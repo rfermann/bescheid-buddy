@@ -11,36 +11,12 @@ SET stripe_customer_id = $2,
 WHERE id = $1;
 
 -- name: GetUserByID :one
-SELECT id,
-       name,
-       email,
-       email_verified,
-       image,
-       created_at,
-       updated_at,
-       telegram_id,
-       telegram_phone_number,
-       telegram_username,
-       monthly_points,
-       lifetime_points,
-       stripe_customer_id
+SELECT *
 FROM "users"
 WHERE id = $1;
 
 -- name: GetUserByStripeCustomerID :one
-SELECT id,
-       name,
-       email,
-       email_verified,
-       image,
-       created_at,
-       updated_at,
-       telegram_id,
-       telegram_phone_number,
-       telegram_username,
-       monthly_points,
-       lifetime_points,
-       stripe_customer_id
+SELECT *
 FROM "users"
 WHERE stripe_customer_id = $1;
 

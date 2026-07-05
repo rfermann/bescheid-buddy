@@ -88,6 +88,68 @@ func (q *Queries) CreateSupportCaseMessage(ctx context.Context, arg CreateSuppor
 	return &i, err
 }
 
+const getAllSupportCases = `-- name: GetAllSupportCases :many
+SELECT id, user_id, subject, status, category, updated_by, created_at, updated_at, resolved_at
+FROM support_cases
+`
+
+func (q *Queries) GetAllSupportCases(ctx context.Context) ([]*SupportCase, error) {
+	rows, err := q.db.Query(ctx, getAllSupportCases)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*SupportCase
+	for rows.Next() {
+		var i SupportCase
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Subject,
+			&i.Status,
+			&i.Category,
+			&i.UpdatedBy,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.ResolvedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getSupportCase = `-- name: GetSupportCase :one
+SELECT id, user_id, subject, status, category, updated_by, created_at, updated_at, resolved_at
+FROM support_cases
+WHERE id = $1
+`
+
+type GetSupportCaseParams struct {
+	ID uuid.UUID `json:"id"`
+}
+
+func (q *Queries) GetSupportCase(ctx context.Context, arg GetSupportCaseParams) (*SupportCase, error) {
+	row := q.db.QueryRow(ctx, getSupportCase, arg.ID)
+	var i SupportCase
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Subject,
+		&i.Status,
+		&i.Category,
+		&i.UpdatedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ResolvedAt,
+	)
+	return &i, err
+}
+
 const getSupportCaseByID = `-- name: GetSupportCaseByID :one
 SELECT id, user_id, subject, status, category, updated_by, created_at, updated_at, resolved_at
 FROM support_cases
@@ -201,4 +263,23 @@ func (q *Queries) GetSupportCasesByUserID(ctx context.Context, arg GetSupportCas
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateSupportCaseStatus = `-- name: UpdateSupportCaseStatus :exec
+UPDATE support_cases
+SET status = $2,
+    updated_by = $3,
+    updated_at = NOW()
+WHERE id = $1
+`
+
+type UpdateSupportCaseStatusParams struct {
+	ID        uuid.UUID         `json:"id"`
+	Status    SupportCaseStatus `json:"status"`
+	UpdatedBy uuid.UUID         `json:"updated_by"`
+}
+
+func (q *Queries) UpdateSupportCaseStatus(ctx context.Context, arg UpdateSupportCaseStatusParams) error {
+	_, err := q.db.Exec(ctx, updateSupportCaseStatus, arg.ID, arg.Status, arg.UpdatedBy)
+	return err
 }

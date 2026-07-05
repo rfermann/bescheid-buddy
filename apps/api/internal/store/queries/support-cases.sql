@@ -14,6 +14,11 @@ FROM support_cases
 WHERE id = $1
   AND user_id = $2;
 
+-- name: GetSupportCase :one
+SELECT *
+FROM support_cases
+WHERE id = $1;
+
 -- name: GetSupportCasesByUserID :many
 SELECT *
 FROM support_cases
@@ -27,3 +32,14 @@ WHERE case_id = $1
              FROM support_cases
              WHERE id = smc.case_id
                AND support_cases.user_id = $2);
+
+-- name: GetAllSupportCases :many
+SELECT *
+FROM support_cases;
+
+-- name: UpdateSupportCaseStatus :exec
+UPDATE support_cases
+SET status = $2,
+    updated_by = $3,
+    updated_at = NOW()
+WHERE id = $1;

@@ -91,19 +91,7 @@ func (q *Queries) GetBuddyPointsLedgerByUserID(ctx context.Context, arg GetBuddy
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id,
-       name,
-       email,
-       email_verified,
-       image,
-       created_at,
-       updated_at,
-       telegram_id,
-       telegram_phone_number,
-       telegram_username,
-       monthly_points,
-       lifetime_points,
-       stripe_customer_id
+SELECT id, name, email, email_verified, image, created_at, updated_at, telegram_id, telegram_phone_number, telegram_username, monthly_points, lifetime_points, stripe_customer_id, role, banned, ban_reason, ban_expires
 FROM "users"
 WHERE id = $1
 `
@@ -129,24 +117,16 @@ func (q *Queries) GetUserByID(ctx context.Context, arg GetUserByIDParams) (*User
 		&i.MonthlyPoints,
 		&i.LifetimePoints,
 		&i.StripeCustomerID,
+		&i.Role,
+		&i.Banned,
+		&i.BanReason,
+		&i.BanExpires,
 	)
 	return &i, err
 }
 
 const getUserByStripeCustomerID = `-- name: GetUserByStripeCustomerID :one
-SELECT id,
-       name,
-       email,
-       email_verified,
-       image,
-       created_at,
-       updated_at,
-       telegram_id,
-       telegram_phone_number,
-       telegram_username,
-       monthly_points,
-       lifetime_points,
-       stripe_customer_id
+SELECT id, name, email, email_verified, image, created_at, updated_at, telegram_id, telegram_phone_number, telegram_username, monthly_points, lifetime_points, stripe_customer_id, role, banned, ban_reason, ban_expires
 FROM "users"
 WHERE stripe_customer_id = $1
 `
@@ -172,6 +152,10 @@ func (q *Queries) GetUserByStripeCustomerID(ctx context.Context, arg GetUserBySt
 		&i.MonthlyPoints,
 		&i.LifetimePoints,
 		&i.StripeCustomerID,
+		&i.Role,
+		&i.Banned,
+		&i.BanReason,
+		&i.BanExpires,
 	)
 	return &i, err
 }

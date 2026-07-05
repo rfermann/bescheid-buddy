@@ -12,15 +12,18 @@ type Querier interface {
 	CreateSupportCase(ctx context.Context, arg CreateSupportCaseParams) (*SupportCase, error)
 	CreateSupportCaseMessage(ctx context.Context, arg CreateSupportCaseMessageParams) (*SupportCaseMessage, error)
 	GetAllBuddyPackages(ctx context.Context) ([]*BuddyPackage, error)
+	GetAllSupportCases(ctx context.Context) ([]*SupportCase, error)
 	GetBuddyPackageByID(ctx context.Context, arg GetBuddyPackageByIDParams) (*BuddyPackage, error)
 	GetBuddyPointsByUserID(ctx context.Context, arg GetBuddyPointsByUserIDParams) (*GetBuddyPointsByUserIDRow, error)
 	GetBuddyPointsLedgerByUserID(ctx context.Context, arg GetBuddyPointsLedgerByUserIDParams) ([]*BuddyPointsLedger, error)
+	GetSupportCase(ctx context.Context, arg GetSupportCaseParams) (*SupportCase, error)
 	GetSupportCaseByID(ctx context.Context, arg GetSupportCaseByIDParams) (*SupportCase, error)
 	GetSupportCaseMessagesBySupportCaseID(ctx context.Context, arg GetSupportCaseMessagesBySupportCaseIDParams) ([]*SupportCaseMessage, error)
 	GetSupportCasesByUserID(ctx context.Context, arg GetSupportCasesByUserIDParams) ([]*SupportCase, error)
 	GetUserByID(ctx context.Context, arg GetUserByIDParams) (*User, error)
 	GetUserByStripeCustomerID(ctx context.Context, arg GetUserByStripeCustomerIDParams) (*User, error)
 	InsertBuddyPointsLedger(ctx context.Context, arg InsertBuddyPointsLedgerParams) error
+	UpdateSupportCaseStatus(ctx context.Context, arg UpdateSupportCaseStatusParams) error
 	UpdateUserPoints(ctx context.Context, arg UpdateUserPointsParams) error
 	UpdateUserStripeCustomerID(ctx context.Context, arg UpdateUserStripeCustomerIDParams) error
 }
