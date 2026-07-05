@@ -16,10 +16,11 @@ const config = {
 			async: true
 		}
 	},
-	kit: { 
+	kit: {
 		adapter: adapter(),
 		experimental: {
-			remoteFunctions: true
+			remoteFunctions: true,
+			forkPreloads: true
 		}
 	}
 };

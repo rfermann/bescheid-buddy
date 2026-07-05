@@ -12,7 +12,8 @@ const config = {
 		adapter: adapter(),
 		experimental: {
 			remoteFunctions: true,
-			handleRenderingErrors: true
+			handleRenderingErrors: true,
+			forkPreloads: true
 		},
 		typescript: {
 			config: (config) => ({
