@@ -1,6 +1,6 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"buddypoints_page_title": "إدارة BuddyPoints",
+	"buddypoints_page_title": "BuddyPoints الخاصة بي",
 	"buddypoints_overview_title": "نظرة عامة",
 	"buddypoints_overview_subtitle": "رصيد BuddyPoints الحالي وتفصيله",
 	"buddypoints_total": "الإجمالي",

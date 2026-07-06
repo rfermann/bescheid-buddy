@@ -29,7 +29,7 @@
 	</div>
 	{#if user}
 		<div class="gap-2.5 items-center hidden md:flex">
-			<PrimaryLink href="/buddypoints-verwalten" text={m.header_manage_buddypoints()} />
+			<PrimaryLink href="/meine-buddypoints" text={m.header_manage_buddypoints()} />
 			<PrimaryLink href="/nachrichten" text={m.header_messages()}>
 				{#if unreadCount > 0}
 				<span

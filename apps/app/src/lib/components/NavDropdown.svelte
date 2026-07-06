@@ -37,7 +37,7 @@
 		{currentLabel}
 	</span>
 	<span class="flex-none text-primary transition-transform duration-150 ease-in-out" class:rotate-180={isOpen}
-				aria-hidden="true">▾</span
+	      aria-hidden="true">▾</span
 	>
 </button>
 
@@ -63,16 +63,16 @@
 				</a>
 			{/if}
 		{/each}
-
-		<a href="/buddypoints-verwalten"
-			 class="w-full text-left flex items-center gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all md:hidden"
-			 role="menuitem">
+		
+		<a href="/meine-buddypoints"
+		   class="w-full text-left flex items-center gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all md:hidden"
+		   role="menuitem">
 			<span class="flex-1 font-semibold">{m.header_manage_buddypoints()}</span>
 		</a>
 
 		<a href="/nachrichten"
-			 class="w-full text-left flex items-center justify-between gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all md:hidden"
-			 role="menuitem">
+		   class="w-full text-left flex items-center justify-between gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all md:hidden"
+		   role="menuitem">
 			<span class="flex-1 font-semibold">{m.header_messages()}</span>
 			{#if unreadCount > 0}
 				<span class="bg-[#ff4d6d] text-white text-xs rounded-full px-1.5 py-0.5">{unreadCount}</span>
@@ -81,8 +81,8 @@
 
 		<form {...logout.for("dropdown")} class="w-full md:hidden">
 			<button type="submit"
-							class="w-full text-left flex items-center gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all"
-							role="menuitem">
+			        class="w-full text-left flex items-center gap-2.5 p-3 rounded-xl border border-primary/30 bg-primary/10 text-white cursor-pointer mb-2.5 transition-all"
+			        role="menuitem">
 				<span class="flex-1 font-semibold">{m.header_logout()}</span>
 			</button>
 		</form>

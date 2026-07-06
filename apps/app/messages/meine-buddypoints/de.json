@@ -1,6 +1,6 @@
 {
 	"$schema": "https://inlang.com/schema/inlang-message-format",
-	"buddypoints_page_title": "BuddyPoints verwalten",
+	"buddypoints_page_title": "Meine BuddyPoints",
 	"buddypoints_overview_title": "Übersicht",
 	"buddypoints_overview_subtitle": "Ihr aktueller BuddyPoints-Saldo und Aufschlüsselung",
 	"buddypoints_total": "Gesamt",
