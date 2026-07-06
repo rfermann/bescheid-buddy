@@ -39,7 +39,7 @@
 
 	$effect(() => {
 		if (verifyOTP.result?.success) {
-			goto('/dashboard');
+			goto('/');
 		}
 	});
 

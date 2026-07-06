@@ -1,0 +1,9 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"support_page_title": "Wsparcie",
+	"support_contact_heading": "Skontaktuj się z nami",
+	"support_contact_subtitle": "Jeśli masz pytania lub sugestie",
+	"support_subject_label": "Wsparcie",
+	"support_message_label": "Wiadomość",
+	"support_send_button": "Wyślij"
+}

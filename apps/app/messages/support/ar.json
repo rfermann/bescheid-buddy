@@ -1,0 +1,9 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"support_page_title": "الدعم",
+	"support_contact_heading": "اتصل بنا",
+	"support_contact_subtitle": "إذا كان لديك أسئلة أو اقتراحات",
+	"support_subject_label": "الدعم",
+	"support_message_label": "الرسالة",
+	"support_send_button": "إرسال"
+}

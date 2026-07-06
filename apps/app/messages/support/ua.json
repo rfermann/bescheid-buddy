@@ -1,0 +1,9 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"support_page_title": "Підтримка",
+	"support_contact_heading": "Зв'яжіться з нами",
+	"support_contact_subtitle": "Якщо у вас є питання чи пропозиції",
+	"support_subject_label": "Підтримка",
+	"support_message_label": "Повідомлення",
+	"support_send_button": "Надіслати"
+}

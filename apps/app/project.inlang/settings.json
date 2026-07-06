@@ -10,7 +10,8 @@
 			"./messages/buddypoints-verwalten/{locale}.json",
 			"./messages/datenschutz/{locale}.json",
 			"./messages/login/{locale}.json",
-			"./messages/email/{locale}.json"
+			"./messages/email/{locale}.json",
+			"./messages/support/{locale}.json"
 		]
 	},
 	"baseLocale": "en",

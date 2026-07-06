@@ -31,6 +31,42 @@ export type CreateCheckoutSessionOutputBody = {
     url: string;
 };
 
+export type CreateSupportCaseInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    category: 'general' | 'technical' | 'billing' | 'feature_request';
+    message: string;
+    subject: string;
+};
+
+export type CreateSupportCaseMessageInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    isInternal: boolean | null;
+    isUserMessage: boolean | null;
+    message: string;
+};
+
+export type CreateSupportCaseMessageOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    message: SupportCaseMessage;
+};
+
+export type CreateSupportCaseOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    case: SupportCase;
+};
+
 export type ErrorDetail = {
     /**
      * Where the error occurred, e.g. 'body.items[3].tags' or 'path.thing-id'
@@ -85,6 +121,14 @@ export type GetAllBuddyPackagesOutputBody = {
     packages: Array<BuddyPackage> | null;
 };
 
+export type GetAllSupportCasesOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    cases: Array<SupportCase> | null;
+};
+
 export type GetBuddyPointsLedgerOutputBody = {
     /**
      * A URL to the JSON Schema for this object.
@@ -100,6 +144,30 @@ export type GetBuddyPointsOutputBody = {
     readonly $schema?: string;
     lifetime_points: number;
     monthly_points: number;
+};
+
+export type GetSupportCaseByIdOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    supportCase: SupportCase;
+};
+
+export type GetSupportCaseMessagesBySupportCaseIdOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    messages: Array<SupportCaseMessage> | null;
+};
+
+export type GetSupportCasesByUserIdOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    cases: Array<SupportCase> | null;
 };
 
 export type HealthCheckResponseBody = {
@@ -146,6 +214,47 @@ export type SendEmailOutputBody = {
     message: string;
 };
 
+export type SupportCase = {
+    category: string;
+    created_at: Date;
+    id: string;
+    resolved_at: Date | null;
+    status: string;
+    subject: string;
+    updated_at: Date;
+    updated_by: string;
+    user_id: string;
+};
+
+export type SupportCaseMessage = {
+    case_id: string;
+    created_at: Date;
+    id: string;
+    is_internal: boolean;
+    is_read: boolean;
+    is_user_message: boolean;
+    message: string;
+    updated_at: Date;
+    updated_by: string;
+    user_id: string;
+};
+
+export type UpdateSupportCaseStatusInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    status: 'in_progress' | 'resolved' | 'closed';
+};
+
+export type UpdateSupportCaseStatusOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    case: SupportCase;
+};
+
 export type CreateCheckoutSessionInputBodyWritable = {
     package_name: string;
     stripe_price_id: string;
@@ -153,6 +262,26 @@ export type CreateCheckoutSessionInputBodyWritable = {
 
 export type CreateCheckoutSessionOutputBodyWritable = {
     url: string;
+};
+
+export type CreateSupportCaseInputBodyWritable = {
+    category: 'general' | 'technical' | 'billing' | 'feature_request';
+    message: string;
+    subject: string;
+};
+
+export type CreateSupportCaseMessageInputBodyWritable = {
+    isInternal: boolean | null;
+    isUserMessage: boolean | null;
+    message: string;
+};
+
+export type CreateSupportCaseMessageOutputBodyWritable = {
+    message: SupportCaseMessage;
+};
+
+export type CreateSupportCaseOutputBodyWritable = {
+    case: SupportCase;
 };
 
 export type ErrorModelWritable = {
@@ -186,6 +315,10 @@ export type GetAllBuddyPackagesOutputBodyWritable = {
     packages: Array<BuddyPackage> | null;
 };
 
+export type GetAllSupportCasesOutputBodyWritable = {
+    cases: Array<SupportCase> | null;
+};
+
 export type GetBuddyPointsLedgerOutputBodyWritable = {
     entries: Array<LedgerEntry> | null;
 };
@@ -193,6 +326,18 @@ export type GetBuddyPointsLedgerOutputBodyWritable = {
 export type GetBuddyPointsOutputBodyWritable = {
     lifetime_points: number;
     monthly_points: number;
+};
+
+export type GetSupportCaseByIdOutputBodyWritable = {
+    supportCase: SupportCase;
+};
+
+export type GetSupportCaseMessagesBySupportCaseIdOutputBodyWritable = {
+    messages: Array<SupportCaseMessage> | null;
+};
+
+export type GetSupportCasesByUserIdOutputBodyWritable = {
+    cases: Array<SupportCase> | null;
 };
 
 export type HealthCheckResponseBodyWritable = {
@@ -211,6 +356,39 @@ export type SendEmailInputBodyWritable = {
 export type SendEmailOutputBodyWritable = {
     message: string;
 };
+
+export type UpdateSupportCaseStatusInputBodyWritable = {
+    status: 'in_progress' | 'resolved' | 'closed';
+};
+
+export type UpdateSupportCaseStatusOutputBodyWritable = {
+    case: SupportCase;
+};
+
+export type GetAllSupportCasesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/support-cases';
+};
+
+export type GetAllSupportCasesErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetAllSupportCasesError = GetAllSupportCasesErrors[keyof GetAllSupportCasesErrors];
+
+export type GetAllSupportCasesResponses = {
+    /**
+     * OK
+     */
+    200: GetAllSupportCasesOutputBody;
+};
+
+export type GetAllSupportCasesResponse = GetAllSupportCasesResponses[keyof GetAllSupportCasesResponses];
 
 export type GetAllBuddyPackagesData = {
     body?: never;
@@ -311,6 +489,164 @@ export type CreateCheckoutSessionResponses = {
 };
 
 export type CreateCheckoutSessionResponse = CreateCheckoutSessionResponses[keyof CreateCheckoutSessionResponses];
+
+export type GetSupportCasesByUserData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/support-cases';
+};
+
+export type GetSupportCasesByUserErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetSupportCasesByUserError = GetSupportCasesByUserErrors[keyof GetSupportCasesByUserErrors];
+
+export type GetSupportCasesByUserResponses = {
+    /**
+     * OK
+     */
+    200: GetSupportCasesByUserIdOutputBody;
+};
+
+export type GetSupportCasesByUserResponse = GetSupportCasesByUserResponses[keyof GetSupportCasesByUserResponses];
+
+export type CreateSupportCaseData = {
+    body: CreateSupportCaseInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/v1/support-cases';
+};
+
+export type CreateSupportCaseErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type CreateSupportCaseError = CreateSupportCaseErrors[keyof CreateSupportCaseErrors];
+
+export type CreateSupportCaseResponses = {
+    /**
+     * OK
+     */
+    200: CreateSupportCaseOutputBody;
+};
+
+export type CreateSupportCaseResponse = CreateSupportCaseResponses[keyof CreateSupportCaseResponses];
+
+export type GetSupportCaseMessagesByCaseIdData = {
+    body?: never;
+    path: {
+        caseId: string;
+    };
+    query?: never;
+    url: '/v1/support-cases/{caseId}/messages';
+};
+
+export type GetSupportCaseMessagesByCaseIdErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetSupportCaseMessagesByCaseIdError = GetSupportCaseMessagesByCaseIdErrors[keyof GetSupportCaseMessagesByCaseIdErrors];
+
+export type GetSupportCaseMessagesByCaseIdResponses = {
+    /**
+     * OK
+     */
+    200: GetSupportCaseMessagesBySupportCaseIdOutputBody;
+};
+
+export type GetSupportCaseMessagesByCaseIdResponse = GetSupportCaseMessagesByCaseIdResponses[keyof GetSupportCaseMessagesByCaseIdResponses];
+
+export type CreateSupportCaseMessageData = {
+    body: CreateSupportCaseMessageInputBodyWritable;
+    path: {
+        caseId: string;
+    };
+    query?: never;
+    url: '/v1/support-cases/{caseId}/messages';
+};
+
+export type CreateSupportCaseMessageErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type CreateSupportCaseMessageError = CreateSupportCaseMessageErrors[keyof CreateSupportCaseMessageErrors];
+
+export type CreateSupportCaseMessageResponses = {
+    /**
+     * OK
+     */
+    200: CreateSupportCaseMessageOutputBody;
+};
+
+export type CreateSupportCaseMessageResponse = CreateSupportCaseMessageResponses[keyof CreateSupportCaseMessageResponses];
+
+export type GetSupportCaseByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/support-cases/{id}';
+};
+
+export type GetSupportCaseByIdErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetSupportCaseByIdError = GetSupportCaseByIdErrors[keyof GetSupportCaseByIdErrors];
+
+export type GetSupportCaseByIdResponses = {
+    /**
+     * OK
+     */
+    200: GetSupportCaseByIdOutputBody;
+};
+
+export type GetSupportCaseByIdResponse = GetSupportCaseByIdResponses[keyof GetSupportCaseByIdResponses];
+
+export type UpdateSupportCaseStatusData = {
+    body: UpdateSupportCaseStatusInputBodyWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/support-cases/{id}/status';
+};
+
+export type UpdateSupportCaseStatusErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type UpdateSupportCaseStatusError = UpdateSupportCaseStatusErrors[keyof UpdateSupportCaseStatusErrors];
+
+export type UpdateSupportCaseStatusResponses = {
+    /**
+     * OK
+     */
+    200: UpdateSupportCaseStatusOutputBody;
+};
+
+export type UpdateSupportCaseStatusResponse = UpdateSupportCaseStatusResponses[keyof UpdateSupportCaseStatusResponses];
 
 export type GetBuddyPointsData = {
     body?: never;
