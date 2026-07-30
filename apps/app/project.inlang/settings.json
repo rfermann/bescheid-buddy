@@ -7,6 +7,7 @@
 	"plugin.inlang.messageFormat": {
 		"pathPattern": [
 			"./messages/layout/{locale}.json",
+			"./messages/analyse/{locale}.json",
 			"./messages/meine-buddypoints/{locale}.json",
 			"./messages/datenschutz/{locale}.json",
 			"./messages/login/{locale}.json",

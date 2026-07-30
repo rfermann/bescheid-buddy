@@ -2,6 +2,18 @@
 
 import * as v from 'valibot';
 
+export const vAddress = v.strictObject({
+    address: v.optional(v.string()),
+    category: v.optional(v.string()),
+    city: v.optional(v.string()),
+    country: v.optional(v.string()),
+    house_number: v.optional(v.string()),
+    name: v.optional(v.string()),
+    postal_code: v.optional(v.string()),
+    state: v.optional(v.string()),
+    street: v.optional(v.string())
+});
+
 export const vBuddyPackage = v.strictObject({
     created_at: v.pipe(v.string(), v.isoTimestamp()),
     id: v.string(),
@@ -10,6 +22,23 @@ export const vBuddyPackage = v.strictObject({
     price_in_cents: v.pipe(v.number(), v.integer(), v.minValue(-2147483648, 'Invalid value: Expected int32 to be >= -2147483648'), v.maxValue(2147483647, 'Invalid value: Expected int32 to be <= 2147483647')),
     stripe_price_id: v.string(),
     updated_at: v.pipe(v.string(), v.isoTimestamp())
+});
+
+export const vConfirmUploadOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    documentId: v.string(),
+    uploadStatus: v.string()
+});
+
+export const vCreateCaseInputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    title: v.pipe(v.string(), v.maxLength(255))
+});
+
+export const vCreateCaseOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    id: v.string(),
+    title: v.string()
 });
 
 export const vCreateCheckoutSessionInputBody = v.strictObject({
@@ -42,6 +71,49 @@ export const vCreateSupportCaseMessageInputBody = v.strictObject({
     message: v.pipe(v.string(), v.maxLength(255))
 });
 
+export const vDates = v.strictObject({
+    deadline_date: v.optional(v.string()),
+    letter_date: v.optional(v.string())
+});
+
+export const vDetails = v.strictObject({
+    deadlines: v.nullish(v.array(v.string())),
+    documents_requested: v.nullish(v.array(v.string())),
+    possible_consequences: v.nullish(v.array(v.string())),
+    recommended_next_steps: v.nullish(v.array(v.string())),
+    summary: v.optional(v.string())
+});
+
+export const vEnqueueDocumentAnalysisInputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    language: v.optional(v.string()),
+    model: v.picklist([
+        'gpt-4o-mini',
+        'gemini-2.0-flash',
+        'claude-haiku-4-5'
+    ])
+});
+
+export const vEnqueueDocumentAnalysisOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    documentId: v.string(),
+    jobId: v.pipe(v.union([
+        v.number(),
+        v.string(),
+        v.bigint()
+    ]), v.transform(x => BigInt(x)), v.minValue(BigInt('-9223372036854775808'), 'Invalid value: Expected int64 to be >= -9223372036854775808'), v.maxValue(BigInt('9223372036854775807'), 'Invalid value: Expected int64 to be <= 9223372036854775807'))
+});
+
+export const vEnqueueDocumentExtractionOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    documentId: v.string(),
+    jobId: v.pipe(v.union([
+        v.number(),
+        v.string(),
+        v.bigint()
+    ]), v.transform(x => BigInt(x)), v.minValue(BigInt('-9223372036854775808'), 'Invalid value: Expected int64 to be >= -9223372036854775808'), v.maxValue(BigInt('9223372036854775807'), 'Invalid value: Expected int64 to be <= 9223372036854775807'))
+});
+
 export const vErrorDetail = v.strictObject({
     location: v.optional(v.string()),
     message: v.optional(v.string()),
@@ -60,6 +132,17 @@ export const vErrorModel = v.strictObject({
     ]), v.transform(x => BigInt(x)), v.minValue(BigInt('-9223372036854775808'), 'Invalid value: Expected int64 to be >= -9223372036854775808'), v.maxValue(BigInt('9223372036854775807'), 'Invalid value: Expected int64 to be <= 9223372036854775807'))),
     title: v.optional(v.string()),
     type: v.optional(v.pipe(v.string(), v.url()), 'about:blank')
+});
+
+export const vGenerateUploadUrlInputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    fileName: v.pipe(v.string(), v.maxLength(255))
+});
+
+export const vGenerateUploadUrlOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    documentId: v.string(),
+    uploadUrl: v.string()
 });
 
 export const vGetAllBuddyPackagesOutputBody = v.strictObject({
@@ -116,6 +199,41 @@ export const vSendEmailInputBody = v.strictObject({
 export const vSendEmailOutputBody = v.strictObject({
     $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
     message: v.string()
+});
+
+export const vSubject = v.strictObject({
+    localized: v.optional(v.string()),
+    original: v.optional(v.string())
+});
+
+export const vMetadata = v.strictObject({
+    dates: v.optional(vDates),
+    importance: v.optional(v.string()),
+    letter_type: v.optional(v.string()),
+    part_1_full_translation: v.optional(v.string()),
+    part_2_ai_analysis: v.optional(vDetails),
+    receiver: v.optional(vAddress),
+    sender: v.optional(vAddress),
+    subject: v.optional(vSubject),
+    topic: v.optional(v.string())
+});
+
+export const vAnalysisStatusBody = v.strictObject({
+    errorMessage: v.optional(v.string()),
+    metadata: v.optional(vMetadata),
+    model: v.optional(v.string()),
+    provider: v.optional(v.string()),
+    status: v.string(),
+    text: v.optional(v.string())
+});
+
+export const vGetDocumentStatusOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    analysis: vAnalysisStatusBody,
+    documentId: v.string(),
+    extractionStatus: v.string(),
+    fileName: v.string(),
+    uploadStatus: v.string()
 });
 
 export const vSupportCase = v.strictObject({
@@ -187,6 +305,20 @@ export const vUpdateSupportCaseStatusOutputBody = v.strictObject({
     case: vSupportCase
 });
 
+export const vConfirmUploadOutputBodyWritable = v.strictObject({
+    documentId: v.string(),
+    uploadStatus: v.string()
+});
+
+export const vCreateCaseInputBodyWritable = v.strictObject({
+    title: v.pipe(v.string(), v.maxLength(255))
+});
+
+export const vCreateCaseOutputBodyWritable = v.strictObject({
+    id: v.string(),
+    title: v.string()
+});
+
 export const vCreateCheckoutSessionInputBodyWritable = v.strictObject({
     package_name: v.string(),
     stripe_price_id: v.string()
@@ -221,6 +353,33 @@ export const vCreateSupportCaseOutputBodyWritable = v.strictObject({
     case: vSupportCase
 });
 
+export const vEnqueueDocumentAnalysisInputBodyWritable = v.strictObject({
+    language: v.optional(v.string()),
+    model: v.picklist([
+        'gpt-4o-mini',
+        'gemini-2.0-flash',
+        'claude-haiku-4-5'
+    ])
+});
+
+export const vEnqueueDocumentAnalysisOutputBodyWritable = v.strictObject({
+    documentId: v.string(),
+    jobId: v.pipe(v.union([
+        v.number(),
+        v.string(),
+        v.bigint()
+    ]), v.transform(x => BigInt(x)), v.minValue(BigInt('-9223372036854775808'), 'Invalid value: Expected int64 to be >= -9223372036854775808'), v.maxValue(BigInt('9223372036854775807'), 'Invalid value: Expected int64 to be <= 9223372036854775807'))
+});
+
+export const vEnqueueDocumentExtractionOutputBodyWritable = v.strictObject({
+    documentId: v.string(),
+    jobId: v.pipe(v.union([
+        v.number(),
+        v.string(),
+        v.bigint()
+    ]), v.transform(x => BigInt(x)), v.minValue(BigInt('-9223372036854775808'), 'Invalid value: Expected int64 to be >= -9223372036854775808'), v.maxValue(BigInt('9223372036854775807'), 'Invalid value: Expected int64 to be <= 9223372036854775807'))
+});
+
 export const vErrorModelWritable = v.strictObject({
     detail: v.optional(v.string()),
     errors: v.nullish(v.array(vErrorDetail)),
@@ -232,6 +391,15 @@ export const vErrorModelWritable = v.strictObject({
     ]), v.transform(x => BigInt(x)), v.minValue(BigInt('-9223372036854775808'), 'Invalid value: Expected int64 to be >= -9223372036854775808'), v.maxValue(BigInt('9223372036854775807'), 'Invalid value: Expected int64 to be <= 9223372036854775807'))),
     title: v.optional(v.string()),
     type: v.optional(v.pipe(v.string(), v.url()), 'about:blank')
+});
+
+export const vGenerateUploadUrlInputBodyWritable = v.strictObject({
+    fileName: v.pipe(v.string(), v.maxLength(255))
+});
+
+export const vGenerateUploadUrlOutputBodyWritable = v.strictObject({
+    documentId: v.string(),
+    uploadUrl: v.string()
 });
 
 export const vGetAllBuddyPackagesOutputBodyWritable = v.strictObject({
@@ -249,6 +417,14 @@ export const vGetBuddyPointsLedgerOutputBodyWritable = v.strictObject({
 export const vGetBuddyPointsOutputBodyWritable = v.strictObject({
     lifetime_points: v.pipe(v.number(), v.integer(), v.minValue(-2147483648, 'Invalid value: Expected int32 to be >= -2147483648'), v.maxValue(2147483647, 'Invalid value: Expected int32 to be <= 2147483647')),
     monthly_points: v.pipe(v.number(), v.integer(), v.minValue(-2147483648, 'Invalid value: Expected int32 to be >= -2147483648'), v.maxValue(2147483647, 'Invalid value: Expected int32 to be <= 2147483647'))
+});
+
+export const vGetDocumentStatusOutputBodyWritable = v.strictObject({
+    analysis: vAnalysisStatusBody,
+    documentId: v.string(),
+    extractionStatus: v.string(),
+    fileName: v.string(),
+    uploadStatus: v.string()
 });
 
 export const vGetSupportCaseByIdOutputBodyWritable = v.strictObject({
@@ -301,6 +477,66 @@ export const vGetAllSupportCasesResponse = vGetAllSupportCasesOutputBody;
  * OK
  */
 export const vGetAllBuddyPackagesResponse = vGetAllBuddyPackagesOutputBody;
+
+export const vCreateCaseBody = vCreateCaseInputBodyWritable;
+
+/**
+ * OK
+ */
+export const vCreateCaseResponse = vCreateCaseOutputBody;
+
+export const vGenerateUploadUrlBody = vGenerateUploadUrlInputBodyWritable;
+
+export const vGenerateUploadUrlPath = v.object({
+    caseId: v.string()
+});
+
+/**
+ * OK
+ */
+export const vGenerateUploadUrlResponse = vGenerateUploadUrlOutputBody;
+
+export const vGetDocumentStatusPath = v.object({
+    caseId: v.string(),
+    documentId: v.string()
+});
+
+/**
+ * OK
+ */
+export const vGetDocumentStatusResponse = vGetDocumentStatusOutputBody;
+
+export const vEnqueueDocumentAnalysisBody = vEnqueueDocumentAnalysisInputBodyWritable;
+
+export const vEnqueueDocumentAnalysisPath = v.object({
+    caseId: v.string(),
+    documentId: v.string()
+});
+
+/**
+ * OK
+ */
+export const vEnqueueDocumentAnalysisResponse = vEnqueueDocumentAnalysisOutputBody;
+
+export const vConfirmDocumentUploadPath = v.object({
+    caseId: v.string(),
+    documentId: v.string()
+});
+
+/**
+ * OK
+ */
+export const vConfirmDocumentUploadResponse = vConfirmUploadOutputBody;
+
+export const vEnqueueDocumentExtractionPath = v.object({
+    caseId: v.string(),
+    documentId: v.string()
+});
+
+/**
+ * OK
+ */
+export const vEnqueueDocumentExtractionResponse = vEnqueueDocumentExtractionOutputBody;
 
 export const vSendEmailBody = vSendEmailInputBodyWritable;
 
