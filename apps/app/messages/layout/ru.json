@@ -12,7 +12,7 @@
 	"nav_menu": "Меню",
 	"nav_analysis": "Анализ",
 	"nav_send_paper_letter": "Отправить бумажное письмо",
-	"nav_archive": "Архив",
+	"nav_analyses": "Мои анализы",
 	"nav_reply_pdf": "Ответ и PDF",
 	"nav_solutions": "Решения",
 	"nav_partners": "Партнёры",
@@ -25,4 +25,3 @@
 	"header_messages": "Сообщения",
 	"header_logout": "Выйти"
 }
-

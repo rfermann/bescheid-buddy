@@ -22,7 +22,7 @@
 	const navItems: NavItem[] = [
 		{ id: 'analysis', label: m.nav_analysis, href: '/' },
 		{ id: 'paper-letter', label: m.nav_send_paper_letter, href: '/paper-letter' },
-		{ id: 'archive', label: m.nav_archive, href: '/archive' },
+		{ id: 'analyses', label: m.nav_analyses, href: '/analyses' },
 		{ id: 'reply-pdf', label: m.nav_reply_pdf, href: '/reply-pdf', hidden: true },
 		{ id: 'solutions', label: m.nav_solutions, href: '/solutions' },
 		{ id: 'partners', label: m.nav_partners, href: '/partners', disabled: true, badge: m.nav_soon },
