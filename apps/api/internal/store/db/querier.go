@@ -25,6 +25,7 @@ type Querier interface {
 	GetBuddyPointsByUserID(ctx context.Context, arg GetBuddyPointsByUserIDParams) (*GetBuddyPointsByUserIDRow, error)
 	GetBuddyPointsLedgerByUserID(ctx context.Context, arg GetBuddyPointsLedgerByUserIDParams) ([]*BuddyPointsLedger, error)
 	GetCaseDocumentByID(ctx context.Context, arg GetCaseDocumentByIDParams) (*CaseDocument, error)
+	GetCasesByUserID(ctx context.Context, arg GetCasesByUserIDParams) ([]*Case, error)
 	GetDocumentAnalysisByDocumentID(ctx context.Context, arg GetDocumentAnalysisByDocumentIDParams) (*DocumentAnalysisResult, error)
 	GetDocumentExtractionByDocumentID(ctx context.Context, arg GetDocumentExtractionByDocumentIDParams) (*GetDocumentExtractionByDocumentIDRow, error)
 	GetDocumentExtractionTextByDocumentID(ctx context.Context, arg GetDocumentExtractionTextByDocumentIDParams) (*GetDocumentExtractionTextByDocumentIDRow, error)

@@ -308,3 +308,7 @@ func (s *Service) GetDocumentStatus(ctx context.Context, documentID uuid.UUID) (
 
 	return status, nil
 }
+
+func (s *Service) GetCasesByUserID(ctx context.Context, userID uuid.UUID) ([]*db.Case, error) {
+	return s.repository.GetCasesByUserID(ctx, db.GetCasesByUserIDParams{UserID: userID})
+}

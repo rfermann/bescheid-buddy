@@ -3,6 +3,12 @@ INSERT INTO cases (user_id, title)
 VALUES ($1, $2)
 RETURNING *;
 
+-- name: GetCasesByUserID :many
+SELECT *
+FROM cases
+WHERE user_id = $1
+ORDER BY created_at DESC, id DESC;
+
 -- name: UpdateCaseTitle :exec
 UPDATE cases
 SET title = $2,

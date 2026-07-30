@@ -11,6 +11,7 @@ import (
 type Repository interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
 	CreateCase(ctx context.Context, params db.CreateCaseParams) (*db.Case, error)
+	GetCasesByUserID(ctx context.Context, params db.GetCasesByUserIDParams) ([]*db.Case, error)
 	UpdateCaseTitle(ctx context.Context, params db.UpdateCaseTitleParams) error
 	CreateCaseDocument(ctx context.Context, params db.CreateCaseDocumentParams) (*db.CaseDocument, error)
 	GetCaseDocumentByID(ctx context.Context, params db.GetCaseDocumentByIDParams) (*db.CaseDocument, error)
@@ -56,6 +57,10 @@ func (r *CasesRepository) BeginTx(ctx context.Context) (pgx.Tx, error) {
 
 func (r *CasesRepository) CreateCase(ctx context.Context, params db.CreateCaseParams) (*db.Case, error) {
 	return r.Store.Queries.CreateCase(ctx, params)
+}
+
+func (r *CasesRepository) GetCasesByUserID(ctx context.Context, params db.GetCasesByUserIDParams) ([]*db.Case, error) {
+	return r.Store.Queries.GetCasesByUserID(ctx, params)
 }
 
 func (r *CasesRepository) UpdateCaseTitle(ctx context.Context, params db.UpdateCaseTitleParams) error {

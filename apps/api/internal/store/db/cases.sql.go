@@ -431,6 +431,43 @@ func (q *Queries) GetCaseDocumentByID(ctx context.Context, arg GetCaseDocumentBy
 	return &i, err
 }
 
+const getCasesByUserID = `-- name: GetCasesByUserID :many
+SELECT id, user_id, title, created_at, updated_at
+FROM cases
+WHERE user_id = $1
+ORDER BY created_at DESC, id DESC
+`
+
+type GetCasesByUserIDParams struct {
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) GetCasesByUserID(ctx context.Context, arg GetCasesByUserIDParams) ([]*Case, error) {
+	rows, err := q.db.Query(ctx, getCasesByUserID, arg.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*Case
+	for rows.Next() {
+		var i Case
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Title,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getDocumentAnalysisByDocumentID = `-- name: GetDocumentAnalysisByDocumentID :one
 SELECT id, document_id, status, job_id, model, language, detected_language, provider, analysis_text, analysis_metadata, error_message, started_at, completed_at, created_at, updated_at
 FROM document_analysis_results
