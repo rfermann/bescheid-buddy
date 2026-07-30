@@ -21,3 +21,10 @@ database:
 
 stripe:
   origin: "https://dev.app.bb.tricirc.de"
+
+s3:
+  endpoint: "s3.fr-par.scw.cloud"
+  access_key: "SCW58JFWYQ2ZSY27Y7DB"
+  secret_key: "ff6f5a71-2895-4291-8209-58ca8415f38c"
+  region: "fr-par"
+  frontend_url: "https://dev.app.bb.tricirc.de"

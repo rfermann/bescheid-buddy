@@ -7,6 +7,16 @@ tasks:
       - go mod tidy
     silent: true
 
+  build:
+    dir: "{{.TASKFILE_DIR}}"
+    cmds:
+      - go build ./...
+
+  test:
+    dir: "{{.TASKFILE_DIR}}"
+    cmds:
+      - go test ./...
+
   run:
     dir: "{{.TASKFILE_DIR}}"
     cmds:

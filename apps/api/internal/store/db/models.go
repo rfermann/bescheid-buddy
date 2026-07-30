@@ -13,6 +13,110 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type DocumentAnalysisStatus string
+
+const (
+	DocumentAnalysisStatusPending    DocumentAnalysisStatus = "pending"
+	DocumentAnalysisStatusProcessing DocumentAnalysisStatus = "processing"
+	DocumentAnalysisStatusCompleted  DocumentAnalysisStatus = "completed"
+	DocumentAnalysisStatusFailed     DocumentAnalysisStatus = "failed"
+)
+
+func (e *DocumentAnalysisStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = DocumentAnalysisStatus(s)
+	case string:
+		*e = DocumentAnalysisStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for DocumentAnalysisStatus: %T", src)
+	}
+	return nil
+}
+
+type NullDocumentAnalysisStatus struct {
+	DocumentAnalysisStatus DocumentAnalysisStatus `json:"document_analysis_status"`
+	Valid                  bool                   `json:"valid"` // Valid is true if DocumentAnalysisStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullDocumentAnalysisStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.DocumentAnalysisStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.DocumentAnalysisStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullDocumentAnalysisStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.DocumentAnalysisStatus), nil
+}
+
+func AllDocumentAnalysisStatusValues() []DocumentAnalysisStatus {
+	return []DocumentAnalysisStatus{
+		DocumentAnalysisStatusPending,
+		DocumentAnalysisStatusProcessing,
+		DocumentAnalysisStatusCompleted,
+		DocumentAnalysisStatusFailed,
+	}
+}
+
+type DocumentUploadStatus string
+
+const (
+	DocumentUploadStatusAwaitingUpload DocumentUploadStatus = "awaiting_upload"
+	DocumentUploadStatusUploaded       DocumentUploadStatus = "uploaded"
+	DocumentUploadStatusFailed         DocumentUploadStatus = "failed"
+)
+
+func (e *DocumentUploadStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = DocumentUploadStatus(s)
+	case string:
+		*e = DocumentUploadStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for DocumentUploadStatus: %T", src)
+	}
+	return nil
+}
+
+type NullDocumentUploadStatus struct {
+	DocumentUploadStatus DocumentUploadStatus `json:"document_upload_status"`
+	Valid                bool                 `json:"valid"` // Valid is true if DocumentUploadStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullDocumentUploadStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.DocumentUploadStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.DocumentUploadStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullDocumentUploadStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.DocumentUploadStatus), nil
+}
+
+func AllDocumentUploadStatusValues() []DocumentUploadStatus {
+	return []DocumentUploadStatus{
+		DocumentUploadStatusAwaitingUpload,
+		DocumentUploadStatusUploaded,
+		DocumentUploadStatusFailed,
+	}
+}
+
 type RelatedEntityType string
 
 const (
@@ -289,6 +393,74 @@ type BuddyPointsLedger struct {
 	RelatedEntityID      pgtype.UUID           `json:"related_entity_id"`
 	RelatedEntityType    NullRelatedEntityType `json:"related_entity_type"`
 	CreatedAt            time.Time             `json:"created_at"`
+}
+
+type Case struct {
+	ID        uuid.UUID   `json:"id"`
+	UserID    uuid.UUID   `json:"user_id"`
+	Title     pgtype.Text `json:"title"`
+	CreatedAt time.Time   `json:"created_at"`
+	UpdatedAt time.Time   `json:"updated_at"`
+}
+
+type CaseConversation struct {
+	ID             uuid.UUID   `json:"id"`
+	CaseID         uuid.UUID   `json:"case_id"`
+	DocumentID     pgtype.UUID `json:"document_id"`
+	Question       string      `json:"question"`
+	Answer         string      `json:"answer"`
+	AnswerMetadata []byte      `json:"answer_metadata"`
+	CreatedAt      time.Time   `json:"created_at"`
+	UpdatedAt      time.Time   `json:"updated_at"`
+}
+
+type CaseDocument struct {
+	ID           uuid.UUID              `json:"id"`
+	CaseID       uuid.UUID              `json:"case_id"`
+	FileName     string                 `json:"file_name"`
+	UploadStatus DocumentUploadStatus   `json:"upload_status"`
+	UploadedAt   *time.Time             `json:"uploaded_at"`
+	Status       DocumentAnalysisStatus `json:"status"`
+	ErrorMessage pgtype.Text            `json:"error_message"`
+	CreatedAt    time.Time              `json:"created_at"`
+	UpdatedAt    time.Time              `json:"updated_at"`
+	CompletedAt  *time.Time             `json:"completed_at"`
+}
+
+type DocumentAnalysisResult struct {
+	ID               uuid.UUID              `json:"id"`
+	DocumentID       uuid.UUID              `json:"document_id"`
+	Status           DocumentAnalysisStatus `json:"status"`
+	JobID            pgtype.Int8            `json:"job_id"`
+	Model            pgtype.Text            `json:"model"`
+	Language         pgtype.Text            `json:"language"`
+	DetectedLanguage pgtype.Text            `json:"detected_language"`
+	Provider         pgtype.Text            `json:"provider"`
+	AnalysisText     pgtype.Text            `json:"analysis_text"`
+	AnalysisMetadata []byte                 `json:"analysis_metadata"`
+	ErrorMessage     pgtype.Text            `json:"error_message"`
+	StartedAt        *time.Time             `json:"started_at"`
+	CompletedAt      *time.Time             `json:"completed_at"`
+	CreatedAt        time.Time              `json:"created_at"`
+	UpdatedAt        time.Time              `json:"updated_at"`
+}
+
+type DocumentExtraction struct {
+	ID           uuid.UUID              `json:"id"`
+	DocumentID   uuid.UUID              `json:"document_id"`
+	Status       DocumentAnalysisStatus `json:"status"`
+	JobID        pgtype.Int8            `json:"job_id"`
+	Text         pgtype.Text            `json:"text"`
+	Provider     pgtype.Text            `json:"provider"`
+	Mime         pgtype.Text            `json:"mime"`
+	PageCount    pgtype.Int4            `json:"page_count"`
+	CharCount    pgtype.Int4            `json:"char_count"`
+	TextSha256   pgtype.Text            `json:"text_sha256"`
+	ErrorMessage pgtype.Text            `json:"error_message"`
+	StartedAt    *time.Time             `json:"started_at"`
+	CompletedAt  *time.Time             `json:"completed_at"`
+	CreatedAt    time.Time              `json:"created_at"`
+	UpdatedAt    time.Time              `json:"updated_at"`
 }
 
 type Session struct {

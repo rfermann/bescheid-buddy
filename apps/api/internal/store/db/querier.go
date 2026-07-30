@@ -9,13 +9,26 @@ import (
 )
 
 type Querier interface {
+	CompleteDocumentAnalysis(ctx context.Context, arg CompleteDocumentAnalysisParams) (*CompleteDocumentAnalysisRow, error)
+	CompleteDocumentExtraction(ctx context.Context, arg CompleteDocumentExtractionParams) (*CompleteDocumentExtractionRow, error)
+	CreateCase(ctx context.Context, arg CreateCaseParams) (*Case, error)
+	CreateCaseDocument(ctx context.Context, arg CreateCaseDocumentParams) (*CaseDocument, error)
+	CreateDocumentAnalysis(ctx context.Context, arg CreateDocumentAnalysisParams) (*CreateDocumentAnalysisRow, error)
+	CreateDocumentExtraction(ctx context.Context, arg CreateDocumentExtractionParams) (*CreateDocumentExtractionRow, error)
 	CreateSupportCase(ctx context.Context, arg CreateSupportCaseParams) (*SupportCase, error)
 	CreateSupportCaseMessage(ctx context.Context, arg CreateSupportCaseMessageParams) (*SupportCaseMessage, error)
+	FailDocumentAnalysis(ctx context.Context, arg FailDocumentAnalysisParams) (*FailDocumentAnalysisRow, error)
+	FailDocumentExtraction(ctx context.Context, arg FailDocumentExtractionParams) (*FailDocumentExtractionRow, error)
 	GetAllBuddyPackages(ctx context.Context) ([]*BuddyPackage, error)
 	GetAllSupportCases(ctx context.Context) ([]*SupportCase, error)
 	GetBuddyPackageByID(ctx context.Context, arg GetBuddyPackageByIDParams) (*BuddyPackage, error)
 	GetBuddyPointsByUserID(ctx context.Context, arg GetBuddyPointsByUserIDParams) (*GetBuddyPointsByUserIDRow, error)
 	GetBuddyPointsLedgerByUserID(ctx context.Context, arg GetBuddyPointsLedgerByUserIDParams) ([]*BuddyPointsLedger, error)
+	GetCaseDocumentByID(ctx context.Context, arg GetCaseDocumentByIDParams) (*CaseDocument, error)
+	GetDocumentAnalysisByDocumentID(ctx context.Context, arg GetDocumentAnalysisByDocumentIDParams) (*DocumentAnalysisResult, error)
+	GetDocumentExtractionByDocumentID(ctx context.Context, arg GetDocumentExtractionByDocumentIDParams) (*GetDocumentExtractionByDocumentIDRow, error)
+	GetDocumentExtractionTextByDocumentID(ctx context.Context, arg GetDocumentExtractionTextByDocumentIDParams) (*GetDocumentExtractionTextByDocumentIDRow, error)
+	GetInitialCaseDocument(ctx context.Context, arg GetInitialCaseDocumentParams) (*CaseDocument, error)
 	GetSupportCase(ctx context.Context, arg GetSupportCaseParams) (*SupportCase, error)
 	GetSupportCaseByID(ctx context.Context, arg GetSupportCaseByIDParams) (*SupportCase, error)
 	GetSupportCaseMessagesBySupportCaseID(ctx context.Context, arg GetSupportCaseMessagesBySupportCaseIDParams) ([]*SupportCaseMessage, error)
@@ -23,6 +36,11 @@ type Querier interface {
 	GetUserByID(ctx context.Context, arg GetUserByIDParams) (*User, error)
 	GetUserByStripeCustomerID(ctx context.Context, arg GetUserByStripeCustomerIDParams) (*User, error)
 	InsertBuddyPointsLedger(ctx context.Context, arg InsertBuddyPointsLedgerParams) error
+	MarkCaseDocumentUploadFailed(ctx context.Context, arg MarkCaseDocumentUploadFailedParams) (*CaseDocument, error)
+	MarkCaseDocumentUploaded(ctx context.Context, arg MarkCaseDocumentUploadedParams) (*CaseDocument, error)
+	MarkDocumentAnalysisProcessing(ctx context.Context, arg MarkDocumentAnalysisProcessingParams) (*MarkDocumentAnalysisProcessingRow, error)
+	MarkDocumentExtractionProcessing(ctx context.Context, arg MarkDocumentExtractionProcessingParams) (*MarkDocumentExtractionProcessingRow, error)
+	UpdateCaseTitle(ctx context.Context, arg UpdateCaseTitleParams) error
 	UpdateSupportCaseStatus(ctx context.Context, arg UpdateSupportCaseStatusParams) error
 	UpdateUserPoints(ctx context.Context, arg UpdateUserPointsParams) error
 	UpdateUserStripeCustomerID(ctx context.Context, arg UpdateUserStripeCustomerIDParams) error

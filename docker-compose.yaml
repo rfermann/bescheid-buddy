@@ -18,6 +18,24 @@ services:
       - .:/src
     command: [ "version" ]
 
+  river:
+    build:
+      context: ./dockerfiles
+      dockerfile: river.dockerfile
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://postgres:${DB_PASSWORD}@45.129.183.29:5432/postgres
+
+  river-ui:
+    image: ghcr.io/riverqueue/riverui:latest
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://postgres:${DB_PASSWORD}@45.129.183.29:5432/postgres
+    ports:
+      - "8080:8080"
+
 volumes:
   postgres_data:
   go-mod-cache:

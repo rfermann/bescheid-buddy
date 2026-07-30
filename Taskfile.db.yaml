@@ -3,9 +3,11 @@ version: 3
 vars:
   DB_DRIVER: postgres
   DB_MIGRATIONS_DIR: /migrations
+  DB_URL: postgres://postgres:${DB_PASSWORD}@45.129.183.29:5432/postgres
   DOCKER_COMPOSE: docker-compose -f docker-compose.yaml
   GOOSE_CMD: "{{.DOCKER_COMPOSE}} run --rm goose -dir {{.DB_MIGRATIONS_DIR}}"
   SQLC_CMD: "{{.DOCKER_COMPOSE}} run --rm sqlc"
+  RIVER_CMD: "{{.DOCKER_COMPOSE}} run --rm river"
 
 tasks:
   sqlc:generate:
@@ -76,3 +78,16 @@ tasks:
     dir: '{{.TASKFILE_DIR}}'
     cmds:
       - '{{.GOOSE_CMD}} reset'
+
+  river:migrate:up:
+    desc: Apply all River up migrations
+    dir: '{{.TASKFILE_DIR}}'
+    cmds:
+      - 'echo {{.DB_URL}}'
+      - '{{.RIVER_CMD}} migrate-up --database-url {{.DB_URL}}'
+
+  river:migrate:down:
+    desc: Roll back the most recent River migration
+    dir: '{{.TASKFILE_DIR}}'
+    cmds:
+      - '{{.RIVER_CMD}} migrate-down --database-url {{.DB_URL}}'

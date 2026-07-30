@@ -13,8 +13,12 @@ type Config struct {
 	Auth     AuthConfig     `mapstructure:"auth"`
 	API      APIConfig      `mapstructure:"api"`
 	Database DatabaseConfig `mapstructure:"database"`
+	S3       S3Config       `mapstructure:"s3"`
 	Stripe   StripeConfig   `mapstructure:"stripe"`
 	SMTP     SMTPConfig     `mapstructure:"smtp"`
+	Vision   VisionConfig   `mapstructure:"vision"`
+	Upload   UploadConfig   `mapstructure:"upload"`
+	LLM      LLMConfig      `mapstructure:"llm"`
 }
 
 // ServerConfig holds server-related configuration
@@ -50,12 +54,34 @@ type DatabaseConfig struct {
 	DBName   string `mapstructure:"dbname"`
 }
 
+type S3Config struct {
+	Endpoint    string `mapstructure:"endpoint"`
+	AccessKey   string `mapstructure:"access_key"`
+	SecretKey   string `mapstructure:"secret_key"`
+	Region      string `mapstructure:"region"`
+	FrontendURL string `mapstructure:"frontend_url"`
+}
+
 type SMTPConfig struct {
 	Host     string `mapstructure:"host"`
 	Port     int    `mapstructure:"port"`
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 	UseSSL   bool   `mapstructure:"use_ssl"`
+}
+
+type VisionConfig struct {
+	APIKey string `mapstructure:"api_key"`
+}
+
+type UploadConfig struct {
+	MaxBytes int64 `mapstructure:"max_bytes"`
+}
+
+type LLMConfig struct {
+	OpenAIAPIKey    string `mapstructure:"openai_api_key"`
+	GeminiAPIKey    string `mapstructure:"gemini_api_key"`
+	AnthropicAPIKey string `mapstructure:"anthropic_api_key"`
 }
 
 // LoadConfig loads configuration using Viper
@@ -82,6 +108,11 @@ func LoadConfig(configPath string) (*Config, error) {
 	v.BindEnv("database.password")
 	v.BindEnv("database.port")
 	v.BindEnv("database.dbname")
+	v.BindEnv("s3.endpoint")
+	v.BindEnv("s3.access_key")
+	v.BindEnv("s3.secret_key")
+	v.BindEnv("s3.region")
+	v.BindEnv("s3.frontend_url")
 	v.BindEnv("stripe.webhook_secret")
 	v.BindEnv("stripe.secret_key")
 	v.BindEnv("stripe.origin")
@@ -90,6 +121,11 @@ func LoadConfig(configPath string) (*Config, error) {
 	v.BindEnv("smtp.username")
 	v.BindEnv("smtp.password")
 	v.BindEnv("smtp.use_ssl")
+	v.BindEnv("vision.api_key")
+	v.BindEnv("upload.max_bytes")
+	v.BindEnv("llm.openai_api_key")
+	v.BindEnv("llm.gemini_api_key")
+	v.BindEnv("llm.anthropic_api_key")
 
 	v.SetConfigFile(configPath)
 	if err := v.ReadInConfig(); err != nil {
@@ -137,6 +173,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("server.graceful_shutdown", 30)
 	v.SetDefault("api.title", "Bored Template")
 	v.SetDefault("api.version", "0.0.1")
+	v.SetDefault("upload.max_bytes", 15728640)
 }
 
 // GetAddr returns the server address in host:port format
