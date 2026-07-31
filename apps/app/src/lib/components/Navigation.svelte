@@ -22,7 +22,7 @@
 	const navItems: NavItem[] = [
 		{ id: 'analysis', label: m.nav_analysis, href: '/' },
 		{ id: 'paper-letter', label: m.nav_send_paper_letter, href: '/paper-letter' },
-		{ id: 'analyses', label: m.nav_analyses, href: '/analyses' },
+		{ id: 'analyses', label: m.nav_analyses, href: '/meine-analysen' },
 		{ id: 'reply-pdf', label: m.nav_reply_pdf, href: '/reply-pdf', hidden: true },
 		{ id: 'solutions', label: m.nav_solutions, href: '/solutions' },
 		{ id: 'partners', label: m.nav_partners, href: '/partners', disabled: true, badge: m.nav_soon },
@@ -42,7 +42,9 @@
 	};
 </script>
 
-<aside class="fixed left-0 top-20 z-50 w-full px-4 md:left-4 md:w-[min(320px,calc(100vw-36px))] md:px-0">
+<aside
+	class="fixed top-20 left-0 z-50 w-full px-4 md:left-4 md:w-[min(320px,calc(100vw-36px))] md:px-0"
+>
 	<NavDropdown
 		{isOpen}
 		currentLabel={getCurrentLabel()}

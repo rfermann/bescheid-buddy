@@ -35,6 +35,13 @@ export type BuddyPackage = {
     updated_at: Date;
 };
 
+export type CaseListItem = {
+    createdAt: Date;
+    id: string;
+    title: string;
+    updatedAt: Date;
+};
+
 export type ConfirmUploadOutputBody = {
     /**
      * A URL to the JSON Schema for this object.
@@ -254,6 +261,14 @@ export type GetBuddyPointsOutputBody = {
     readonly $schema?: string;
     lifetime_points: number;
     monthly_points: number;
+};
+
+export type GetCasesByUserIdOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    cases: Array<CaseListItem> | null;
 };
 
 export type GetDocumentStatusOutputBody = {
@@ -511,6 +526,10 @@ export type GetBuddyPointsOutputBodyWritable = {
     monthly_points: number;
 };
 
+export type GetCasesByUserIdOutputBodyWritable = {
+    cases: Array<CaseListItem> | null;
+};
+
 export type GetDocumentStatusOutputBodyWritable = {
     analysis: AnalysisStatusBody;
     documentId: string;
@@ -605,6 +624,31 @@ export type GetAllBuddyPackagesResponses = {
 };
 
 export type GetAllBuddyPackagesResponse = GetAllBuddyPackagesResponses[keyof GetAllBuddyPackagesResponses];
+
+export type GetCasesByUserData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/cases';
+};
+
+export type GetCasesByUserErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetCasesByUserError = GetCasesByUserErrors[keyof GetCasesByUserErrors];
+
+export type GetCasesByUserResponses = {
+    /**
+     * OK
+     */
+    200: GetCasesByUserIdOutputBody;
+};
+
+export type GetCasesByUserResponse = GetCasesByUserResponses[keyof GetCasesByUserResponses];
 
 export type CreateCaseData = {
     body: CreateCaseInputBodyWritable;

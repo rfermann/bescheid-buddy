@@ -24,6 +24,13 @@ export const vBuddyPackage = v.strictObject({
     updated_at: v.pipe(v.string(), v.isoTimestamp())
 });
 
+export const vCaseListItem = v.strictObject({
+    createdAt: v.pipe(v.string(), v.isoTimestamp()),
+    id: v.string(),
+    title: v.string(),
+    updatedAt: v.pipe(v.string(), v.isoTimestamp())
+});
+
 export const vConfirmUploadOutputBody = v.strictObject({
     $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
     documentId: v.string(),
@@ -154,6 +161,11 @@ export const vGetBuddyPointsOutputBody = v.strictObject({
     $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
     lifetime_points: v.pipe(v.number(), v.integer(), v.minValue(-2147483648, 'Invalid value: Expected int32 to be >= -2147483648'), v.maxValue(2147483647, 'Invalid value: Expected int32 to be <= 2147483647')),
     monthly_points: v.pipe(v.number(), v.integer(), v.minValue(-2147483648, 'Invalid value: Expected int32 to be >= -2147483648'), v.maxValue(2147483647, 'Invalid value: Expected int32 to be <= 2147483647'))
+});
+
+export const vGetCasesByUserIdOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    cases: v.nullable(v.array(vCaseListItem))
 });
 
 export const vHealthCheckResponseBody = v.strictObject({
@@ -419,6 +431,10 @@ export const vGetBuddyPointsOutputBodyWritable = v.strictObject({
     monthly_points: v.pipe(v.number(), v.integer(), v.minValue(-2147483648, 'Invalid value: Expected int32 to be >= -2147483648'), v.maxValue(2147483647, 'Invalid value: Expected int32 to be <= 2147483647'))
 });
 
+export const vGetCasesByUserIdOutputBodyWritable = v.strictObject({
+    cases: v.nullable(v.array(vCaseListItem))
+});
+
 export const vGetDocumentStatusOutputBodyWritable = v.strictObject({
     analysis: vAnalysisStatusBody,
     documentId: v.string(),
@@ -477,6 +493,11 @@ export const vGetAllSupportCasesResponse = vGetAllSupportCasesOutputBody;
  * OK
  */
 export const vGetAllBuddyPackagesResponse = vGetAllBuddyPackagesOutputBody;
+
+/**
+ * OK
+ */
+export const vGetCasesByUserResponse = vGetCasesByUserIdOutputBody;
 
 export const vCreateCaseBody = vCreateCaseInputBodyWritable;
 

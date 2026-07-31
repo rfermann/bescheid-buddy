@@ -1,0 +1,10 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"analyses_page_title": "Meine Analysen",
+	"analyses_new": "Neue Analyse starten",
+	"analyses_empty_title": "Noch keine Analysen",
+	"analyses_empty_description": "Sobald du ein Dokument analysierst, erscheint es hier.",
+	"analyses_created": "Erstellt",
+	"analyses_updated": "Aktualisiert",
+	"analyses_untitled": "Unbenannte Analyse"
+}

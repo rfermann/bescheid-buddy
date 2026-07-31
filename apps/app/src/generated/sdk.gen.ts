@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import { createSupportCaseMessageResponseTransformer, createSupportCaseResponseTransformer, enqueueDocumentAnalysisResponseTransformer, enqueueDocumentExtractionResponseTransformer, getAllBuddyPackagesResponseTransformer, getAllSupportCasesResponseTransformer, getSupportCaseByIdResponseTransformer, getSupportCaseMessagesByCaseIdResponseTransformer, getSupportCasesByUserResponseTransformer, updateSupportCaseStatusResponseTransformer } from './transformers.gen';
-import type { ConfirmDocumentUploadData, ConfirmDocumentUploadErrors, ConfirmDocumentUploadResponses, CreateCaseData, CreateCaseErrors, CreateCaseResponses, CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, CreateSupportCaseData, CreateSupportCaseErrors, CreateSupportCaseMessageData, CreateSupportCaseMessageErrors, CreateSupportCaseMessageResponses, CreateSupportCaseResponses, EnqueueDocumentAnalysisData, EnqueueDocumentAnalysisErrors, EnqueueDocumentAnalysisResponses, EnqueueDocumentExtractionData, EnqueueDocumentExtractionErrors, EnqueueDocumentExtractionResponses, GenerateUploadUrlData, GenerateUploadUrlErrors, GenerateUploadUrlResponses, GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetAllSupportCasesData, GetAllSupportCasesErrors, GetAllSupportCasesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, GetDocumentStatusData, GetDocumentStatusErrors, GetDocumentStatusResponses, GetSupportCaseByIdData, GetSupportCaseByIdErrors, GetSupportCaseByIdResponses, GetSupportCaseMessagesByCaseIdData, GetSupportCaseMessagesByCaseIdErrors, GetSupportCaseMessagesByCaseIdResponses, GetSupportCasesByUserData, GetSupportCasesByUserErrors, GetSupportCasesByUserResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, SendEmailData, SendEmailErrors, SendEmailResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses, UpdateSupportCaseStatusData, UpdateSupportCaseStatusErrors, UpdateSupportCaseStatusResponses } from './types.gen';
+import { createSupportCaseMessageResponseTransformer, createSupportCaseResponseTransformer, enqueueDocumentAnalysisResponseTransformer, enqueueDocumentExtractionResponseTransformer, getAllBuddyPackagesResponseTransformer, getAllSupportCasesResponseTransformer, getCasesByUserResponseTransformer, getSupportCaseByIdResponseTransformer, getSupportCaseMessagesByCaseIdResponseTransformer, getSupportCasesByUserResponseTransformer, updateSupportCaseStatusResponseTransformer } from './transformers.gen';
+import type { ConfirmDocumentUploadData, ConfirmDocumentUploadErrors, ConfirmDocumentUploadResponses, CreateCaseData, CreateCaseErrors, CreateCaseResponses, CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, CreateSupportCaseData, CreateSupportCaseErrors, CreateSupportCaseMessageData, CreateSupportCaseMessageErrors, CreateSupportCaseMessageResponses, CreateSupportCaseResponses, EnqueueDocumentAnalysisData, EnqueueDocumentAnalysisErrors, EnqueueDocumentAnalysisResponses, EnqueueDocumentExtractionData, EnqueueDocumentExtractionErrors, EnqueueDocumentExtractionResponses, GenerateUploadUrlData, GenerateUploadUrlErrors, GenerateUploadUrlResponses, GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetAllSupportCasesData, GetAllSupportCasesErrors, GetAllSupportCasesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, GetCasesByUserData, GetCasesByUserErrors, GetCasesByUserResponses, GetDocumentStatusData, GetDocumentStatusErrors, GetDocumentStatusResponses, GetSupportCaseByIdData, GetSupportCaseByIdErrors, GetSupportCaseByIdResponses, GetSupportCaseMessagesByCaseIdData, GetSupportCaseMessagesByCaseIdErrors, GetSupportCaseMessagesByCaseIdResponses, GetSupportCasesByUserData, GetSupportCasesByUserErrors, GetSupportCasesByUserResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, SendEmailData, SendEmailErrors, SendEmailResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses, UpdateSupportCaseStatusData, UpdateSupportCaseStatusErrors, UpdateSupportCaseStatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -38,6 +38,17 @@ export const getAllSupportCases = <ThrowOnError extends boolean = false>(options
 export const getAllBuddyPackages = <ThrowOnError extends boolean = false>(options?: Options<GetAllBuddyPackagesData, ThrowOnError>) => (options?.client ?? client).get<GetAllBuddyPackagesResponses, GetAllBuddyPackagesErrors, ThrowOnError>({
     responseTransformer: getAllBuddyPackagesResponseTransformer,
     url: '/v1/buddy-packages',
+    ...options
+});
+
+/**
+ * Get cases
+ *
+ * Get cases for the currently logged in user, newest first
+ */
+export const getCasesByUser = <ThrowOnError extends boolean = false>(options?: Options<GetCasesByUserData, ThrowOnError>) => (options?.client ?? client).get<GetCasesByUserResponses, GetCasesByUserErrors, ThrowOnError>({
+    responseTransformer: getCasesByUserResponseTransformer,
+    url: '/v1/cases',
     ...options
 });
 

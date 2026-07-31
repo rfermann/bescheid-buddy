@@ -1,0 +1,10 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"analyses_page_title": "تحليلاتي",
+	"analyses_new": "بدء تحليل جديد",
+	"analyses_empty_title": "لا توجد تحليلات بعد",
+	"analyses_empty_description": "عندما تحلل مستنداً، سيظهر هنا.",
+	"analyses_created": "تاريخ الإنشاء",
+	"analyses_updated": "آخر تحديث",
+	"analyses_untitled": "تحليل بلا عنوان"
+}
