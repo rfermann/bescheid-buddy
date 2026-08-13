@@ -39,6 +39,16 @@ func (h *Handler) RegisterRoutes(api huma.API) {
 	}, h.getCasesByUserID)
 
 	huma.Register(api, huma.Operation{
+		OperationID: "get-case-by-id",
+		Method:      http.MethodGet,
+		Path:        "/cases/{caseId}",
+		Summary:     "Get case",
+		Description: "Get a case belonging to the currently logged in user",
+		Tags:        []string{"Cases"},
+		Security:    []map[string][]string{{"session-cookie": {}}},
+	}, h.getCaseByID)
+
+	huma.Register(api, huma.Operation{
 		OperationID: "generate-upload-url",
 		Method:      http.MethodPost,
 		Path:        "/cases/{caseId}/documents/upload-url",

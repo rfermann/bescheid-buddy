@@ -19,6 +19,7 @@ var (
 	ErrFileTooLarge         = errors.New("uploaded file exceeds the maximum allowed size")
 	ErrDocumentNotExtracted = errors.New("document extraction has not completed")
 	ErrDocumentNotFound     = errors.New("document was not found")
+	ErrCaseNotFound         = errors.New("case was not found")
 )
 
 type DocumentStorage interface {
@@ -311,4 +312,19 @@ func (s *Service) GetDocumentStatus(ctx context.Context, documentID uuid.UUID) (
 
 func (s *Service) GetCasesByUserID(ctx context.Context, userID uuid.UUID) ([]*db.Case, error) {
 	return s.repository.GetCasesByUserID(ctx, db.GetCasesByUserIDParams{UserID: userID})
+}
+
+func (s *Service) GetCaseByID(ctx context.Context, userID, caseID uuid.UUID) (*db.Case, error) {
+	caseRecord, err := s.repository.GetCaseByIDAndUserID(ctx, db.GetCaseByIDAndUserIDParams{
+		ID:     caseID,
+		UserID: userID,
+	})
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, ErrCaseNotFound
+	}
+	return caseRecord, err
+}
+
+func (s *Service) GetCaseDocumentsForDetail(ctx context.Context, caseID uuid.UUID) ([]*db.GetCaseDocumentsForDetailRow, error) {
+	return s.repository.GetCaseDocumentsForDetail(ctx, db.GetCaseDocumentsForDetailParams{CaseID: caseID})
 }

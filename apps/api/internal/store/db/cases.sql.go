@@ -403,6 +403,31 @@ func (q *Queries) FailDocumentExtraction(ctx context.Context, arg FailDocumentEx
 	return &i, err
 }
 
+const getCaseByIDAndUserID = `-- name: GetCaseByIDAndUserID :one
+SELECT id, user_id, title, created_at, updated_at
+FROM cases
+WHERE id = $1
+  AND user_id = $2
+`
+
+type GetCaseByIDAndUserIDParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) GetCaseByIDAndUserID(ctx context.Context, arg GetCaseByIDAndUserIDParams) (*Case, error) {
+	row := q.db.QueryRow(ctx, getCaseByIDAndUserID, arg.ID, arg.UserID)
+	var i Case
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Title,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
 const getCaseDocumentByID = `-- name: GetCaseDocumentByID :one
 SELECT id, case_id, file_name, upload_status, uploaded_at, status, error_message, created_at, updated_at, completed_at
 FROM case_documents
@@ -429,6 +454,66 @@ func (q *Queries) GetCaseDocumentByID(ctx context.Context, arg GetCaseDocumentBy
 		&i.CompletedAt,
 	)
 	return &i, err
+}
+
+const getCaseDocumentsForDetail = `-- name: GetCaseDocumentsForDetail :many
+SELECT document.id AS document_id,
+       document.file_name,
+       document.upload_status,
+       extraction.status AS extraction_status,
+       analysis.status AS analysis_status,
+       analysis.analysis_text,
+       analysis.analysis_metadata,
+       analysis.error_message AS analysis_error_message
+FROM case_documents AS document
+LEFT JOIN document_extractions AS extraction ON extraction.document_id = document.id
+LEFT JOIN document_analysis_results AS analysis ON analysis.document_id = document.id
+WHERE document.case_id = $1
+ORDER BY document.created_at, document.id
+`
+
+type GetCaseDocumentsForDetailParams struct {
+	CaseID uuid.UUID `json:"case_id"`
+}
+
+type GetCaseDocumentsForDetailRow struct {
+	DocumentID           uuid.UUID                  `json:"document_id"`
+	FileName             string                     `json:"file_name"`
+	UploadStatus         DocumentUploadStatus       `json:"upload_status"`
+	ExtractionStatus     NullDocumentAnalysisStatus `json:"extraction_status"`
+	AnalysisStatus       NullDocumentAnalysisStatus `json:"analysis_status"`
+	AnalysisText         pgtype.Text                `json:"analysis_text"`
+	AnalysisMetadata     []byte                     `json:"analysis_metadata"`
+	AnalysisErrorMessage pgtype.Text                `json:"analysis_error_message"`
+}
+
+func (q *Queries) GetCaseDocumentsForDetail(ctx context.Context, arg GetCaseDocumentsForDetailParams) ([]*GetCaseDocumentsForDetailRow, error) {
+	rows, err := q.db.Query(ctx, getCaseDocumentsForDetail, arg.CaseID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*GetCaseDocumentsForDetailRow
+	for rows.Next() {
+		var i GetCaseDocumentsForDetailRow
+		if err := rows.Scan(
+			&i.DocumentID,
+			&i.FileName,
+			&i.UploadStatus,
+			&i.ExtractionStatus,
+			&i.AnalysisStatus,
+			&i.AnalysisText,
+			&i.AnalysisMetadata,
+			&i.AnalysisErrorMessage,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getCasesByUserID = `-- name: GetCasesByUserID :many

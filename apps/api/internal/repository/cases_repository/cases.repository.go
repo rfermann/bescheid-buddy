@@ -11,10 +11,12 @@ import (
 type Repository interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
 	CreateCase(ctx context.Context, params db.CreateCaseParams) (*db.Case, error)
+	GetCaseByIDAndUserID(ctx context.Context, params db.GetCaseByIDAndUserIDParams) (*db.Case, error)
 	GetCasesByUserID(ctx context.Context, params db.GetCasesByUserIDParams) ([]*db.Case, error)
 	UpdateCaseTitle(ctx context.Context, params db.UpdateCaseTitleParams) error
 	CreateCaseDocument(ctx context.Context, params db.CreateCaseDocumentParams) (*db.CaseDocument, error)
 	GetCaseDocumentByID(ctx context.Context, params db.GetCaseDocumentByIDParams) (*db.CaseDocument, error)
+	GetCaseDocumentsForDetail(ctx context.Context, params db.GetCaseDocumentsForDetailParams) ([]*db.GetCaseDocumentsForDetailRow, error)
 	GetInitialCaseDocument(ctx context.Context, params db.GetInitialCaseDocumentParams) (*db.CaseDocument, error)
 	MarkCaseDocumentUploaded(ctx context.Context, params db.MarkCaseDocumentUploadedParams) (*db.CaseDocument, error)
 	MarkCaseDocumentUploadFailed(ctx context.Context, params db.MarkCaseDocumentUploadFailedParams) (*db.CaseDocument, error)
@@ -59,6 +61,10 @@ func (r *CasesRepository) CreateCase(ctx context.Context, params db.CreateCasePa
 	return r.Store.Queries.CreateCase(ctx, params)
 }
 
+func (r *CasesRepository) GetCaseByIDAndUserID(ctx context.Context, params db.GetCaseByIDAndUserIDParams) (*db.Case, error) {
+	return r.Store.Queries.GetCaseByIDAndUserID(ctx, params)
+}
+
 func (r *CasesRepository) GetCasesByUserID(ctx context.Context, params db.GetCasesByUserIDParams) ([]*db.Case, error) {
 	return r.Store.Queries.GetCasesByUserID(ctx, params)
 }
@@ -73,6 +79,10 @@ func (r *CasesRepository) CreateCaseDocument(ctx context.Context, params db.Crea
 
 func (r *CasesRepository) GetCaseDocumentByID(ctx context.Context, params db.GetCaseDocumentByIDParams) (*db.CaseDocument, error) {
 	return r.Store.Queries.GetCaseDocumentByID(ctx, params)
+}
+
+func (r *CasesRepository) GetCaseDocumentsForDetail(ctx context.Context, params db.GetCaseDocumentsForDetailParams) ([]*db.GetCaseDocumentsForDetailRow, error) {
+	return r.Store.Queries.GetCaseDocumentsForDetail(ctx, params)
 }
 
 func (r *CasesRepository) GetInitialCaseDocument(ctx context.Context, params db.GetInitialCaseDocumentParams) (*db.CaseDocument, error) {

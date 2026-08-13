@@ -9,6 +9,12 @@ FROM cases
 WHERE user_id = $1
 ORDER BY created_at DESC, id DESC;
 
+-- name: GetCaseByIDAndUserID :one
+SELECT *
+FROM cases
+WHERE id = $1
+  AND user_id = $2;
+
 -- name: UpdateCaseTitle :exec
 UPDATE cases
 SET title = $2,
@@ -31,6 +37,21 @@ FROM case_documents
 WHERE case_id = $1
 ORDER BY created_at, id
 LIMIT 1;
+
+-- name: GetCaseDocumentsForDetail :many
+SELECT document.id AS document_id,
+       document.file_name,
+       document.upload_status,
+       extraction.status AS extraction_status,
+       analysis.status AS analysis_status,
+       analysis.analysis_text,
+       analysis.analysis_metadata,
+       analysis.error_message AS analysis_error_message
+FROM case_documents AS document
+LEFT JOIN document_extractions AS extraction ON extraction.document_id = document.id
+LEFT JOIN document_analysis_results AS analysis ON analysis.document_id = document.id
+WHERE document.case_id = $1
+ORDER BY document.created_at, document.id;
 
 -- name: MarkCaseDocumentUploaded :one
 UPDATE case_documents
