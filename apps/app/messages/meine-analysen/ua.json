@@ -6,5 +6,10 @@
 	"analyses_empty_description": "Коли ви проаналізуєте документ, він з’явиться тут.",
 	"analyses_created": "Створено",
 	"analyses_updated": "Оновлено",
-	"analyses_untitled": "Аналіз без назви"
+	"analyses_untitled": "Аналіз без назви",
+	"analysis_detail_back": "Назад до моїх аналізів",
+	"analysis_detail_pending_title": "Аналіз триває",
+	"analysis_detail_pending_description": "Результат ще не готовий. Будь ласка, перевірте трохи пізніше.",
+	"analysis_detail_failed_title": "Не вдалося виконати аналіз",
+	"analysis_detail_failed_description": "Не вдалося завершити цей аналіз. Почніть новий аналіз або зверніться до служби підтримки."
 }

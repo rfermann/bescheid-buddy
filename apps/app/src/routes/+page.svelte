@@ -6,7 +6,7 @@
 	import FileSelector from './FileSelector.svelte';
 	import ModelSelector from './ModelSelector.svelte';
 	import ConsentGate from './ConsentGate.svelte';
-	import Result from './Result.svelte';
+	import Result from '$lib/components/analysis/Result.svelte';
 	import {
 		runAnalysisPipeline,
 		type AnalysisModel,

@@ -6,5 +6,10 @@
 	"analyses_empty_description": "Gdy przeanalizujesz dokument, pojawi się on tutaj.",
 	"analyses_created": "Utworzono",
 	"analyses_updated": "Zaktualizowano",
-	"analyses_untitled": "Analiza bez nazwy"
+	"analyses_untitled": "Analiza bez nazwy",
+	"analysis_detail_back": "Wróć do moich analiz",
+	"analysis_detail_pending_title": "Analiza w toku",
+	"analysis_detail_pending_description": "Wynik nie jest jeszcze gotowy. Sprawdź ponownie za chwilę.",
+	"analysis_detail_failed_title": "Analiza nie powiodła się",
+	"analysis_detail_failed_description": "Nie udało się ukończyć tej analizy. Rozpocznij nową analizę lub skontaktuj się z pomocą techniczną."
 }

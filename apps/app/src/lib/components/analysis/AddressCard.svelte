@@ -1,4 +1,6 @@
 <script lang="ts">
+	import * as m from '$lib/paraglide/messages.js';
+
 	let {
 		title,
 		name,
@@ -30,7 +32,12 @@
 
 <div class="rounded-lg border border-white/10 bg-white/5 p-4">
 	<h3 class="text-sm font-medium text-[#b7b7c8]">{title}</h3>
-	<p class="mt-1 text-base font-semibold text-white">{name || '—'}</p>
+	<p class="mt-1 text-base font-semibold text-white">
+		{name ||
+			(!address && !hasStructuredAddress && (!category || category === 'unknown')
+				? m.analyse_result_no_information()
+				: '—')}
+	</p>
 	{#if hasStructuredAddress}
 		<div class="mt-1 text-sm text-[#b7b7c8]">
 			{#if streetLine}<p>{streetLine}</p>{/if}
@@ -39,7 +46,7 @@
 			{#if country}<p>{country}</p>{/if}
 		</div>
 	{:else if address}
-		<p class="mt-1 whitespace-pre-line text-sm text-[#b7b7c8]">{address}</p>
+		<p class="mt-1 text-sm whitespace-pre-line text-[#b7b7c8]">{address}</p>
 	{/if}
 	{#if category && category !== 'unknown'}
 		<p class="mt-1 text-sm text-[#b7b7c8]">{category}</p>

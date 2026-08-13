@@ -6,5 +6,10 @@
 	"analyses_empty_description": "Sobald du ein Dokument analysierst, erscheint es hier.",
 	"analyses_created": "Erstellt",
 	"analyses_updated": "Aktualisiert",
-	"analyses_untitled": "Unbenannte Analyse"
+	"analyses_untitled": "Unbenannte Analyse",
+	"analysis_detail_back": "Zurück zu meinen Analysen",
+	"analysis_detail_pending_title": "Analyse läuft",
+	"analysis_detail_pending_description": "Das Ergebnis ist noch nicht fertig. Bitte schau in Kürze noch einmal vorbei.",
+	"analysis_detail_failed_title": "Analyse fehlgeschlagen",
+	"analysis_detail_failed_description": "Diese Analyse konnte nicht abgeschlossen werden. Bitte starte eine neue Analyse oder kontaktiere den Support."
 }

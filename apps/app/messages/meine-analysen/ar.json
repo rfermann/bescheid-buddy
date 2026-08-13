@@ -6,5 +6,10 @@
 	"analyses_empty_description": "عندما تحلل مستنداً، سيظهر هنا.",
 	"analyses_created": "تاريخ الإنشاء",
 	"analyses_updated": "آخر تحديث",
-	"analyses_untitled": "تحليل بلا عنوان"
+	"analyses_untitled": "تحليل بلا عنوان",
+	"analysis_detail_back": "العودة إلى تحليلاتي",
+	"analysis_detail_pending_title": "التحليل قيد التنفيذ",
+	"analysis_detail_pending_description": "النتيجة ليست جاهزة بعد. يرجى التحقق مرة أخرى قريباً.",
+	"analysis_detail_failed_title": "فشل التحليل",
+	"analysis_detail_failed_description": "تعذر إكمال هذا التحليل. يرجى بدء تحليل جديد أو التواصل مع الدعم."
 }

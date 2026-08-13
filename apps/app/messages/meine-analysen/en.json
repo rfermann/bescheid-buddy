@@ -6,5 +6,10 @@
 	"analyses_empty_description": "Once you analyse a document, it will appear here.",
 	"analyses_created": "Created",
 	"analyses_updated": "Updated",
-	"analyses_untitled": "Untitled analysis"
+	"analyses_untitled": "Untitled analysis",
+	"analysis_detail_back": "Back to my analyses",
+	"analysis_detail_pending_title": "Analysis in progress",
+	"analysis_detail_pending_description": "The result is not ready yet. Please check again shortly.",
+	"analysis_detail_failed_title": "Analysis failed",
+	"analysis_detail_failed_description": "We could not complete this analysis. Please start a new analysis or contact support."
 }
