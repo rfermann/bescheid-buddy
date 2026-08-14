@@ -54,3 +54,13 @@ func (s *Service) QueueDocumentAnalysisJobTx(ctx context.Context, tx pgx.Tx, doc
 	}
 	return result.Job.ID, nil
 }
+
+func (s *Service) QueueDocumentReplyGenerationJobTx(ctx context.Context, tx pgx.Tx, replyGenerationID uuid.UUID) (int64, error) {
+	result, err := s.client.InsertTx(ctx, tx, workers.DocumentReplyGenerationJobArgs{
+		ReplyGenerationID: replyGenerationID,
+	}, nil)
+	if err != nil {
+		return 0, err
+	}
+	return result.Job.ID, nil
+}

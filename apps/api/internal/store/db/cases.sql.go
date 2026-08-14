@@ -145,6 +145,44 @@ func (q *Queries) CompleteDocumentExtraction(ctx context.Context, arg CompleteDo
 	return &i, err
 }
 
+const completeDocumentReplyGeneration = `-- name: CompleteDocumentReplyGeneration :one
+UPDATE document_reply_generations
+SET status        = 'completed',
+    result        = $2,
+    error_message = NULL,
+    completed_at  = NOW(),
+    updated_at    = NOW()
+WHERE id = $1
+RETURNING id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+`
+
+type CompleteDocumentReplyGenerationParams struct {
+	ID     uuid.UUID `json:"id"`
+	Result []byte    `json:"result"`
+}
+
+func (q *Queries) CompleteDocumentReplyGeneration(ctx context.Context, arg CompleteDocumentReplyGenerationParams) (*DocumentReplyGeneration, error) {
+	row := q.db.QueryRow(ctx, completeDocumentReplyGeneration, arg.ID, arg.Result)
+	var i DocumentReplyGeneration
+	err := row.Scan(
+		&i.ID,
+		&i.DocumentID,
+		&i.Status,
+		&i.JobID,
+		&i.Model,
+		&i.Provider,
+		&i.Language,
+		&i.Instruction,
+		&i.Result,
+		&i.ErrorMessage,
+		&i.StartedAt,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
 const createCase = `-- name: CreateCase :one
 INSERT INTO cases (user_id, title)
 VALUES ($1, $2)
@@ -301,6 +339,52 @@ func (q *Queries) CreateDocumentExtraction(ctx context.Context, arg CreateDocume
 	return &i, err
 }
 
+const createDocumentReplyGeneration = `-- name: CreateDocumentReplyGeneration :one
+INSERT INTO document_reply_generations (id, document_id, job_id, model, provider, language, instruction)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+`
+
+type CreateDocumentReplyGenerationParams struct {
+	ID          uuid.UUID   `json:"id"`
+	DocumentID  uuid.UUID   `json:"document_id"`
+	JobID       pgtype.Int8 `json:"job_id"`
+	Model       string      `json:"model"`
+	Provider    string      `json:"provider"`
+	Language    string      `json:"language"`
+	Instruction string      `json:"instruction"`
+}
+
+func (q *Queries) CreateDocumentReplyGeneration(ctx context.Context, arg CreateDocumentReplyGenerationParams) (*DocumentReplyGeneration, error) {
+	row := q.db.QueryRow(ctx, createDocumentReplyGeneration,
+		arg.ID,
+		arg.DocumentID,
+		arg.JobID,
+		arg.Model,
+		arg.Provider,
+		arg.Language,
+		arg.Instruction,
+	)
+	var i DocumentReplyGeneration
+	err := row.Scan(
+		&i.ID,
+		&i.DocumentID,
+		&i.Status,
+		&i.JobID,
+		&i.Model,
+		&i.Provider,
+		&i.Language,
+		&i.Instruction,
+		&i.Result,
+		&i.ErrorMessage,
+		&i.StartedAt,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
 const failDocumentAnalysis = `-- name: FailDocumentAnalysis :one
 UPDATE document_analysis_results
 SET status        = 'failed',
@@ -394,6 +478,43 @@ func (q *Queries) FailDocumentExtraction(ctx context.Context, arg FailDocumentEx
 		&i.PageCount,
 		&i.CharCount,
 		&i.TextSha256,
+		&i.ErrorMessage,
+		&i.StartedAt,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const failDocumentReplyGeneration = `-- name: FailDocumentReplyGeneration :one
+UPDATE document_reply_generations
+SET status        = 'failed',
+    error_message = $2,
+    completed_at  = NOW(),
+    updated_at    = NOW()
+WHERE id = $1
+RETURNING id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+`
+
+type FailDocumentReplyGenerationParams struct {
+	ID           uuid.UUID   `json:"id"`
+	ErrorMessage pgtype.Text `json:"error_message"`
+}
+
+func (q *Queries) FailDocumentReplyGeneration(ctx context.Context, arg FailDocumentReplyGenerationParams) (*DocumentReplyGeneration, error) {
+	row := q.db.QueryRow(ctx, failDocumentReplyGeneration, arg.ID, arg.ErrorMessage)
+	var i DocumentReplyGeneration
+	err := row.Scan(
+		&i.ID,
+		&i.DocumentID,
+		&i.Status,
+		&i.JobID,
+		&i.Model,
+		&i.Provider,
+		&i.Language,
+		&i.Instruction,
+		&i.Result,
 		&i.ErrorMessage,
 		&i.StartedAt,
 		&i.CompletedAt,
@@ -670,6 +791,38 @@ func (q *Queries) GetDocumentExtractionTextByDocumentID(ctx context.Context, arg
 	return &i, err
 }
 
+const getDocumentReplyGenerationByID = `-- name: GetDocumentReplyGenerationByID :one
+SELECT id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+FROM document_reply_generations
+WHERE id = $1
+`
+
+type GetDocumentReplyGenerationByIDParams struct {
+	ID uuid.UUID `json:"id"`
+}
+
+func (q *Queries) GetDocumentReplyGenerationByID(ctx context.Context, arg GetDocumentReplyGenerationByIDParams) (*DocumentReplyGeneration, error) {
+	row := q.db.QueryRow(ctx, getDocumentReplyGenerationByID, arg.ID)
+	var i DocumentReplyGeneration
+	err := row.Scan(
+		&i.ID,
+		&i.DocumentID,
+		&i.Status,
+		&i.JobID,
+		&i.Model,
+		&i.Provider,
+		&i.Language,
+		&i.Instruction,
+		&i.Result,
+		&i.ErrorMessage,
+		&i.StartedAt,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
 const getInitialCaseDocument = `-- name: GetInitialCaseDocument :one
 SELECT id, case_id, file_name, upload_status, uploaded_at, status, error_message, created_at, updated_at, completed_at
 FROM case_documents
@@ -850,6 +1003,41 @@ func (q *Queries) MarkDocumentExtractionProcessing(ctx context.Context, arg Mark
 		&i.PageCount,
 		&i.CharCount,
 		&i.TextSha256,
+		&i.ErrorMessage,
+		&i.StartedAt,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const markDocumentReplyGenerationProcessing = `-- name: MarkDocumentReplyGenerationProcessing :one
+UPDATE document_reply_generations
+SET status     = 'processing',
+    started_at = COALESCE(started_at, NOW()),
+    updated_at = NOW()
+WHERE id = $1
+RETURNING id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+`
+
+type MarkDocumentReplyGenerationProcessingParams struct {
+	ID uuid.UUID `json:"id"`
+}
+
+func (q *Queries) MarkDocumentReplyGenerationProcessing(ctx context.Context, arg MarkDocumentReplyGenerationProcessingParams) (*DocumentReplyGeneration, error) {
+	row := q.db.QueryRow(ctx, markDocumentReplyGenerationProcessing, arg.ID)
+	var i DocumentReplyGeneration
+	err := row.Scan(
+		&i.ID,
+		&i.DocumentID,
+		&i.Status,
+		&i.JobID,
+		&i.Model,
+		&i.Provider,
+		&i.Language,
+		&i.Instruction,
+		&i.Result,
 		&i.ErrorMessage,
 		&i.StartedAt,
 		&i.CompletedAt,

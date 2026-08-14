@@ -14,6 +14,7 @@ import (
 	"github.com/bored-bots/bored-template/internal/services/document_service"
 	"github.com/bored-bots/bored-template/internal/services/extraction_service"
 	"github.com/bored-bots/bored-template/internal/services/llm_service"
+	"github.com/bored-bots/bored-template/internal/services/reply_service"
 	"github.com/bored-bots/bored-template/internal/services/vision_service"
 	s "github.com/bored-bots/bored-template/internal/store"
 	"github.com/minio/minio-go/v7"
@@ -55,8 +56,9 @@ func New() (*App, error) {
 		AnthropicAPIKey: cfg.LLM.AnthropicAPIKey,
 	})
 	analysisService := analysis_service.New(casesRepo, llmService)
+	replyService := reply_service.New(casesRepo, llmService)
 
-	q, err := queue.New(store.Pool, extractionService, analysisService)
+	q, err := queue.New(store.Pool, extractionService, analysisService, replyService)
 	if err != nil {
 		return nil, err
 	}

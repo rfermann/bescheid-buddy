@@ -97,4 +97,25 @@ func (h *Handler) RegisterRoutes(api huma.API) {
 		Tags:        []string{"Cases"},
 		Security:    []map[string][]string{{"session-cookie": {}}},
 	}, h.getDocumentStatus)
+
+	huma.Register(api, huma.Operation{
+		OperationID:   "enqueue-document-reply-generation",
+		Method:        http.MethodPost,
+		Path:          "/cases/{caseId}/documents/{documentId}/reply-generations",
+		Summary:       "Enqueue document reply generation",
+		Description:   "Enqueue a River job to generate a reply to an analyzed document",
+		Tags:          []string{"Cases"},
+		Security:      []map[string][]string{{"session-cookie": {}}},
+		DefaultStatus: http.StatusAccepted,
+	}, h.enqueueDocumentReplyGeneration)
+
+	huma.Register(api, huma.Operation{
+		OperationID: "get-document-reply-generation",
+		Method:      http.MethodGet,
+		Path:        "/cases/{caseId}/documents/{documentId}/reply-generations/{replyGenerationId}",
+		Summary:     "Get document reply generation",
+		Description: "Get the status and result of a document reply generation",
+		Tags:        []string{"Cases"},
+		Security:    []map[string][]string{{"session-cookie": {}}},
+	}, h.getDocumentReplyGeneration)
 }

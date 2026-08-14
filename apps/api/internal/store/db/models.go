@@ -66,6 +66,59 @@ func AllDocumentAnalysisStatusValues() []DocumentAnalysisStatus {
 	}
 }
 
+type DocumentReplyGenerationStatus string
+
+const (
+	DocumentReplyGenerationStatusPending    DocumentReplyGenerationStatus = "pending"
+	DocumentReplyGenerationStatusProcessing DocumentReplyGenerationStatus = "processing"
+	DocumentReplyGenerationStatusCompleted  DocumentReplyGenerationStatus = "completed"
+	DocumentReplyGenerationStatusFailed     DocumentReplyGenerationStatus = "failed"
+)
+
+func (e *DocumentReplyGenerationStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = DocumentReplyGenerationStatus(s)
+	case string:
+		*e = DocumentReplyGenerationStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for DocumentReplyGenerationStatus: %T", src)
+	}
+	return nil
+}
+
+type NullDocumentReplyGenerationStatus struct {
+	DocumentReplyGenerationStatus DocumentReplyGenerationStatus `json:"document_reply_generation_status"`
+	Valid                         bool                          `json:"valid"` // Valid is true if DocumentReplyGenerationStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullDocumentReplyGenerationStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.DocumentReplyGenerationStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.DocumentReplyGenerationStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullDocumentReplyGenerationStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.DocumentReplyGenerationStatus), nil
+}
+
+func AllDocumentReplyGenerationStatusValues() []DocumentReplyGenerationStatus {
+	return []DocumentReplyGenerationStatus{
+		DocumentReplyGenerationStatusPending,
+		DocumentReplyGenerationStatusProcessing,
+		DocumentReplyGenerationStatusCompleted,
+		DocumentReplyGenerationStatusFailed,
+	}
+}
+
 type DocumentUploadStatus string
 
 const (
@@ -461,6 +514,23 @@ type DocumentExtraction struct {
 	CompletedAt  *time.Time             `json:"completed_at"`
 	CreatedAt    time.Time              `json:"created_at"`
 	UpdatedAt    time.Time              `json:"updated_at"`
+}
+
+type DocumentReplyGeneration struct {
+	ID           uuid.UUID                     `json:"id"`
+	DocumentID   uuid.UUID                     `json:"document_id"`
+	Status       DocumentReplyGenerationStatus `json:"status"`
+	JobID        pgtype.Int8                   `json:"job_id"`
+	Model        string                        `json:"model"`
+	Provider     string                        `json:"provider"`
+	Language     string                        `json:"language"`
+	Instruction  string                        `json:"instruction"`
+	Result       []byte                        `json:"result"`
+	ErrorMessage pgtype.Text                   `json:"error_message"`
+	StartedAt    *time.Time                    `json:"started_at"`
+	CompletedAt  *time.Time                    `json:"completed_at"`
+	CreatedAt    time.Time                     `json:"created_at"`
+	UpdatedAt    time.Time                     `json:"updated_at"`
 }
 
 type Session struct {

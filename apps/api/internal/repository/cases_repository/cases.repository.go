@@ -31,6 +31,11 @@ type Repository interface {
 	MarkDocumentAnalysisProcessing(ctx context.Context, params db.MarkDocumentAnalysisProcessingParams) (*db.MarkDocumentAnalysisProcessingRow, error)
 	CompleteDocumentAnalysis(ctx context.Context, params db.CompleteDocumentAnalysisParams) (*db.CompleteDocumentAnalysisRow, error)
 	FailDocumentAnalysis(ctx context.Context, params db.FailDocumentAnalysisParams) (*db.FailDocumentAnalysisRow, error)
+	CreateDocumentReplyGeneration(ctx context.Context, params db.CreateDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error)
+	GetDocumentReplyGenerationByID(ctx context.Context, params db.GetDocumentReplyGenerationByIDParams) (*db.DocumentReplyGeneration, error)
+	MarkDocumentReplyGenerationProcessing(ctx context.Context, params db.MarkDocumentReplyGenerationProcessingParams) (*db.DocumentReplyGeneration, error)
+	CompleteDocumentReplyGeneration(ctx context.Context, params db.CompleteDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error)
+	FailDocumentReplyGeneration(ctx context.Context, params db.FailDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error)
 	WithTx(tx pgx.Tx) Repository
 }
 
@@ -139,4 +144,24 @@ func (r *CasesRepository) CompleteDocumentAnalysis(ctx context.Context, params d
 
 func (r *CasesRepository) FailDocumentAnalysis(ctx context.Context, params db.FailDocumentAnalysisParams) (*db.FailDocumentAnalysisRow, error) {
 	return r.Store.Queries.FailDocumentAnalysis(ctx, params)
+}
+
+func (r *CasesRepository) CreateDocumentReplyGeneration(ctx context.Context, params db.CreateDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error) {
+	return r.Store.Queries.CreateDocumentReplyGeneration(ctx, params)
+}
+
+func (r *CasesRepository) GetDocumentReplyGenerationByID(ctx context.Context, params db.GetDocumentReplyGenerationByIDParams) (*db.DocumentReplyGeneration, error) {
+	return r.Store.Queries.GetDocumentReplyGenerationByID(ctx, params)
+}
+
+func (r *CasesRepository) MarkDocumentReplyGenerationProcessing(ctx context.Context, params db.MarkDocumentReplyGenerationProcessingParams) (*db.DocumentReplyGeneration, error) {
+	return r.Store.Queries.MarkDocumentReplyGenerationProcessing(ctx, params)
+}
+
+func (r *CasesRepository) CompleteDocumentReplyGeneration(ctx context.Context, params db.CompleteDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error) {
+	return r.Store.Queries.CompleteDocumentReplyGeneration(ctx, params)
+}
+
+func (r *CasesRepository) FailDocumentReplyGeneration(ctx context.Context, params db.FailDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error) {
+	return r.Store.Queries.FailDocumentReplyGeneration(ctx, params)
 }

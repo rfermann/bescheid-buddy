@@ -165,3 +165,40 @@ SET status        = 'failed',
     updated_at    = NOW()
 WHERE document_id = $1
 RETURNING id, document_id, status, job_id, model, provider, error_message, started_at, completed_at, created_at, updated_at;
+
+-- name: CreateDocumentReplyGeneration :one
+INSERT INTO document_reply_generations (id, document_id, job_id, model, provider, language, instruction)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
+RETURNING *;
+
+-- name: GetDocumentReplyGenerationByID :one
+SELECT *
+FROM document_reply_generations
+WHERE id = $1;
+
+-- name: MarkDocumentReplyGenerationProcessing :one
+UPDATE document_reply_generations
+SET status     = 'processing',
+    started_at = COALESCE(started_at, NOW()),
+    updated_at = NOW()
+WHERE id = $1
+RETURNING *;
+
+-- name: CompleteDocumentReplyGeneration :one
+UPDATE document_reply_generations
+SET status        = 'completed',
+    result        = $2,
+    error_message = NULL,
+    completed_at  = NOW(),
+    updated_at    = NOW()
+WHERE id = $1
+RETURNING *;
+
+-- name: FailDocumentReplyGeneration :one
+UPDATE document_reply_generations
+SET status        = 'failed',
+    error_message = $2,
+    completed_at  = NOW(),
+    updated_at    = NOW()
+WHERE id = $1
+RETURNING *;
