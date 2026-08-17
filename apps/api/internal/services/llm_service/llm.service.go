@@ -15,38 +15,50 @@ import (
 type Model string
 
 const (
-	ModelGPT4oMini     Model = "gpt-4o-mini"
-	ModelGeminiFlash20 Model = "gemini-2.0-flash"
+	ModelGPT56Luna     Model = "gpt-5.6-luna"
+	ModelGeminiFlash37 Model = "gemini-3.7-flash"
 	ModelHaiku45       Model = "claude-haiku-4-5"
 )
+
+type ModelInfo struct {
+	ID       Model
+	Name     string
+	Provider string
+}
+
+var models = []ModelInfo{
+	{ID: ModelGPT56Luna, Name: "GPT-5.6 Luna", Provider: "openai"},
+	{ID: ModelGeminiFlash37, Name: "Gemini 3.7 Flash", Provider: "google"},
+	{ID: ModelHaiku45, Name: "Claude Haiku 4.5", Provider: "anthropic"},
+}
 
 const maxOutputTokens = 2048
 
 var (
-	ErrUnsupportedModel = errors.New("unsupported analysis model")
+	ErrUnsupportedModel = errors.New("unsupported model")
 	ErrMissingAPIKey    = errors.New("no api key configured for the selected model's provider")
 )
 
 func ParseModel(s string) (Model, error) {
-	switch Model(s) {
-	case ModelGPT4oMini, ModelGeminiFlash20, ModelHaiku45:
-		return Model(s), nil
-	default:
-		return "", fmt.Errorf("%w: %s", ErrUnsupportedModel, s)
+	for _, model := range models {
+		if model.ID == Model(s) {
+			return model.ID, nil
+		}
 	}
+	return "", fmt.Errorf("%w: %s", ErrUnsupportedModel, s)
+}
+
+func Models() []ModelInfo {
+	return append([]ModelInfo(nil), models...)
 }
 
 func (m Model) Provider() string {
-	switch m {
-	case ModelGPT4oMini:
-		return "openai"
-	case ModelGeminiFlash20:
-		return "google"
-	case ModelHaiku45:
-		return "anthropic"
-	default:
-		return "unknown"
+	for _, model := range models {
+		if model.ID == m {
+			return model.Provider
+		}
 	}
+	return "unknown"
 }
 
 type Config struct {
@@ -82,12 +94,12 @@ func (e *APIError) Retryable() bool {
 }
 
 func (s *Service) Complete(ctx context.Context, model Model, system, user string) (string, error) {
-	switch model {
-	case ModelGPT4oMini:
+	switch model.Provider() {
+	case "openai":
 		return s.completeOpenAI(ctx, model, system, user)
-	case ModelGeminiFlash20:
+	case "google":
 		return s.completeGemini(ctx, model, system, user)
-	case ModelHaiku45:
+	case "anthropic":
 		return s.completeAnthropic(ctx, model, system, user)
 	default:
 		return "", fmt.Errorf("%w: %s", ErrUnsupportedModel, model)
@@ -100,7 +112,8 @@ func (s *Service) completeOpenAI(ctx context.Context, model Model, system, user 
 	}
 
 	payload := openAIRequest{
-		Model: string(model),
+		Model:           string(model),
+		ReasoningEffort: "none",
 		Messages: []openAIMessage{
 			{Role: "system", Content: system},
 			{Role: "user", Content: user},
@@ -232,9 +245,10 @@ type openAIMessage struct {
 }
 
 type openAIRequest struct {
-	Model          string                `json:"model"`
-	Messages       []openAIMessage       `json:"messages"`
-	ResponseFormat *openAIResponseFormat `json:"response_format,omitempty"`
+	Model           string                `json:"model"`
+	ReasoningEffort string                `json:"reasoning_effort,omitempty"`
+	Messages        []openAIMessage       `json:"messages"`
+	ResponseFormat  *openAIResponseFormat `json:"response_format,omitempty"`
 }
 
 type openAIResponse struct {

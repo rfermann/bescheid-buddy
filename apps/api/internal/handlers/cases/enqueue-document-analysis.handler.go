@@ -15,7 +15,7 @@ type EnqueueDocumentAnalysisInput struct {
 	CaseID     uuid.UUID `path:"caseId"`
 	DocumentID uuid.UUID `path:"documentId"`
 	Body       struct {
-		Model    string `json:"model" enum:"gpt-4o-mini,gemini-2.0-flash,claude-haiku-4-5" doc:"AI model to run the analysis with"`
+		Model    string `json:"model" doc:"AI model to run the analysis with; see GET /v1/models"`
 		Language string `json:"language,omitempty" doc:"Locale to write the analysis output in (e.g. de, en, ru, ua, pl, ar)"`
 	}
 }

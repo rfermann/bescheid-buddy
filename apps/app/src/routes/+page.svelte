@@ -13,13 +13,19 @@
 		type AnalysisPipelineResult,
 		type AnalysisStep
 	} from './analyse.client';
+	import { getModelsQuery } from './analyse.remote';
 
+	const models = $derived(await getModelsQuery({}));
 	let selectedFile = $state<File | null>(null);
-	let selectedModel = $state<AnalysisModel>('gpt-4o-mini');
+	let selectedModel = $state<AnalysisModel>('');
 	let isUploading = $state(false);
 	let currentStep = $state('');
 	let uploadError = $state<string | null>('some rubbish');
 	let analysisResult = $state<AnalysisPipelineResult | null>(null);
+
+	$effect(() => {
+		if (!selectedModel && models.length > 0) selectedModel = models[0].id;
+	});
 
 	const steps = [
 		{ id: 'preparing', label: m.analyse_step_preparing() },
@@ -36,7 +42,7 @@
 
 	const runAnalysis = async () => {
 		const file = selectedFile;
-		if (!file) {
+		if (!file || !selectedModel) {
 			return;
 		}
 		isUploading = true;
@@ -67,9 +73,9 @@
 		</div>
 	</div>
 	<FileSelector onFileSelected={handleFileSelected} />
-	<ModelSelector bind:value={selectedModel} disabled={isUploading} />
+	<ModelSelector {models} bind:value={selectedModel} disabled={isUploading} />
 	<div class="mt-6 grid grid-cols-1 gap-3">
-		<ConsentGate canProceed={!!selectedFile} onConfirm={runAnalysis} />
+		<ConsentGate canProceed={!!selectedFile && !!selectedModel} onConfirm={runAnalysis} />
 		{#if uploadError}
 			<div
 				role="alert"

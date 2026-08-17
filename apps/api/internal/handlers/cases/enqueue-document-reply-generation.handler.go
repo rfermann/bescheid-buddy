@@ -15,7 +15,7 @@ type EnqueueDocumentReplyGenerationInput struct {
 	CaseID     uuid.UUID `path:"caseId"`
 	DocumentID uuid.UUID `path:"documentId"`
 	Body       struct {
-		Model       string `json:"model" required:"true" enum:"gpt-4o-mini,gemini-2.0-flash,claude-haiku-4-5" doc:"AI model to generate the reply with"`
+		Model       string `json:"model" required:"true" doc:"AI model to generate the reply with; see GET /v1/models"`
 		Language    string `json:"language" required:"true" enum:"de,en,ru,uk,ua,pl,ar" doc:"Locale for the reply translation and explanation"`
 		Instruction string `json:"instruction,omitempty" maxLength:"2500" doc:"Optional instructions for the generated reply"`
 	}

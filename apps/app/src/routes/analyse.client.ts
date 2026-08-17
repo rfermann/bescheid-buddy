@@ -8,7 +8,7 @@ import {
 } from './analyse.remote';
 import type { Metadata } from '../generated';
 
-export type AnalysisModel = 'gpt-4o-mini' | 'gemini-2.0-flash' | 'claude-haiku-4-5';
+export type AnalysisModel = string;
 export type AnalysisStep = 'preparing' | 'uploading' | 'extracting' | 'analyzing' | 'finished';
 
 export type AnalysisPipelineResult = {

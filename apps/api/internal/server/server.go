@@ -15,6 +15,7 @@ import (
 	"github.com/bored-bots/bored-template/internal/handlers/cases"
 	"github.com/bored-bots/bored-template/internal/handlers/email"
 	"github.com/bored-bots/bored-template/internal/handlers/health"
+	"github.com/bored-bots/bored-template/internal/handlers/models"
 	"github.com/bored-bots/bored-template/internal/handlers/stripe"
 	"github.com/bored-bots/bored-template/internal/handlers/support_cases"
 	"github.com/bored-bots/bored-template/internal/handlers/users"
@@ -63,6 +64,9 @@ func NewServer(cfg *config.Config, services *services.Services, store *store.Sto
 
 	healthHandler := health_handler.NewHealthHandler(services.HealthService)
 	healthHandler.RegisterRoutes(apiV1)
+
+	modelsHandler := models_handler.NewHandler()
+	modelsHandler.RegisterRoutes(apiV1)
 
 	buddyPackageHandler := buddy_packages_handler.NewHandler(services.BuddyPackageService)
 	buddyPackageHandler.RegisterRoutes(api)

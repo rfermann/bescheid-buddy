@@ -1,16 +1,14 @@
 import * as v from 'valibot';
-import {
-	vGenerateUploadUrlInputBody,
-	vEnqueueDocumentAnalysisBody
-} from '../generated/valibot.gen';
+import { query } from '$app/server';
+import { vGenerateUploadUrlInputBody } from '../generated/valibot.gen';
 import {
 	createCase,
 	generateUploadUrl,
 	confirmDocumentUpload,
 	enqueueDocumentExtraction,
-	enqueueDocumentAnalysis,
 	getDocumentStatus
 } from '../generated';
+import { client } from '../generated/client.gen';
 import { getClientConfig } from '$lib/server/apiClient';
 import { authenticatedCommand, authenticatedQuery } from '$lib/server/authenticatedRemotes';
 
@@ -101,14 +99,16 @@ const enqueueExtractionCommand = authenticatedCommand(
 
 const vAnalysisRequest = v.object({
 	...vDocumentRef.entries,
-	...vEnqueueDocumentAnalysisBody.entries
+	model: v.string(),
+	language: v.optional(v.string())
 });
 
 const enqueueAnalysisCommand = authenticatedCommand(
 	vAnalysisRequest,
 	async ({ caseId, documentId, model, language }) => {
-		const result = await enqueueDocumentAnalysis({
+		const result = await client.post<{ 200: { documentId: string; jobId?: bigint } }>({
 			...getClientConfig(),
+			url: '/v1/cases/{caseId}/documents/{documentId}/analyse',
 			path: {
 				caseId,
 				documentId
@@ -129,6 +129,23 @@ const enqueueAnalysisCommand = authenticatedCommand(
 		};
 	}
 );
+
+type ModelCatalog = {
+	models: Array<{ id: string; name: string; provider: string }>;
+};
+
+const getModelsQuery = query('unchecked', async () => {
+	const result = await client.get<{ 200: ModelCatalog }>({
+		...getClientConfig(),
+		url: '/v1/models'
+	});
+
+	if (result.error || !result.data) {
+		throw new Error('Failed to fetch models');
+	}
+
+	return result.data.models;
+});
 
 const getDocumentStatusQuery = authenticatedQuery(vDocumentRef, async ({ caseId, documentId }) => {
 	const result = await getDocumentStatus({
@@ -151,5 +168,6 @@ export {
 	confirmUploadCommand,
 	enqueueExtractionCommand,
 	enqueueAnalysisCommand,
+	getModelsQuery,
 	getDocumentStatusQuery
 };
