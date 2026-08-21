@@ -13,6 +13,7 @@ import (
 	"github.com/bored-bots/bored-template/internal/services/document_service"
 	"github.com/bored-bots/bored-template/internal/services/email_service"
 	"github.com/bored-bots/bored-template/internal/services/health_service"
+	"github.com/bored-bots/bored-template/internal/services/models_service"
 	"github.com/bored-bots/bored-template/internal/services/queue_service"
 	"github.com/bored-bots/bored-template/internal/services/stripe_service"
 	"github.com/bored-bots/bored-template/internal/services/support_cases_service"
@@ -32,11 +33,12 @@ type Services struct {
 	EmailService        *email_service.Service
 	SupportCasesService *support_cases_service.Service
 	CasesService        *cases_service.Service
+	ModelsService       *models_service.Service
 	DocumentService     *document_service.Service
 	QueueService        *queue_service.Service
 }
 
-func NewService(config *config.Config, minioClient *minio.Client, riverClient *river.Client[pgx.Tx], store *store.Store, stripeClient *stripe.Client) (*Services, error) {
+func NewService(config *config.Config, modelsService *models_service.Service, minioClient *minio.Client, riverClient *river.Client[pgx.Tx], store *store.Store, stripeClient *stripe.Client) (*Services, error) {
 	buddyPackageRepo := buddy_packages_repository.New(store)
 	supportCasesRepo := support_cases_repository.New(store)
 	userRepo := users_repository.New(store)
@@ -57,7 +59,8 @@ func NewService(config *config.Config, minioClient *minio.Client, riverClient *r
 		UserService:         users_service.New(userRepo, buddyPackageRepo),
 		EmailService:        emailService,
 		SupportCasesService: support_cases_service.New(supportCasesRepo),
-		CasesService:        cases_service.New(casesRepo, documentService, queueService, config.Upload.MaxBytes),
+		CasesService:        cases_service.New(casesRepo, documentService, queueService, modelsService, config.Upload.MaxBytes),
+		ModelsService:       modelsService,
 		DocumentService:     documentService,
 		QueueService:        queueService,
 	}, nil

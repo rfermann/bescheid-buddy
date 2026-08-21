@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import { createSupportCaseMessageResponseTransformer, createSupportCaseResponseTransformer, getAllBuddyPackagesResponseTransformer, getAllSupportCasesResponseTransformer, getSupportCaseByIdResponseTransformer, getSupportCaseMessagesByCaseIdResponseTransformer, getSupportCasesByUserResponseTransformer, updateSupportCaseStatusResponseTransformer } from './transformers.gen';
-import type { CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, CreateSupportCaseData, CreateSupportCaseErrors, CreateSupportCaseMessageData, CreateSupportCaseMessageErrors, CreateSupportCaseMessageResponses, CreateSupportCaseResponses, GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetAllSupportCasesData, GetAllSupportCasesErrors, GetAllSupportCasesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, GetSupportCaseByIdData, GetSupportCaseByIdErrors, GetSupportCaseByIdResponses, GetSupportCaseMessagesByCaseIdData, GetSupportCaseMessagesByCaseIdErrors, GetSupportCaseMessagesByCaseIdResponses, GetSupportCasesByUserData, GetSupportCasesByUserErrors, GetSupportCasesByUserResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, SendEmailData, SendEmailErrors, SendEmailResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses, UpdateSupportCaseStatusData, UpdateSupportCaseStatusErrors, UpdateSupportCaseStatusResponses } from './types.gen';
+import { createAiModelResponseTransformer, createSupportCaseMessageResponseTransformer, createSupportCaseResponseTransformer, enqueueDocumentAnalysisResponseTransformer, enqueueDocumentExtractionResponseTransformer, enqueueDocumentReplyGenerationResponseTransformer, getAllBuddyPackagesResponseTransformer, getAllModelsResponseTransformer, getAllSupportCasesResponseTransformer, getCaseByIdResponseTransformer, getCasesByUserResponseTransformer, getDocumentReplyGenerationResponseTransformer, getSupportCaseByIdResponseTransformer, getSupportCaseMessagesByCaseIdResponseTransformer, getSupportCasesByUserResponseTransformer, setModelEnabledResponseTransformer, updateSupportCaseStatusResponseTransformer } from './transformers.gen';
+import type { ConfirmDocumentUploadData, ConfirmDocumentUploadErrors, ConfirmDocumentUploadResponses, CreateAiModelData, CreateAiModelErrors, CreateAiModelResponses, CreateCaseData, CreateCaseErrors, CreateCaseResponses, CreateCheckoutSessionData, CreateCheckoutSessionErrors, CreateCheckoutSessionResponses, CreateSupportCaseData, CreateSupportCaseErrors, CreateSupportCaseMessageData, CreateSupportCaseMessageErrors, CreateSupportCaseMessageResponses, CreateSupportCaseResponses, EnqueueDocumentAnalysisData, EnqueueDocumentAnalysisErrors, EnqueueDocumentAnalysisResponses, EnqueueDocumentExtractionData, EnqueueDocumentExtractionErrors, EnqueueDocumentExtractionResponses, EnqueueDocumentReplyGenerationData, EnqueueDocumentReplyGenerationErrors, EnqueueDocumentReplyGenerationResponses, GenerateUploadUrlData, GenerateUploadUrlErrors, GenerateUploadUrlResponses, GetAllBuddyPackagesData, GetAllBuddyPackagesErrors, GetAllBuddyPackagesResponses, GetAllModelsData, GetAllModelsErrors, GetAllModelsResponses, GetAllSupportCasesData, GetAllSupportCasesErrors, GetAllSupportCasesResponses, GetBuddyPointsData, GetBuddyPointsErrors, GetBuddyPointsLedgerData, GetBuddyPointsLedgerErrors, GetBuddyPointsLedgerResponses, GetBuddyPointsResponses, GetCaseByIdData, GetCaseByIdErrors, GetCaseByIdResponses, GetCasesByUserData, GetCasesByUserErrors, GetCasesByUserResponses, GetDocumentReplyGenerationData, GetDocumentReplyGenerationErrors, GetDocumentReplyGenerationResponses, GetDocumentStatusData, GetDocumentStatusErrors, GetDocumentStatusResponses, GetModelProvidersData, GetModelProvidersErrors, GetModelProvidersResponses, GetModelsData, GetModelsErrors, GetModelsResponses, GetSupportCaseByIdData, GetSupportCaseByIdErrors, GetSupportCaseByIdResponses, GetSupportCaseMessagesByCaseIdData, GetSupportCaseMessagesByCaseIdErrors, GetSupportCaseMessagesByCaseIdResponses, GetSupportCasesByUserData, GetSupportCasesByUserErrors, GetSupportCasesByUserResponses, HealthCheckData, HealthCheckErrors, HealthCheckResponses, SendEmailData, SendEmailErrors, SendEmailResponses, SetModelEnabledData, SetModelEnabledErrors, SetModelEnabledResponses, StripeWebhookData, StripeWebhookErrors, StripeWebhookResponses, UpdateSupportCaseStatusData, UpdateSupportCaseStatusErrors, UpdateSupportCaseStatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -18,6 +18,46 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: Record<string, unknown>;
 };
+
+/**
+ * Get supported AI model providers
+ */
+export const getModelProviders = <ThrowOnError extends boolean = false>(options?: Options<GetModelProvidersData, ThrowOnError>) => (options?.client ?? client).get<GetModelProvidersResponses, GetModelProvidersErrors, ThrowOnError>({ url: '/v1/admin/model-providers', ...options });
+
+/**
+ * Get all AI models
+ */
+export const getAllModels = <ThrowOnError extends boolean = false>(options?: Options<GetAllModelsData, ThrowOnError>) => (options?.client ?? client).get<GetAllModelsResponses, GetAllModelsErrors, ThrowOnError>({
+    responseTransformer: getAllModelsResponseTransformer,
+    url: '/v1/admin/models',
+    ...options
+});
+
+/**
+ * Create an AI model
+ */
+export const createAiModel = <ThrowOnError extends boolean = false>(options: Options<CreateAiModelData, ThrowOnError>) => (options.client ?? client).post<CreateAiModelResponses, CreateAiModelErrors, ThrowOnError>({
+    responseTransformer: createAiModelResponseTransformer,
+    url: '/v1/admin/models',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Activate or deactivate an AI model
+ */
+export const setModelEnabled = <ThrowOnError extends boolean = false>(options: Options<SetModelEnabledData, ThrowOnError>) => (options.client ?? client).patch<SetModelEnabledResponses, SetModelEnabledErrors, ThrowOnError>({
+    responseTransformer: setModelEnabledResponseTransformer,
+    url: '/v1/admin/models/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get all support cases
@@ -42,6 +82,122 @@ export const getAllBuddyPackages = <ThrowOnError extends boolean = false>(option
 });
 
 /**
+ * Get cases
+ *
+ * Get cases for the currently logged in user, newest first
+ */
+export const getCasesByUser = <ThrowOnError extends boolean = false>(options?: Options<GetCasesByUserData, ThrowOnError>) => (options?.client ?? client).get<GetCasesByUserResponses, GetCasesByUserErrors, ThrowOnError>({
+    responseTransformer: getCasesByUserResponseTransformer,
+    url: '/v1/cases',
+    ...options
+});
+
+/**
+ * Create case
+ *
+ * Create a new case for document analysis
+ */
+export const createCase = <ThrowOnError extends boolean = false>(options: Options<CreateCaseData, ThrowOnError>) => (options.client ?? client).post<CreateCaseResponses, CreateCaseErrors, ThrowOnError>({
+    url: '/v1/cases',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get case
+ *
+ * Get a case belonging to the currently logged in user
+ */
+export const getCaseById = <ThrowOnError extends boolean = false>(options: Options<GetCaseByIdData, ThrowOnError>) => (options.client ?? client).get<GetCaseByIdResponses, GetCaseByIdErrors, ThrowOnError>({
+    responseTransformer: getCaseByIdResponseTransformer,
+    url: '/v1/cases/{caseId}',
+    ...options
+});
+
+/**
+ * Generate upload URL
+ *
+ * Generate a signed URL for uploading a document to a case
+ */
+export const generateUploadUrl = <ThrowOnError extends boolean = false>(options: Options<GenerateUploadUrlData, ThrowOnError>) => (options.client ?? client).post<GenerateUploadUrlResponses, GenerateUploadUrlErrors, ThrowOnError>({
+    url: '/v1/cases/{caseId}/documents/upload-url',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get document status
+ *
+ * Get a document's upload, extraction and analysis status, including the analysis result once complete
+ */
+export const getDocumentStatus = <ThrowOnError extends boolean = false>(options: Options<GetDocumentStatusData, ThrowOnError>) => (options.client ?? client).get<GetDocumentStatusResponses, GetDocumentStatusErrors, ThrowOnError>({ url: '/v1/cases/{caseId}/documents/{documentId}', ...options });
+
+/**
+ * Enqueue document analysis
+ *
+ * Enqueue a River job to analyze an extracted document with the chosen AI model
+ */
+export const enqueueDocumentAnalysis = <ThrowOnError extends boolean = false>(options: Options<EnqueueDocumentAnalysisData, ThrowOnError>) => (options.client ?? client).post<EnqueueDocumentAnalysisResponses, EnqueueDocumentAnalysisErrors, ThrowOnError>({
+    responseTransformer: enqueueDocumentAnalysisResponseTransformer,
+    url: '/v1/cases/{caseId}/documents/{documentId}/analyse',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Confirm document upload
+ *
+ * Verify an uploaded document landed in storage and mark it uploaded
+ */
+export const confirmDocumentUpload = <ThrowOnError extends boolean = false>(options: Options<ConfirmDocumentUploadData, ThrowOnError>) => (options.client ?? client).post<ConfirmDocumentUploadResponses, ConfirmDocumentUploadErrors, ThrowOnError>({ url: '/v1/cases/{caseId}/documents/{documentId}/confirm', ...options });
+
+/**
+ * Enqueue document extraction
+ *
+ * Enqueue a River job to extract data from an uploaded document
+ */
+export const enqueueDocumentExtraction = <ThrowOnError extends boolean = false>(options: Options<EnqueueDocumentExtractionData, ThrowOnError>) => (options.client ?? client).post<EnqueueDocumentExtractionResponses, EnqueueDocumentExtractionErrors, ThrowOnError>({
+    responseTransformer: enqueueDocumentExtractionResponseTransformer,
+    url: '/v1/cases/{caseId}/documents/{documentId}/extract',
+    ...options
+});
+
+/**
+ * Enqueue document reply generation
+ *
+ * Enqueue a River job to generate a reply to an analyzed document
+ */
+export const enqueueDocumentReplyGeneration = <ThrowOnError extends boolean = false>(options: Options<EnqueueDocumentReplyGenerationData, ThrowOnError>) => (options.client ?? client).post<EnqueueDocumentReplyGenerationResponses, EnqueueDocumentReplyGenerationErrors, ThrowOnError>({
+    responseTransformer: enqueueDocumentReplyGenerationResponseTransformer,
+    url: '/v1/cases/{caseId}/documents/{documentId}/reply-generations',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get document reply generation
+ *
+ * Get the status and result of a document reply generation
+ */
+export const getDocumentReplyGeneration = <ThrowOnError extends boolean = false>(options: Options<GetDocumentReplyGenerationData, ThrowOnError>) => (options.client ?? client).get<GetDocumentReplyGenerationResponses, GetDocumentReplyGenerationErrors, ThrowOnError>({
+    responseTransformer: getDocumentReplyGenerationResponseTransformer,
+    url: '/v1/cases/{caseId}/documents/{documentId}/reply-generations/{replyGenerationId}',
+    ...options
+});
+
+/**
  * Send email
  *
  * Receives email details and logs them to console
@@ -62,6 +218,11 @@ export const sendEmail = <ThrowOnError extends boolean = false>(options: Options
  * Returns the health status of the API
  */
 export const healthCheck = <ThrowOnError extends boolean = false>(options?: Options<HealthCheckData, ThrowOnError>) => (options?.client ?? client).get<HealthCheckResponses, HealthCheckErrors, ThrowOnError>({ url: '/v1/health', ...options });
+
+/**
+ * Get selectable AI models
+ */
+export const getModels = <ThrowOnError extends boolean = false>(options?: Options<GetModelsData, ThrowOnError>) => (options?.client ?? client).get<GetModelsResponses, GetModelsErrors, ThrowOnError>({ url: '/v1/models', ...options });
 
 /**
  * Create Stripe checkout session

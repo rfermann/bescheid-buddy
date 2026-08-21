@@ -12,6 +12,7 @@ type Querier interface {
 	CompleteDocumentAnalysis(ctx context.Context, arg CompleteDocumentAnalysisParams) (*CompleteDocumentAnalysisRow, error)
 	CompleteDocumentExtraction(ctx context.Context, arg CompleteDocumentExtractionParams) (*CompleteDocumentExtractionRow, error)
 	CompleteDocumentReplyGeneration(ctx context.Context, arg CompleteDocumentReplyGenerationParams) (*DocumentReplyGeneration, error)
+	CreateAIModel(ctx context.Context, arg CreateAIModelParams) (*AiModel, error)
 	CreateCase(ctx context.Context, arg CreateCaseParams) (*Case, error)
 	CreateCaseDocument(ctx context.Context, arg CreateCaseDocumentParams) (*CaseDocument, error)
 	CreateDocumentAnalysis(ctx context.Context, arg CreateDocumentAnalysisParams) (*CreateDocumentAnalysisRow, error)
@@ -22,6 +23,7 @@ type Querier interface {
 	FailDocumentAnalysis(ctx context.Context, arg FailDocumentAnalysisParams) (*FailDocumentAnalysisRow, error)
 	FailDocumentExtraction(ctx context.Context, arg FailDocumentExtractionParams) (*FailDocumentExtractionRow, error)
 	FailDocumentReplyGeneration(ctx context.Context, arg FailDocumentReplyGenerationParams) (*DocumentReplyGeneration, error)
+	GetAIModelByProviderModelID(ctx context.Context, arg GetAIModelByProviderModelIDParams) (*AiModel, error)
 	GetAllBuddyPackages(ctx context.Context) ([]*BuddyPackage, error)
 	GetAllSupportCases(ctx context.Context) ([]*SupportCase, error)
 	GetBuddyPackageByID(ctx context.Context, arg GetBuddyPackageByIDParams) (*BuddyPackage, error)
@@ -43,11 +45,14 @@ type Querier interface {
 	GetUserByID(ctx context.Context, arg GetUserByIDParams) (*User, error)
 	GetUserByStripeCustomerID(ctx context.Context, arg GetUserByStripeCustomerIDParams) (*User, error)
 	InsertBuddyPointsLedger(ctx context.Context, arg InsertBuddyPointsLedgerParams) error
+	ListAIModels(ctx context.Context) ([]*AiModel, error)
+	ListEnabledAIModels(ctx context.Context) ([]*AiModel, error)
 	MarkCaseDocumentUploadFailed(ctx context.Context, arg MarkCaseDocumentUploadFailedParams) (*CaseDocument, error)
 	MarkCaseDocumentUploaded(ctx context.Context, arg MarkCaseDocumentUploadedParams) (*CaseDocument, error)
 	MarkDocumentAnalysisProcessing(ctx context.Context, arg MarkDocumentAnalysisProcessingParams) (*MarkDocumentAnalysisProcessingRow, error)
 	MarkDocumentExtractionProcessing(ctx context.Context, arg MarkDocumentExtractionProcessingParams) (*MarkDocumentExtractionProcessingRow, error)
 	MarkDocumentReplyGenerationProcessing(ctx context.Context, arg MarkDocumentReplyGenerationProcessingParams) (*DocumentReplyGeneration, error)
+	SetAIModelEnabled(ctx context.Context, arg SetAIModelEnabledParams) (*AiModel, error)
 	UpdateCaseTitle(ctx context.Context, arg UpdateCaseTitleParams) error
 	UpdateSupportCaseStatus(ctx context.Context, arg UpdateSupportCaseStatusParams) error
 	UpdateUserPoints(ctx context.Context, arg UpdateUserPointsParams) error

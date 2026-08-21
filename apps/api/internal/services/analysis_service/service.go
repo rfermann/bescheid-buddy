@@ -27,18 +27,27 @@ var (
 
 type Service struct {
 	repository cases_repository.Repository
+	models     ModelCatalog
 	llm        *llm_service.Service
 }
 
-func New(repository cases_repository.Repository, llm *llm_service.Service) *Service {
-	return &Service{repository: repository, llm: llm}
+type ModelCatalog interface {
+	GetModelByProviderModelID(ctx context.Context, providerModelID string) (*db.AiModel, error)
+}
+
+func New(repository cases_repository.Repository, models ModelCatalog, llm *llm_service.Service) *Service {
+	return &Service{repository: repository, models: models, llm: llm}
 }
 
 func (s *Service) AnalyzeDocument(ctx context.Context, documentID uuid.UUID, modelStr, language string) error {
-	model, err := llm_service.ParseModel(modelStr)
-	if err != nil {
-		return s.fail(ctx, documentID, err)
+	catalogModel, err := s.models.GetModelByProviderModelID(ctx, modelStr)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return s.fail(ctx, documentID, llm_service.ErrUnsupportedModel)
 	}
+	if err != nil {
+		return err
+	}
+	model := llm_service.Model{ID: catalogModel.ProviderModelID, Provider: catalogModel.Provider}
 
 	if _, err := s.repository.MarkDocumentAnalysisProcessing(ctx, db.MarkDocumentAnalysisProcessingParams{
 		DocumentID: documentID,
@@ -85,7 +94,7 @@ func (s *Service) AnalyzeDocument(ctx context.Context, documentID uuid.UUID, mod
 		DocumentID:       documentID,
 		AnalysisText:     pgtype.Text{String: analysisText, Valid: true},
 		AnalysisMetadata: metadata,
-		Provider:         pgtype.Text{String: model.Provider(), Valid: true},
+		Provider:         pgtype.Text{String: model.Provider, Valid: true},
 		DetectedLanguage: pgtype.Text{String: detectedLang, Valid: detectedLang != ""},
 	}); err != nil {
 		return err
@@ -184,13 +193,13 @@ func (s *Service) enforceTranslationLanguage(ctx context.Context, model llm_serv
 	retranslated, err := s.retranslate(ctx, model, label, part1)
 	if err != nil || retranslated == "" {
 		slog.WarnContext(ctx, "analysis language guard: re-translation failed",
-			"model", string(model), "target", langCode, "detected", detected, "error", err)
+			"model", model.ID, "target", langCode, "detected", detected, "error", err)
 		return detected
 	}
 
 	decoded["part_1_full_translation"] = retranslated
 	slog.InfoContext(ctx, "analysis language guard: re-translated PART 1",
-		"model", string(model), "target", langCode, "detected", detected, "confidence", info.Confidence)
+		"model", model.ID, "target", langCode, "detected", detected, "confidence", info.Confidence)
 	return detected
 }
 

@@ -4,6 +4,38 @@ export type ClientOptions = {
     baseUrl: 'https://dev.api.bb.tricirc.de' | (string & {});
 };
 
+export type Address = {
+    address?: string;
+    category?: string;
+    city?: string;
+    country?: string;
+    house_number?: string;
+    name?: string;
+    postal_code?: string;
+    state?: string;
+    street?: string;
+};
+
+export type AiModel = {
+    created_at: Date;
+    enabled: boolean;
+    id: string;
+    name: string;
+    provider: string;
+    provider_model_id: string;
+    sort_order: number;
+    updated_at: Date;
+};
+
+export type AnalysisStatusBody = {
+    errorMessage?: string;
+    metadata?: Metadata;
+    model?: string;
+    provider?: string;
+    status: string;
+    text?: string;
+};
+
 export type BuddyPackage = {
     created_at: Date;
     id: string;
@@ -12,6 +44,54 @@ export type BuddyPackage = {
     price_in_cents: number;
     stripe_price_id: string;
     updated_at: Date;
+};
+
+export type CaseAnalysisBody = {
+    errorMessage?: string;
+    metadata?: Metadata;
+    status: string;
+    text?: string;
+};
+
+export type CaseDocumentBody = {
+    analysis: CaseAnalysisBody;
+    documentId: string;
+    extractionStatus: string;
+    fileName: string;
+    uploadStatus: string;
+};
+
+export type CaseListItem = {
+    createdAt: Date;
+    id: string;
+    title: string;
+    updatedAt: Date;
+};
+
+export type ConfirmUploadOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    documentId: string;
+    uploadStatus: string;
+};
+
+export type CreateCaseInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    title: string;
+};
+
+export type CreateCaseOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    id: string;
+    title: string;
 };
 
 export type CreateCheckoutSessionInputBody = {
@@ -29,6 +109,25 @@ export type CreateCheckoutSessionOutputBody = {
      */
     readonly $schema?: string;
     url: string;
+};
+
+export type CreateModelInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    name: string;
+    provider: string;
+    provider_model_id: string;
+    sort_order: number;
+};
+
+export type CreateModelOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    model: AiModel;
 };
 
 export type CreateSupportCaseInputBody = {
@@ -65,6 +164,89 @@ export type CreateSupportCaseOutputBody = {
      */
     readonly $schema?: string;
     case: SupportCase;
+};
+
+export type Dates = {
+    deadline_date?: string;
+    letter_date?: string;
+};
+
+export type Details = {
+    deadlines?: Array<string> | null;
+    documents_requested?: Array<string> | null;
+    possible_consequences?: Array<string> | null;
+    recommended_next_steps?: Array<string> | null;
+    summary?: string;
+};
+
+export type DocumentReplyGenerationResultBody = {
+    explanation: string;
+    germanLetter: string;
+    subject: string;
+    tone: string;
+    userLanguageLetter: string;
+};
+
+export type EnqueueDocumentAnalysisInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    /**
+     * Locale to write the analysis output in (e.g. de, en, ru, ua, pl, ar)
+     */
+    language?: string;
+    /**
+     * AI model to run the analysis with; see GET /v1/models
+     */
+    model: string;
+};
+
+export type EnqueueDocumentAnalysisOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    documentId: string;
+    jobId: bigint;
+};
+
+export type EnqueueDocumentExtractionOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    documentId: string;
+    jobId: bigint;
+};
+
+export type EnqueueDocumentReplyGenerationInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    /**
+     * Optional instructions for the generated reply
+     */
+    instruction?: string;
+    /**
+     * Locale for the reply translation and explanation
+     */
+    language: 'de' | 'en' | 'ru' | 'uk' | 'ua' | 'pl' | 'ar';
+    /**
+     * AI model to generate the reply with; see GET /v1/models
+     */
+    model: string;
+};
+
+export type EnqueueDocumentReplyGenerationOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    jobId: bigint;
+    replyGenerationId: string;
+    status: string;
 };
 
 export type ErrorDetail = {
@@ -113,12 +295,37 @@ export type ErrorModel = {
     type?: string;
 };
 
+export type GenerateUploadUrlInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    fileName: string;
+};
+
+export type GenerateUploadUrlOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    documentId: string;
+    uploadUrl: string;
+};
+
 export type GetAllBuddyPackagesOutputBody = {
     /**
      * A URL to the JSON Schema for this object.
      */
     readonly $schema?: string;
     packages: Array<BuddyPackage> | null;
+};
+
+export type GetAllModelsOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    models: Array<AiModel> | null;
 };
 
 export type GetAllSupportCasesOutputBody = {
@@ -144,6 +351,75 @@ export type GetBuddyPointsOutputBody = {
     readonly $schema?: string;
     lifetime_points: number;
     monthly_points: number;
+};
+
+export type GetCaseByIdOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    createdAt: Date;
+    documents: Array<CaseDocumentBody> | null;
+    id: string;
+    title: string;
+    updatedAt: Date;
+};
+
+export type GetCasesByUserIdOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    cases: Array<CaseListItem> | null;
+};
+
+export type GetDocumentReplyGenerationOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    completedAt?: Date;
+    createdAt: Date;
+    documentId: string;
+    errorMessage?: string;
+    instruction?: string;
+    jobId?: bigint;
+    language: string;
+    model: string;
+    provider: string;
+    replyGenerationId: string;
+    result?: DocumentReplyGenerationResultBody;
+    startedAt?: Date;
+    status: string;
+    updatedAt: Date;
+};
+
+export type GetDocumentStatusOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    analysis: AnalysisStatusBody;
+    documentId: string;
+    extractionStatus: string;
+    fileName: string;
+    uploadStatus: string;
+};
+
+export type GetModelProvidersOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    providers: Array<string> | null;
+};
+
+export type GetModelsOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    models: Array<ModelBody> | null;
 };
 
 export type GetSupportCaseByIdOutputBody = {
@@ -195,6 +471,24 @@ export type LedgerEntry = {
     transaction_type: 'purchase' | 'referral' | 'monthly_reset' | 'usage';
 };
 
+export type Metadata = {
+    dates?: Dates;
+    importance?: string;
+    letter_type?: string;
+    part_1_full_translation?: string;
+    part_2_ai_analysis?: Details;
+    receiver?: Address;
+    sender?: Address;
+    subject?: Subject;
+    topic?: string;
+};
+
+export type ModelBody = {
+    id: string;
+    name: string;
+    provider: string;
+};
+
 export type SendEmailInputBody = {
     /**
      * A URL to the JSON Schema for this object.
@@ -212,6 +506,27 @@ export type SendEmailOutputBody = {
      */
     readonly $schema?: string;
     message: string;
+};
+
+export type SetModelEnabledInputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    enabled: boolean;
+};
+
+export type SetModelEnabledOutputBody = {
+    /**
+     * A URL to the JSON Schema for this object.
+     */
+    readonly $schema?: string;
+    model: AiModel;
+};
+
+export type Subject = {
+    localized?: string;
+    original?: string;
 };
 
 export type SupportCase = {
@@ -255,6 +570,20 @@ export type UpdateSupportCaseStatusOutputBody = {
     case: SupportCase;
 };
 
+export type ConfirmUploadOutputBodyWritable = {
+    documentId: string;
+    uploadStatus: string;
+};
+
+export type CreateCaseInputBodyWritable = {
+    title: string;
+};
+
+export type CreateCaseOutputBodyWritable = {
+    id: string;
+    title: string;
+};
+
 export type CreateCheckoutSessionInputBodyWritable = {
     package_name: string;
     stripe_price_id: string;
@@ -262,6 +591,17 @@ export type CreateCheckoutSessionInputBodyWritable = {
 
 export type CreateCheckoutSessionOutputBodyWritable = {
     url: string;
+};
+
+export type CreateModelInputBodyWritable = {
+    name: string;
+    provider: string;
+    provider_model_id: string;
+    sort_order: number;
+};
+
+export type CreateModelOutputBodyWritable = {
+    model: AiModel;
 };
 
 export type CreateSupportCaseInputBodyWritable = {
@@ -282,6 +622,48 @@ export type CreateSupportCaseMessageOutputBodyWritable = {
 
 export type CreateSupportCaseOutputBodyWritable = {
     case: SupportCase;
+};
+
+export type EnqueueDocumentAnalysisInputBodyWritable = {
+    /**
+     * Locale to write the analysis output in (e.g. de, en, ru, ua, pl, ar)
+     */
+    language?: string;
+    /**
+     * AI model to run the analysis with; see GET /v1/models
+     */
+    model: string;
+};
+
+export type EnqueueDocumentAnalysisOutputBodyWritable = {
+    documentId: string;
+    jobId: bigint;
+};
+
+export type EnqueueDocumentExtractionOutputBodyWritable = {
+    documentId: string;
+    jobId: bigint;
+};
+
+export type EnqueueDocumentReplyGenerationInputBodyWritable = {
+    /**
+     * Optional instructions for the generated reply
+     */
+    instruction?: string;
+    /**
+     * Locale for the reply translation and explanation
+     */
+    language: 'de' | 'en' | 'ru' | 'uk' | 'ua' | 'pl' | 'ar';
+    /**
+     * AI model to generate the reply with; see GET /v1/models
+     */
+    model: string;
+};
+
+export type EnqueueDocumentReplyGenerationOutputBodyWritable = {
+    jobId: bigint;
+    replyGenerationId: string;
+    status: string;
 };
 
 export type ErrorModelWritable = {
@@ -311,8 +693,21 @@ export type ErrorModelWritable = {
     type?: string;
 };
 
+export type GenerateUploadUrlInputBodyWritable = {
+    fileName: string;
+};
+
+export type GenerateUploadUrlOutputBodyWritable = {
+    documentId: string;
+    uploadUrl: string;
+};
+
 export type GetAllBuddyPackagesOutputBodyWritable = {
     packages: Array<BuddyPackage> | null;
+};
+
+export type GetAllModelsOutputBodyWritable = {
+    models: Array<AiModel> | null;
 };
 
 export type GetAllSupportCasesOutputBodyWritable = {
@@ -326,6 +721,51 @@ export type GetBuddyPointsLedgerOutputBodyWritable = {
 export type GetBuddyPointsOutputBodyWritable = {
     lifetime_points: number;
     monthly_points: number;
+};
+
+export type GetCaseByIdOutputBodyWritable = {
+    createdAt: Date;
+    documents: Array<CaseDocumentBody> | null;
+    id: string;
+    title: string;
+    updatedAt: Date;
+};
+
+export type GetCasesByUserIdOutputBodyWritable = {
+    cases: Array<CaseListItem> | null;
+};
+
+export type GetDocumentReplyGenerationOutputBodyWritable = {
+    completedAt?: Date;
+    createdAt: Date;
+    documentId: string;
+    errorMessage?: string;
+    instruction?: string;
+    jobId?: bigint;
+    language: string;
+    model: string;
+    provider: string;
+    replyGenerationId: string;
+    result?: DocumentReplyGenerationResultBody;
+    startedAt?: Date;
+    status: string;
+    updatedAt: Date;
+};
+
+export type GetDocumentStatusOutputBodyWritable = {
+    analysis: AnalysisStatusBody;
+    documentId: string;
+    extractionStatus: string;
+    fileName: string;
+    uploadStatus: string;
+};
+
+export type GetModelProvidersOutputBodyWritable = {
+    providers: Array<string> | null;
+};
+
+export type GetModelsOutputBodyWritable = {
+    models: Array<ModelBody> | null;
 };
 
 export type GetSupportCaseByIdOutputBodyWritable = {
@@ -357,6 +797,14 @@ export type SendEmailOutputBodyWritable = {
     message: string;
 };
 
+export type SetModelEnabledInputBodyWritable = {
+    enabled: boolean;
+};
+
+export type SetModelEnabledOutputBodyWritable = {
+    model: AiModel;
+};
+
 export type UpdateSupportCaseStatusInputBodyWritable = {
     status: 'in_progress' | 'resolved' | 'closed';
 };
@@ -364,6 +812,108 @@ export type UpdateSupportCaseStatusInputBodyWritable = {
 export type UpdateSupportCaseStatusOutputBodyWritable = {
     case: SupportCase;
 };
+
+export type GetModelProvidersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/model-providers';
+};
+
+export type GetModelProvidersErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetModelProvidersError = GetModelProvidersErrors[keyof GetModelProvidersErrors];
+
+export type GetModelProvidersResponses = {
+    /**
+     * OK
+     */
+    200: GetModelProvidersOutputBody;
+};
+
+export type GetModelProvidersResponse = GetModelProvidersResponses[keyof GetModelProvidersResponses];
+
+export type GetAllModelsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/models';
+};
+
+export type GetAllModelsErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetAllModelsError = GetAllModelsErrors[keyof GetAllModelsErrors];
+
+export type GetAllModelsResponses = {
+    /**
+     * OK
+     */
+    200: GetAllModelsOutputBody;
+};
+
+export type GetAllModelsResponse = GetAllModelsResponses[keyof GetAllModelsResponses];
+
+export type CreateAiModelData = {
+    body: CreateModelInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/v1/admin/models';
+};
+
+export type CreateAiModelErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type CreateAiModelError = CreateAiModelErrors[keyof CreateAiModelErrors];
+
+export type CreateAiModelResponses = {
+    /**
+     * Created
+     */
+    201: CreateModelOutputBody;
+};
+
+export type CreateAiModelResponse = CreateAiModelResponses[keyof CreateAiModelResponses];
+
+export type SetModelEnabledData = {
+    body: SetModelEnabledInputBodyWritable;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/v1/admin/models/{id}';
+};
+
+export type SetModelEnabledErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type SetModelEnabledError = SetModelEnabledErrors[keyof SetModelEnabledErrors];
+
+export type SetModelEnabledResponses = {
+    /**
+     * OK
+     */
+    200: SetModelEnabledOutputBody;
+};
+
+export type SetModelEnabledResponse = SetModelEnabledResponses[keyof SetModelEnabledResponses];
 
 export type GetAllSupportCasesData = {
     body?: never;
@@ -415,6 +965,279 @@ export type GetAllBuddyPackagesResponses = {
 
 export type GetAllBuddyPackagesResponse = GetAllBuddyPackagesResponses[keyof GetAllBuddyPackagesResponses];
 
+export type GetCasesByUserData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/cases';
+};
+
+export type GetCasesByUserErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetCasesByUserError = GetCasesByUserErrors[keyof GetCasesByUserErrors];
+
+export type GetCasesByUserResponses = {
+    /**
+     * OK
+     */
+    200: GetCasesByUserIdOutputBody;
+};
+
+export type GetCasesByUserResponse = GetCasesByUserResponses[keyof GetCasesByUserResponses];
+
+export type CreateCaseData = {
+    body: CreateCaseInputBodyWritable;
+    path?: never;
+    query?: never;
+    url: '/v1/cases';
+};
+
+export type CreateCaseErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type CreateCaseError = CreateCaseErrors[keyof CreateCaseErrors];
+
+export type CreateCaseResponses = {
+    /**
+     * OK
+     */
+    200: CreateCaseOutputBody;
+};
+
+export type CreateCaseResponse = CreateCaseResponses[keyof CreateCaseResponses];
+
+export type GetCaseByIdData = {
+    body?: never;
+    path: {
+        caseId: string;
+    };
+    query?: never;
+    url: '/v1/cases/{caseId}';
+};
+
+export type GetCaseByIdErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetCaseByIdError = GetCaseByIdErrors[keyof GetCaseByIdErrors];
+
+export type GetCaseByIdResponses = {
+    /**
+     * OK
+     */
+    200: GetCaseByIdOutputBody;
+};
+
+export type GetCaseByIdResponse = GetCaseByIdResponses[keyof GetCaseByIdResponses];
+
+export type GenerateUploadUrlData = {
+    body: GenerateUploadUrlInputBodyWritable;
+    path: {
+        caseId: string;
+    };
+    query?: never;
+    url: '/v1/cases/{caseId}/documents/upload-url';
+};
+
+export type GenerateUploadUrlErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GenerateUploadUrlError = GenerateUploadUrlErrors[keyof GenerateUploadUrlErrors];
+
+export type GenerateUploadUrlResponses = {
+    /**
+     * OK
+     */
+    200: GenerateUploadUrlOutputBody;
+};
+
+export type GenerateUploadUrlResponse = GenerateUploadUrlResponses[keyof GenerateUploadUrlResponses];
+
+export type GetDocumentStatusData = {
+    body?: never;
+    path: {
+        caseId: string;
+        documentId: string;
+    };
+    query?: never;
+    url: '/v1/cases/{caseId}/documents/{documentId}';
+};
+
+export type GetDocumentStatusErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetDocumentStatusError = GetDocumentStatusErrors[keyof GetDocumentStatusErrors];
+
+export type GetDocumentStatusResponses = {
+    /**
+     * OK
+     */
+    200: GetDocumentStatusOutputBody;
+};
+
+export type GetDocumentStatusResponse = GetDocumentStatusResponses[keyof GetDocumentStatusResponses];
+
+export type EnqueueDocumentAnalysisData = {
+    body: EnqueueDocumentAnalysisInputBodyWritable;
+    path: {
+        caseId: string;
+        documentId: string;
+    };
+    query?: never;
+    url: '/v1/cases/{caseId}/documents/{documentId}/analyse';
+};
+
+export type EnqueueDocumentAnalysisErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type EnqueueDocumentAnalysisError = EnqueueDocumentAnalysisErrors[keyof EnqueueDocumentAnalysisErrors];
+
+export type EnqueueDocumentAnalysisResponses = {
+    /**
+     * OK
+     */
+    200: EnqueueDocumentAnalysisOutputBody;
+};
+
+export type EnqueueDocumentAnalysisResponse = EnqueueDocumentAnalysisResponses[keyof EnqueueDocumentAnalysisResponses];
+
+export type ConfirmDocumentUploadData = {
+    body?: never;
+    path: {
+        caseId: string;
+        documentId: string;
+    };
+    query?: never;
+    url: '/v1/cases/{caseId}/documents/{documentId}/confirm';
+};
+
+export type ConfirmDocumentUploadErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type ConfirmDocumentUploadError = ConfirmDocumentUploadErrors[keyof ConfirmDocumentUploadErrors];
+
+export type ConfirmDocumentUploadResponses = {
+    /**
+     * OK
+     */
+    200: ConfirmUploadOutputBody;
+};
+
+export type ConfirmDocumentUploadResponse = ConfirmDocumentUploadResponses[keyof ConfirmDocumentUploadResponses];
+
+export type EnqueueDocumentExtractionData = {
+    body?: never;
+    path: {
+        caseId: string;
+        documentId: string;
+    };
+    query?: never;
+    url: '/v1/cases/{caseId}/documents/{documentId}/extract';
+};
+
+export type EnqueueDocumentExtractionErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type EnqueueDocumentExtractionError = EnqueueDocumentExtractionErrors[keyof EnqueueDocumentExtractionErrors];
+
+export type EnqueueDocumentExtractionResponses = {
+    /**
+     * OK
+     */
+    200: EnqueueDocumentExtractionOutputBody;
+};
+
+export type EnqueueDocumentExtractionResponse = EnqueueDocumentExtractionResponses[keyof EnqueueDocumentExtractionResponses];
+
+export type EnqueueDocumentReplyGenerationData = {
+    body: EnqueueDocumentReplyGenerationInputBodyWritable;
+    path: {
+        caseId: string;
+        documentId: string;
+    };
+    query?: never;
+    url: '/v1/cases/{caseId}/documents/{documentId}/reply-generations';
+};
+
+export type EnqueueDocumentReplyGenerationErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type EnqueueDocumentReplyGenerationError = EnqueueDocumentReplyGenerationErrors[keyof EnqueueDocumentReplyGenerationErrors];
+
+export type EnqueueDocumentReplyGenerationResponses = {
+    /**
+     * Accepted
+     */
+    202: EnqueueDocumentReplyGenerationOutputBody;
+};
+
+export type EnqueueDocumentReplyGenerationResponse = EnqueueDocumentReplyGenerationResponses[keyof EnqueueDocumentReplyGenerationResponses];
+
+export type GetDocumentReplyGenerationData = {
+    body?: never;
+    path: {
+        caseId: string;
+        documentId: string;
+        replyGenerationId: string;
+    };
+    query?: never;
+    url: '/v1/cases/{caseId}/documents/{documentId}/reply-generations/{replyGenerationId}';
+};
+
+export type GetDocumentReplyGenerationErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetDocumentReplyGenerationError = GetDocumentReplyGenerationErrors[keyof GetDocumentReplyGenerationErrors];
+
+export type GetDocumentReplyGenerationResponses = {
+    /**
+     * OK
+     */
+    200: GetDocumentReplyGenerationOutputBody;
+};
+
+export type GetDocumentReplyGenerationResponse = GetDocumentReplyGenerationResponses[keyof GetDocumentReplyGenerationResponses];
+
 export type SendEmailData = {
     body: SendEmailInputBodyWritable;
     path?: never;
@@ -464,6 +1287,31 @@ export type HealthCheckResponses = {
 };
 
 export type HealthCheckResponse = HealthCheckResponses[keyof HealthCheckResponses];
+
+export type GetModelsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/v1/models';
+};
+
+export type GetModelsErrors = {
+    /**
+     * Error
+     */
+    default: ErrorModel;
+};
+
+export type GetModelsError = GetModelsErrors[keyof GetModelsErrors];
+
+export type GetModelsResponses = {
+    /**
+     * OK
+     */
+    200: GetModelsOutputBody;
+};
+
+export type GetModelsResponse = GetModelsResponses[keyof GetModelsResponses];
 
 export type CreateCheckoutSessionData = {
     body: CreateCheckoutSessionInputBodyWritable;

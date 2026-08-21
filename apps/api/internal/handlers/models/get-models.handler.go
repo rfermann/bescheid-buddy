@@ -3,7 +3,7 @@ package models_handler
 import (
 	"context"
 
-	"github.com/bored-bots/bored-template/internal/services/llm_service"
+	"github.com/danielgtaylor/huma/v2"
 )
 
 type ModelBody struct {
@@ -20,12 +20,16 @@ type GetModelsOutput struct {
 	Body GetModelsOutputBody `json:"body"`
 }
 
-func (h *Handler) getModels(_ context.Context, _ *struct{}) (*GetModelsOutput, error) {
-	models := llm_service.Models()
+func (h *Handler) getModels(ctx context.Context, _ *struct{}) (*GetModelsOutput, error) {
+	models, err := h.service.GetEnabledModels(ctx)
+	if err != nil {
+		return nil, huma.Error500InternalServerError("Failed to get AI models", err)
+	}
+
 	result := make([]ModelBody, len(models))
 	for i, model := range models {
 		result[i] = ModelBody{
-			ID:       string(model.ID),
+			ID:       model.ProviderModelID,
 			Name:     model.Name,
 			Provider: model.Provider,
 		}

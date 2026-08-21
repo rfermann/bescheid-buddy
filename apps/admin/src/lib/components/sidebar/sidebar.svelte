@@ -1,5 +1,6 @@
 <script lang="ts" module>
 	import BotIcon from '@lucide/svelte/icons/bot';
+	import BrainCircuitIcon from '@lucide/svelte/icons/brain-circuit';
 	import BriefCaseMedicalIcon from '@lucide/svelte/icons/briefcase-medical';
 
 	const data = {
@@ -14,6 +15,12 @@
 				url: '#',
 				icon: BotIcon,
 				isActive: true,
+				items: []
+			},
+			{
+				title: 'Models',
+				url: '/models',
+				icon: BrainCircuitIcon,
 				items: []
 			},
 			{

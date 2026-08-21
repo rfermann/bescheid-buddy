@@ -8,12 +8,14 @@ import (
 	"github.com/bored-bots/bored-template/internal/config"
 	"github.com/bored-bots/bored-template/internal/queue"
 	"github.com/bored-bots/bored-template/internal/repository/cases_repository"
+	"github.com/bored-bots/bored-template/internal/repository/models_repository"
 	"github.com/bored-bots/bored-template/internal/server"
 	"github.com/bored-bots/bored-template/internal/services"
 	"github.com/bored-bots/bored-template/internal/services/analysis_service"
 	"github.com/bored-bots/bored-template/internal/services/document_service"
 	"github.com/bored-bots/bored-template/internal/services/extraction_service"
 	"github.com/bored-bots/bored-template/internal/services/llm_service"
+	"github.com/bored-bots/bored-template/internal/services/models_service"
 	"github.com/bored-bots/bored-template/internal/services/reply_service"
 	"github.com/bored-bots/bored-template/internal/services/vision_service"
 	s "github.com/bored-bots/bored-template/internal/store"
@@ -55,8 +57,9 @@ func New() (*App, error) {
 		GeminiAPIKey:    cfg.LLM.GeminiAPIKey,
 		AnthropicAPIKey: cfg.LLM.AnthropicAPIKey,
 	})
-	analysisService := analysis_service.New(casesRepo, llmService)
-	replyService := reply_service.New(casesRepo, llmService)
+	modelsService := models_service.New(models_repository.New(store), llmService)
+	analysisService := analysis_service.New(casesRepo, modelsService, llmService)
+	replyService := reply_service.New(casesRepo, modelsService, llmService)
 
 	q, err := queue.New(store.Pool, extractionService, analysisService, replyService)
 	if err != nil {
@@ -66,7 +69,7 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	svc, err := services.NewService(cfg, minioClient, q.Client, store, stripeClient)
+	svc, err := services.NewService(cfg, modelsService, minioClient, q.Client, store, stripeClient)
 	if err != nil {
 		return nil, err
 	}

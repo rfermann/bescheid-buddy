@@ -398,6 +398,17 @@ type Account struct {
 	TelegramUsername      pgtype.Text      `json:"telegram_username"`
 }
 
+type AiModel struct {
+	ID              uuid.UUID `json:"id"`
+	ProviderModelID string    `json:"provider_model_id"`
+	Name            string    `json:"name"`
+	Provider        string    `json:"provider"`
+	Enabled         bool      `json:"enabled"`
+	SortOrder       int32     `json:"sort_order"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+}
+
 type Apikey struct {
 	ID                  uuid.UUID        `json:"id"`
 	ConfigID            string           `json:"config_id"`

@@ -35,8 +35,13 @@ type LLM interface {
 	Complete(ctx context.Context, model llm_service.Model, system, user string) (string, error)
 }
 
+type ModelCatalog interface {
+	GetModelByProviderModelID(ctx context.Context, providerModelID string) (*db.AiModel, error)
+}
+
 type Service struct {
 	repository Repository
+	models     ModelCatalog
 	llm        LLM
 }
 
@@ -48,8 +53,8 @@ type Result struct {
 	Tone               string `json:"tone"`
 }
 
-func New(repository Repository, llm LLM) *Service {
-	return &Service{repository: repository, llm: llm}
+func New(repository Repository, models ModelCatalog, llm LLM) *Service {
+	return &Service{repository: repository, models: models, llm: llm}
 }
 
 func (s *Service) Generate(ctx context.Context, replyGenerationID uuid.UUID) error {
@@ -64,10 +69,14 @@ func (s *Service) Generate(ctx context.Context, replyGenerationID uuid.UUID) err
 		return nil
 	}
 
-	model, err := llm_service.ParseModel(generation.Model)
-	if err != nil {
-		return s.fail(ctx, replyGenerationID, err)
+	catalogModel, err := s.models.GetModelByProviderModelID(ctx, generation.Model)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return s.fail(ctx, replyGenerationID, llm_service.ErrUnsupportedModel)
 	}
+	if err != nil {
+		return err
+	}
+	model := llm_service.Model{ID: catalogModel.ProviderModelID, Provider: catalogModel.Provider}
 	if _, err := s.repository.MarkDocumentReplyGenerationProcessing(ctx, db.MarkDocumentReplyGenerationProcessingParams{ID: replyGenerationID}); err != nil {
 		return err
 	}

@@ -9,27 +9,13 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sort"
 	"time"
 )
 
-type Model string
-
-const (
-	ModelGPT56Luna     Model = "gpt-5.6-luna"
-	ModelGeminiFlash37 Model = "gemini-3.7-flash"
-	ModelHaiku45       Model = "claude-haiku-4-5"
-)
-
-type ModelInfo struct {
-	ID       Model
-	Name     string
+type Model struct {
+	ID       string
 	Provider string
-}
-
-var models = []ModelInfo{
-	{ID: ModelGPT56Luna, Name: "GPT-5.6 Luna", Provider: "openai"},
-	{ID: ModelGeminiFlash37, Name: "Gemini 3.7 Flash", Provider: "google"},
-	{ID: ModelHaiku45, Name: "Claude Haiku 4.5", Provider: "anthropic"},
 }
 
 const maxOutputTokens = 2048
@@ -38,28 +24,6 @@ var (
 	ErrUnsupportedModel = errors.New("unsupported model")
 	ErrMissingAPIKey    = errors.New("no api key configured for the selected model's provider")
 )
-
-func ParseModel(s string) (Model, error) {
-	for _, model := range models {
-		if model.ID == Model(s) {
-			return model.ID, nil
-		}
-	}
-	return "", fmt.Errorf("%w: %s", ErrUnsupportedModel, s)
-}
-
-func Models() []ModelInfo {
-	return append([]ModelInfo(nil), models...)
-}
-
-func (m Model) Provider() string {
-	for _, model := range models {
-		if model.ID == m {
-			return model.Provider
-		}
-	}
-	return "unknown"
-}
 
 type Config struct {
 	OpenAIAPIKey    string
@@ -70,13 +34,36 @@ type Config struct {
 type Service struct {
 	cfg        Config
 	httpClient *http.Client
+	providers  map[string]completionFunc
 }
 
+type completionFunc func(ctx context.Context, model Model, system, user string) (string, error)
+
 func New(cfg Config) *Service {
-	return &Service{
+	service := &Service{
 		cfg:        cfg,
 		httpClient: &http.Client{Timeout: 120 * time.Second},
 	}
+	service.providers = map[string]completionFunc{
+		"anthropic": service.completeAnthropic,
+		"google":    service.completeGemini,
+		"openai":    service.completeOpenAI,
+	}
+	return service
+}
+
+func (s *Service) SupportedProviders() []string {
+	providers := make([]string, 0, len(s.providers))
+	for provider := range s.providers {
+		providers = append(providers, provider)
+	}
+	sort.Strings(providers)
+	return providers
+}
+
+func (s *Service) SupportsProvider(provider string) bool {
+	_, ok := s.providers[provider]
+	return ok
 }
 
 type APIError struct {
@@ -94,16 +81,11 @@ func (e *APIError) Retryable() bool {
 }
 
 func (s *Service) Complete(ctx context.Context, model Model, system, user string) (string, error) {
-	switch model.Provider() {
-	case "openai":
-		return s.completeOpenAI(ctx, model, system, user)
-	case "google":
-		return s.completeGemini(ctx, model, system, user)
-	case "anthropic":
-		return s.completeAnthropic(ctx, model, system, user)
-	default:
-		return "", fmt.Errorf("%w: %s", ErrUnsupportedModel, model)
+	complete, ok := s.providers[model.Provider]
+	if !ok {
+		return "", fmt.Errorf("%w: %s", ErrUnsupportedModel, model.ID)
 	}
+	return complete(ctx, model, system, user)
 }
 
 func (s *Service) completeOpenAI(ctx context.Context, model Model, system, user string) (string, error) {
@@ -112,7 +94,7 @@ func (s *Service) completeOpenAI(ctx context.Context, model Model, system, user 
 	}
 
 	payload := openAIRequest{
-		Model:           string(model),
+		Model:           model.ID,
 		ReasoningEffort: "none",
 		Messages: []openAIMessage{
 			{Role: "system", Content: system},
@@ -150,7 +132,7 @@ func (s *Service) completeGemini(ctx context.Context, model Model, system, user 
 
 	endpoint := fmt.Sprintf(
 		"https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent?key=%s",
-		string(model), url.QueryEscape(s.cfg.GeminiAPIKey),
+		model.ID, url.QueryEscape(s.cfg.GeminiAPIKey),
 	)
 	req, err := s.newJSONRequest(ctx, endpoint, payload)
 	if err != nil {
@@ -173,7 +155,7 @@ func (s *Service) completeAnthropic(ctx context.Context, model Model, system, us
 	}
 
 	payload := anthropicRequest{
-		Model:     string(model),
+		Model:     model.ID,
 		MaxTokens: maxOutputTokens,
 		System:    system,
 		Messages:  []anthropicMessage{{Role: "user", Content: user}},

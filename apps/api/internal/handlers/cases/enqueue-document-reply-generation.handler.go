@@ -6,7 +6,6 @@ import (
 
 	appContext "github.com/bored-bots/bored-template/internal/context"
 	"github.com/bored-bots/bored-template/internal/services/cases_service"
-	"github.com/bored-bots/bored-template/internal/services/llm_service"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 )
@@ -37,16 +36,11 @@ func (h *Handler) enqueueDocumentReplyGeneration(ctx context.Context, input *Enq
 		return nil, huma.Error401Unauthorized("Unauthorized")
 	}
 
-	model, err := llm_service.ParseModel(input.Body.Model)
-	if err != nil {
-		return nil, huma.Error422UnprocessableEntity("Unsupported reply model")
-	}
-
 	result, err := h.service.EnqueueDocumentReplyGeneration(ctx, cases_service.EnqueueReplyGenerationInput{
 		UserID:      userID,
 		CaseID:      input.CaseID,
 		DocumentID:  input.DocumentID,
-		Model:       model,
+		Model:       input.Body.Model,
 		Language:    input.Body.Language,
 		Instruction: input.Body.Instruction,
 	})
@@ -56,6 +50,8 @@ func (h *Handler) enqueueDocumentReplyGeneration(ctx context.Context, input *Enq
 			return nil, huma.Error404NotFound("Document not found")
 		case errors.Is(err, cases_service.ErrDocumentNotAnalyzed):
 			return nil, huma.Error409Conflict("Document analysis has not completed")
+		case errors.Is(err, cases_service.ErrUnsupportedModel):
+			return nil, huma.Error422UnprocessableEntity("Unsupported reply model")
 		case errors.Is(err, cases_service.ErrUnsupportedLanguage):
 			return nil, huma.Error422UnprocessableEntity("Unsupported language")
 		default:

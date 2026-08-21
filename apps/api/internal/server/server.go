@@ -65,7 +65,7 @@ func NewServer(cfg *config.Config, services *services.Services, store *store.Sto
 	healthHandler := health_handler.NewHealthHandler(services.HealthService)
 	healthHandler.RegisterRoutes(apiV1)
 
-	modelsHandler := models_handler.NewHandler()
+	modelsHandler := models_handler.NewHandler(services.ModelsService)
 	modelsHandler.RegisterRoutes(apiV1)
 
 	buddyPackageHandler := buddy_packages_handler.NewHandler(services.BuddyPackageService)

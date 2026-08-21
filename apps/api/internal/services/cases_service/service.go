@@ -7,7 +7,6 @@ import (
 
 	"github.com/bored-bots/bored-template/internal/repository/cases_repository"
 	"github.com/bored-bots/bored-template/internal/services/document_service"
-	"github.com/bored-bots/bored-template/internal/services/llm_service"
 	"github.com/bored-bots/bored-template/internal/store/db"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -23,6 +22,7 @@ var (
 	ErrDocumentNotFound        = errors.New("document was not found")
 	ErrCaseNotFound            = errors.New("case was not found")
 	ErrReplyGenerationNotFound = errors.New("reply generation was not found")
+	ErrUnsupportedModel        = errors.New("unsupported model")
 	ErrUnsupportedLanguage     = errors.New("unsupported language")
 )
 
@@ -38,18 +38,24 @@ type DocumentJobQueue interface {
 	QueueDocumentReplyGenerationJobTx(ctx context.Context, tx pgx.Tx, replyGenerationID uuid.UUID) (int64, error)
 }
 
+type ModelCatalog interface {
+	GetModelByProviderModelID(ctx context.Context, providerModelID string) (*db.AiModel, error)
+}
+
 type Service struct {
 	repository cases_repository.Repository
 	storage    DocumentStorage
 	queue      DocumentJobQueue
+	models     ModelCatalog
 	maxBytes   int64
 }
 
-func New(repository cases_repository.Repository, storage DocumentStorage, queue DocumentJobQueue, maxBytes int64) *Service {
+func New(repository cases_repository.Repository, storage DocumentStorage, queue DocumentJobQueue, models ModelCatalog, maxBytes int64) *Service {
 	return &Service{
 		repository: repository,
 		storage:    storage,
 		queue:      queue,
+		models:     models,
 		maxBytes:   maxBytes,
 	}
 }
@@ -188,7 +194,7 @@ func (s *Service) EnqueueDocumentExtraction(ctx context.Context, input EnqueueEx
 type EnqueueAnalysisInput struct {
 	CaseID     uuid.UUID
 	DocumentID uuid.UUID
-	Model      llm_service.Model
+	Model      string
 	Language   string
 }
 
@@ -217,6 +223,11 @@ func (s *Service) EnqueueDocumentAnalysis(ctx context.Context, input EnqueueAnal
 		return nil, err
 	}
 
+	model, err := s.enabledModel(ctx, input.Model)
+	if err != nil {
+		return nil, err
+	}
+
 	tx, err := s.repository.BeginTx(ctx)
 	if err != nil {
 		return nil, err
@@ -225,7 +236,7 @@ func (s *Service) EnqueueDocumentAnalysis(ctx context.Context, input EnqueueAnal
 
 	txRepo := s.repository.WithTx(tx)
 
-	jobID, err := s.queue.QueueDocumentAnalysisJobTx(ctx, tx, input.DocumentID, string(input.Model), input.Language)
+	jobID, err := s.queue.QueueDocumentAnalysisJobTx(ctx, tx, input.DocumentID, model.ProviderModelID, input.Language)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +244,7 @@ func (s *Service) EnqueueDocumentAnalysis(ctx context.Context, input EnqueueAnal
 	if _, err := txRepo.CreateDocumentAnalysis(ctx, db.CreateDocumentAnalysisParams{
 		DocumentID: input.DocumentID,
 		JobID:      pgtype.Int8{Int64: jobID, Valid: true},
-		Model:      pgtype.Text{String: string(input.Model), Valid: input.Model != ""},
+		Model:      pgtype.Text{String: model.ProviderModelID, Valid: true},
 		Language:   pgtype.Text{String: input.Language, Valid: input.Language != ""},
 	}); err != nil {
 		return nil, err
@@ -253,7 +264,7 @@ type EnqueueReplyGenerationInput struct {
 	UserID      uuid.UUID
 	CaseID      uuid.UUID
 	DocumentID  uuid.UUID
-	Model       llm_service.Model
+	Model       string
 	Language    string
 	Instruction string
 }
@@ -264,7 +275,8 @@ type EnqueueReplyGenerationResult struct {
 }
 
 func (s *Service) EnqueueDocumentReplyGeneration(ctx context.Context, input EnqueueReplyGenerationInput) (*EnqueueReplyGenerationResult, error) {
-	if _, err := llm_service.ParseModel(string(input.Model)); err != nil {
+	model, err := s.enabledModel(ctx, input.Model)
+	if err != nil {
 		return nil, err
 	}
 
@@ -314,8 +326,8 @@ func (s *Service) EnqueueDocumentReplyGeneration(ctx context.Context, input Enqu
 		ID:          replyGenerationID,
 		DocumentID:  input.DocumentID,
 		JobID:       pgtype.Int8{Int64: jobID, Valid: true},
-		Model:       string(input.Model),
-		Provider:    input.Model.Provider(),
+		Model:       model.ProviderModelID,
+		Provider:    model.Provider,
 		Language:    language,
 		Instruction: strings.TrimSpace(input.Instruction),
 	}); err != nil {
@@ -330,6 +342,14 @@ func (s *Service) EnqueueDocumentReplyGeneration(ctx context.Context, input Enqu
 		ReplyGenerationID: replyGenerationID,
 		JobID:             jobID,
 	}, nil
+}
+
+func (s *Service) enabledModel(ctx context.Context, providerModelID string) (*db.AiModel, error) {
+	model, err := s.models.GetModelByProviderModelID(ctx, providerModelID)
+	if errors.Is(err, pgx.ErrNoRows) || (err == nil && !model.Enabled) {
+		return nil, ErrUnsupportedModel
+	}
+	return model, err
 }
 
 func (s *Service) GetDocumentReplyGeneration(ctx context.Context, userID, caseID, documentID, replyGenerationID uuid.UUID) (*db.DocumentReplyGeneration, error) {
