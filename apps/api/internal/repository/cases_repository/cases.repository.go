@@ -5,6 +5,7 @@ import (
 
 	"github.com/bored-bots/bored-template/internal/store"
 	"github.com/bored-bots/bored-template/internal/store/db"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -33,9 +34,23 @@ type Repository interface {
 	FailDocumentAnalysis(ctx context.Context, params db.FailDocumentAnalysisParams) (*db.FailDocumentAnalysisRow, error)
 	CreateDocumentReplyGeneration(ctx context.Context, params db.CreateDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error)
 	GetDocumentReplyGenerationByID(ctx context.Context, params db.GetDocumentReplyGenerationByIDParams) (*db.DocumentReplyGeneration, error)
+	GetDocumentReplyGenerationByIDAndUserID(ctx context.Context, params db.GetDocumentReplyGenerationByIDAndUserIDParams) (*db.DocumentReplyGeneration, error)
+	GetDocumentReplyGenerationByUserAndClientRequestID(ctx context.Context, params db.GetDocumentReplyGenerationByUserAndClientRequestIDParams) (*db.DocumentReplyGeneration, error)
+	SetDocumentReplyGenerationJobID(ctx context.Context, params db.SetDocumentReplyGenerationJobIDParams) error
 	MarkDocumentReplyGenerationProcessing(ctx context.Context, params db.MarkDocumentReplyGenerationProcessingParams) (*db.DocumentReplyGeneration, error)
 	CompleteDocumentReplyGeneration(ctx context.Context, params db.CompleteDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error)
-	FailDocumentReplyGeneration(ctx context.Context, params db.FailDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error)
+	FailActiveDocumentReplyGenerationTx(ctx context.Context, tx pgx.Tx, params db.FailActiveDocumentReplyGenerationParams) (*db.FailActiveDocumentReplyGenerationRow, error)
+	CreatePaperLetterUpload(ctx context.Context, params db.CreatePaperLetterUploadParams) (*db.PaperLetterUpload, error)
+	GetPaperLetterUploadByIDAndUserID(ctx context.Context, params db.GetPaperLetterUploadByIDAndUserIDParams) (*db.PaperLetterUpload, error)
+	ConfirmPaperLetterUpload(ctx context.Context, params db.ConfirmPaperLetterUploadParams) (*db.PaperLetterUpload, error)
+	CreatePaperLetterDelivery(ctx context.Context, params db.CreatePaperLetterDeliveryParams) (*db.PaperLetterDelivery, error)
+	GetPaperLetterDeliveryByID(ctx context.Context, params db.GetPaperLetterDeliveryByIDParams) (*db.PaperLetterDelivery, error)
+	GetPaperLetterDeliveryByUserAndClientRequestID(ctx context.Context, params db.GetPaperLetterDeliveryByUserAndClientRequestIDParams) (*db.PaperLetterDelivery, error)
+	SetPaperLetterDeliveryJobID(ctx context.Context, params db.SetPaperLetterDeliveryJobIDParams) error
+	MarkPaperLetterDeliveryProcessing(ctx context.Context, params db.MarkPaperLetterDeliveryProcessingParams) (*db.PaperLetterDelivery, error)
+	MarkPaperLetterDeliverySent(ctx context.Context, params db.MarkPaperLetterDeliverySentParams) (*db.PaperLetterDelivery, error)
+	MarkPaperLetterDeliveryManualReview(ctx context.Context, params db.MarkPaperLetterDeliveryManualReviewParams) (*db.PaperLetterDelivery, error)
+	FailPaperLetterDelivery(ctx context.Context, params db.FailPaperLetterDeliveryParams) (uuid.UUID, error)
 	WithTx(tx pgx.Tx) Repository
 }
 
@@ -154,6 +169,18 @@ func (r *CasesRepository) GetDocumentReplyGenerationByID(ctx context.Context, pa
 	return r.Store.Queries.GetDocumentReplyGenerationByID(ctx, params)
 }
 
+func (r *CasesRepository) GetDocumentReplyGenerationByIDAndUserID(ctx context.Context, params db.GetDocumentReplyGenerationByIDAndUserIDParams) (*db.DocumentReplyGeneration, error) {
+	return r.Store.Queries.GetDocumentReplyGenerationByIDAndUserID(ctx, params)
+}
+
+func (r *CasesRepository) GetDocumentReplyGenerationByUserAndClientRequestID(ctx context.Context, params db.GetDocumentReplyGenerationByUserAndClientRequestIDParams) (*db.DocumentReplyGeneration, error) {
+	return r.Store.Queries.GetDocumentReplyGenerationByUserAndClientRequestID(ctx, params)
+}
+
+func (r *CasesRepository) SetDocumentReplyGenerationJobID(ctx context.Context, params db.SetDocumentReplyGenerationJobIDParams) error {
+	return r.Store.Queries.SetDocumentReplyGenerationJobID(ctx, params)
+}
+
 func (r *CasesRepository) MarkDocumentReplyGenerationProcessing(ctx context.Context, params db.MarkDocumentReplyGenerationProcessingParams) (*db.DocumentReplyGeneration, error) {
 	return r.Store.Queries.MarkDocumentReplyGenerationProcessing(ctx, params)
 }
@@ -162,6 +189,50 @@ func (r *CasesRepository) CompleteDocumentReplyGeneration(ctx context.Context, p
 	return r.Store.Queries.CompleteDocumentReplyGeneration(ctx, params)
 }
 
-func (r *CasesRepository) FailDocumentReplyGeneration(ctx context.Context, params db.FailDocumentReplyGenerationParams) (*db.DocumentReplyGeneration, error) {
-	return r.Store.Queries.FailDocumentReplyGeneration(ctx, params)
+func (r *CasesRepository) FailActiveDocumentReplyGenerationTx(ctx context.Context, tx pgx.Tx, params db.FailActiveDocumentReplyGenerationParams) (*db.FailActiveDocumentReplyGenerationRow, error) {
+	return r.Store.Queries.WithTx(tx).FailActiveDocumentReplyGeneration(ctx, params)
+}
+
+func (r *CasesRepository) CreatePaperLetterUpload(ctx context.Context, params db.CreatePaperLetterUploadParams) (*db.PaperLetterUpload, error) {
+	return r.Store.Queries.CreatePaperLetterUpload(ctx, params)
+}
+
+func (r *CasesRepository) GetPaperLetterUploadByIDAndUserID(ctx context.Context, params db.GetPaperLetterUploadByIDAndUserIDParams) (*db.PaperLetterUpload, error) {
+	return r.Store.Queries.GetPaperLetterUploadByIDAndUserID(ctx, params)
+}
+
+func (r *CasesRepository) ConfirmPaperLetterUpload(ctx context.Context, params db.ConfirmPaperLetterUploadParams) (*db.PaperLetterUpload, error) {
+	return r.Store.Queries.ConfirmPaperLetterUpload(ctx, params)
+}
+
+func (r *CasesRepository) CreatePaperLetterDelivery(ctx context.Context, params db.CreatePaperLetterDeliveryParams) (*db.PaperLetterDelivery, error) {
+	return r.Store.Queries.CreatePaperLetterDelivery(ctx, params)
+}
+
+func (r *CasesRepository) GetPaperLetterDeliveryByID(ctx context.Context, params db.GetPaperLetterDeliveryByIDParams) (*db.PaperLetterDelivery, error) {
+	return r.Store.Queries.GetPaperLetterDeliveryByID(ctx, params)
+}
+
+func (r *CasesRepository) GetPaperLetterDeliveryByUserAndClientRequestID(ctx context.Context, params db.GetPaperLetterDeliveryByUserAndClientRequestIDParams) (*db.PaperLetterDelivery, error) {
+	return r.Store.Queries.GetPaperLetterDeliveryByUserAndClientRequestID(ctx, params)
+}
+
+func (r *CasesRepository) SetPaperLetterDeliveryJobID(ctx context.Context, params db.SetPaperLetterDeliveryJobIDParams) error {
+	return r.Store.Queries.SetPaperLetterDeliveryJobID(ctx, params)
+}
+
+func (r *CasesRepository) MarkPaperLetterDeliveryProcessing(ctx context.Context, params db.MarkPaperLetterDeliveryProcessingParams) (*db.PaperLetterDelivery, error) {
+	return r.Store.Queries.MarkPaperLetterDeliveryProcessing(ctx, params)
+}
+
+func (r *CasesRepository) MarkPaperLetterDeliverySent(ctx context.Context, params db.MarkPaperLetterDeliverySentParams) (*db.PaperLetterDelivery, error) {
+	return r.Store.Queries.MarkPaperLetterDeliverySent(ctx, params)
+}
+
+func (r *CasesRepository) MarkPaperLetterDeliveryManualReview(ctx context.Context, params db.MarkPaperLetterDeliveryManualReviewParams) (*db.PaperLetterDelivery, error) {
+	return r.Store.Queries.MarkPaperLetterDeliveryManualReview(ctx, params)
+}
+
+func (r *CasesRepository) FailPaperLetterDelivery(ctx context.Context, params db.FailPaperLetterDeliveryParams) (uuid.UUID, error) {
+	return r.Store.Queries.FailPaperLetterDelivery(ctx, params)
 }

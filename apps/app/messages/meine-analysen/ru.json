@@ -11,5 +11,6 @@
 	"analysis_detail_pending_title": "Анализ выполняется",
 	"analysis_detail_pending_description": "Результат ещё не готов. Пожалуйста, проверьте снова чуть позже.",
 	"analysis_detail_failed_title": "Не удалось выполнить анализ",
-	"analysis_detail_failed_description": "Не удалось завершить этот анализ. Начните новый анализ или обратитесь в службу поддержки."
+	"analysis_detail_failed_description": "Не удалось завершить этот анализ. Начните новый анализ или обратитесь в службу поддержки.",
+	"analysis_detail_create_paper_letter": "Создать бумажное письмо"
 }

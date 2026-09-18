@@ -167,13 +167,31 @@ WHERE document_id = $1
 RETURNING id, document_id, status, job_id, model, provider, error_message, started_at, completed_at, created_at, updated_at;
 
 -- name: CreateDocumentReplyGeneration :one
-INSERT INTO document_reply_generations (id, document_id, job_id, model, provider, language, instruction)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO document_reply_generations (id, user_id, document_id, mode, client_request_id, job_id, model, provider, language, input)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 RETURNING *;
 
 -- name: GetDocumentReplyGenerationByID :one
 SELECT *
 FROM document_reply_generations
+WHERE id = $1;
+
+-- name: GetDocumentReplyGenerationByIDAndUserID :one
+SELECT *
+FROM document_reply_generations
+WHERE id = $1
+  AND user_id = $2;
+
+-- name: GetDocumentReplyGenerationByUserAndClientRequestID :one
+SELECT *
+FROM document_reply_generations
+WHERE user_id = $1
+  AND client_request_id = $2;
+
+-- name: SetDocumentReplyGenerationJobID :exec
+UPDATE document_reply_generations
+SET job_id    = $2,
+    updated_at = NOW()
 WHERE id = $1;
 
 -- name: MarkDocumentReplyGenerationProcessing :one
@@ -194,11 +212,78 @@ SET status        = 'completed',
 WHERE id = $1
 RETURNING *;
 
--- name: FailDocumentReplyGeneration :one
+-- name: FailActiveDocumentReplyGeneration :one
 UPDATE document_reply_generations
 SET status        = 'failed',
     error_message = $2,
     completed_at  = NOW(),
     updated_at    = NOW()
 WHERE id = $1
+  AND status IN ('pending', 'processing')
+RETURNING id, user_id;
+
+-- name: CreatePaperLetterUpload :one
+INSERT INTO paper_letter_uploads (id, user_id, sanitized_filename)
+VALUES ($1, $2, $3)
 RETURNING *;
+
+-- name: GetPaperLetterUploadByIDAndUserID :one
+SELECT *
+FROM paper_letter_uploads
+WHERE id = $1
+  AND user_id = $2;
+
+-- name: ConfirmPaperLetterUpload :one
+UPDATE paper_letter_uploads
+SET status       = 'confirmed',
+    size_bytes   = $3,
+    page_count   = $4,
+    sha256       = $5,
+    confirmed_at = NOW(),
+    updated_at   = NOW()
+WHERE id = $1
+  AND user_id = $2
+  AND status = 'pending'
+RETURNING *;
+
+-- name: CreatePaperLetterDelivery :one
+INSERT INTO paper_letter_deliveries
+    (id, user_id, upload_id, client_request_id, page_count, bp_cost,
+     delivery_product, address_position, print_mode, print_spectrum)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING *;
+
+-- name: GetPaperLetterDeliveryByID :one
+SELECT * FROM paper_letter_deliveries WHERE id = $1;
+
+-- name: GetPaperLetterDeliveryByUserAndClientRequestID :one
+SELECT * FROM paper_letter_deliveries WHERE user_id = $1 AND client_request_id = $2;
+
+-- name: SetPaperLetterDeliveryJobID :exec
+UPDATE paper_letter_deliveries SET job_id = $2, updated_at = NOW() WHERE id = $1;
+
+-- name: MarkPaperLetterDeliveryProcessing :one
+UPDATE paper_letter_deliveries
+SET status = 'processing', provider_submission_started_at = COALESCE(provider_submission_started_at, NOW()), updated_at = NOW()
+WHERE id = $1 AND status IN ('pending', 'processing')
+RETURNING *;
+
+-- name: MarkPaperLetterDeliverySent :one
+UPDATE paper_letter_deliveries
+SET status = 'sent', pingen_id = $2, error_message = NULL, sent_at = NOW(), updated_at = NOW()
+WHERE id = $1 AND status = 'processing'
+RETURNING *;
+
+-- name: MarkPaperLetterDeliveryManualReview :one
+UPDATE paper_letter_deliveries
+SET status = 'manual_review', updated_at = NOW()
+WHERE id = $1
+  AND status = 'processing'
+  AND provider_submission_started_at <= sqlc.arg(cutoff)
+RETURNING *;
+
+-- name: FailPaperLetterDelivery :one
+UPDATE paper_letter_deliveries
+SET status = 'failed', error_message = $2, updated_at = NOW()
+WHERE id = $1 AND status = 'processing'
+RETURNING id;

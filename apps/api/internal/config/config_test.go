@@ -12,6 +12,7 @@ import (
 
 func TestLoadConfig_WithDefaults(t *testing.T) {
 	// Arrange
+	t.Setenv("APP_ENV", "")
 	os.Setenv("APP_SERVER_PORT", "8080")
 	os.Setenv("APP_SERVER_HOST", "localhost")
 
@@ -116,7 +117,7 @@ server:
 	err = os.WriteFile(filepath.Join(tempDir, "config.staging.yaml"), []byte(envConfigContent), 0644)
 	require.NoError(t, err)
 
-	os.Setenv("APP_ENV", "staging")
+	t.Setenv("APP_ENV", "staging")
 
 	t.Cleanup(func() {
 		os.Unsetenv("APP_SERVER_PORT")
@@ -179,6 +180,7 @@ func TestLoadConfig_ConfigFileNotFound(t *testing.T) {
 
 func TestLoadConfig_NoConfigFileWithEnvVars(t *testing.T) {
 	// Arrange
+	t.Setenv("APP_ENV", "")
 	tempDir := t.TempDir()
 
 	originalDir, err := os.Getwd()

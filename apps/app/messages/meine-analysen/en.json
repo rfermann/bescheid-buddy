@@ -11,5 +11,6 @@
 	"analysis_detail_pending_title": "Analysis in progress",
 	"analysis_detail_pending_description": "The result is not ready yet. Please check again shortly.",
 	"analysis_detail_failed_title": "Analysis failed",
-	"analysis_detail_failed_description": "We could not complete this analysis. Please start a new analysis or contact support."
+	"analysis_detail_failed_description": "We could not complete this analysis. Please start a new analysis or contact support.",
+	"analysis_detail_create_paper_letter": "Create paper letter"
 }

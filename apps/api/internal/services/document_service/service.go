@@ -41,6 +41,10 @@ func fileKey(caseID, documentID uuid.UUID) string {
 }
 
 func (s *Service) PresignUpload(ctx context.Context, userID, caseID, documentID uuid.UUID) (string, error) {
+	return s.PresignObjectUpload(ctx, userID, fileKey(caseID, documentID))
+}
+
+func (s *Service) PresignObjectUpload(ctx context.Context, userID uuid.UUID, objectKey string) (string, error) {
 	bucket := userID.String()
 
 	exists, err := s.minioClient.BucketExists(ctx, bucket)
@@ -69,7 +73,7 @@ func (s *Service) PresignUpload(ctx context.Context, userID, caseID, documentID 
 		}
 	}
 
-	presignedURL, err := s.minioClient.PresignedPutObject(ctx, bucket, fileKey(caseID, documentID), 15*time.Minute)
+	presignedURL, err := s.minioClient.PresignedPutObject(ctx, bucket, objectKey, 15*time.Minute)
 	if err != nil {
 		return "", err
 	}
@@ -80,9 +84,13 @@ func (s *Service) PresignUpload(ctx context.Context, userID, caseID, documentID 
 var ErrObjectNotFound = errors.New("object not found in storage")
 
 func (s *Service) StatDocumentSize(ctx context.Context, userID, caseID, documentID uuid.UUID) (int64, error) {
+	return s.StatObjectSize(ctx, userID, fileKey(caseID, documentID))
+}
+
+func (s *Service) StatObjectSize(ctx context.Context, userID uuid.UUID, objectKey string) (int64, error) {
 	bucket := userID.String()
 
-	info, err := s.minioClient.StatObject(ctx, bucket, fileKey(caseID, documentID), minio.StatObjectOptions{})
+	info, err := s.minioClient.StatObject(ctx, bucket, objectKey, minio.StatObjectOptions{})
 	if err != nil {
 		if minio.ToErrorResponse(err).Code == "NoSuchKey" {
 			return 0, ErrObjectNotFound
@@ -94,9 +102,13 @@ func (s *Service) StatDocumentSize(ctx context.Context, userID, caseID, document
 }
 
 func (s *Service) DownloadDocument(ctx context.Context, userID, caseID, documentID uuid.UUID, maxBytes int64) ([]byte, error) {
+	return s.DownloadObject(ctx, userID, fileKey(caseID, documentID), maxBytes)
+}
+
+func (s *Service) DownloadObject(ctx context.Context, userID uuid.UUID, objectKey string, maxBytes int64) ([]byte, error) {
 	bucket := userID.String()
 
-	obj, err := s.minioClient.GetObject(ctx, bucket, fileKey(caseID, documentID), minio.GetObjectOptions{})
+	obj, err := s.minioClient.GetObject(ctx, bucket, objectKey, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, err
 	}

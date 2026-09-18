@@ -6,28 +6,37 @@ package db
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 type Querier interface {
 	CompleteDocumentAnalysis(ctx context.Context, arg CompleteDocumentAnalysisParams) (*CompleteDocumentAnalysisRow, error)
 	CompleteDocumentExtraction(ctx context.Context, arg CompleteDocumentExtractionParams) (*CompleteDocumentExtractionRow, error)
 	CompleteDocumentReplyGeneration(ctx context.Context, arg CompleteDocumentReplyGenerationParams) (*DocumentReplyGeneration, error)
+	ConfirmPaperLetterUpload(ctx context.Context, arg ConfirmPaperLetterUploadParams) (*PaperLetterUpload, error)
 	CreateAIModel(ctx context.Context, arg CreateAIModelParams) (*AiModel, error)
 	CreateCase(ctx context.Context, arg CreateCaseParams) (*Case, error)
 	CreateCaseDocument(ctx context.Context, arg CreateCaseDocumentParams) (*CaseDocument, error)
 	CreateDocumentAnalysis(ctx context.Context, arg CreateDocumentAnalysisParams) (*CreateDocumentAnalysisRow, error)
 	CreateDocumentExtraction(ctx context.Context, arg CreateDocumentExtractionParams) (*CreateDocumentExtractionRow, error)
 	CreateDocumentReplyGeneration(ctx context.Context, arg CreateDocumentReplyGenerationParams) (*DocumentReplyGeneration, error)
+	CreatePaperLetterDelivery(ctx context.Context, arg CreatePaperLetterDeliveryParams) (*PaperLetterDelivery, error)
+	CreatePaperLetterUpload(ctx context.Context, arg CreatePaperLetterUploadParams) (*PaperLetterUpload, error)
 	CreateSupportCase(ctx context.Context, arg CreateSupportCaseParams) (*SupportCase, error)
 	CreateSupportCaseMessage(ctx context.Context, arg CreateSupportCaseMessageParams) (*SupportCaseMessage, error)
+	CreditBuddyPoints(ctx context.Context, arg CreditBuddyPointsParams) (int64, error)
+	DebitBuddyPoints(ctx context.Context, arg DebitBuddyPointsParams) (int64, error)
+	FailActiveDocumentReplyGeneration(ctx context.Context, arg FailActiveDocumentReplyGenerationParams) (*FailActiveDocumentReplyGenerationRow, error)
 	FailDocumentAnalysis(ctx context.Context, arg FailDocumentAnalysisParams) (*FailDocumentAnalysisRow, error)
 	FailDocumentExtraction(ctx context.Context, arg FailDocumentExtractionParams) (*FailDocumentExtractionRow, error)
-	FailDocumentReplyGeneration(ctx context.Context, arg FailDocumentReplyGenerationParams) (*DocumentReplyGeneration, error)
+	FailPaperLetterDelivery(ctx context.Context, arg FailPaperLetterDeliveryParams) (uuid.UUID, error)
 	GetAIModelByProviderModelID(ctx context.Context, arg GetAIModelByProviderModelIDParams) (*AiModel, error)
 	GetAllBuddyPackages(ctx context.Context) ([]*BuddyPackage, error)
 	GetAllSupportCases(ctx context.Context) ([]*SupportCase, error)
 	GetBuddyPackageByID(ctx context.Context, arg GetBuddyPackageByIDParams) (*BuddyPackage, error)
 	GetBuddyPointsByUserID(ctx context.Context, arg GetBuddyPointsByUserIDParams) (*GetBuddyPointsByUserIDRow, error)
+	GetBuddyPointsForUpdate(ctx context.Context, arg GetBuddyPointsForUpdateParams) (*GetBuddyPointsForUpdateRow, error)
 	GetBuddyPointsLedgerByUserID(ctx context.Context, arg GetBuddyPointsLedgerByUserIDParams) ([]*BuddyPointsLedger, error)
 	GetCaseByIDAndUserID(ctx context.Context, arg GetCaseByIDAndUserIDParams) (*Case, error)
 	GetCaseDocumentByID(ctx context.Context, arg GetCaseDocumentByIDParams) (*CaseDocument, error)
@@ -37,7 +46,13 @@ type Querier interface {
 	GetDocumentExtractionByDocumentID(ctx context.Context, arg GetDocumentExtractionByDocumentIDParams) (*GetDocumentExtractionByDocumentIDRow, error)
 	GetDocumentExtractionTextByDocumentID(ctx context.Context, arg GetDocumentExtractionTextByDocumentIDParams) (*GetDocumentExtractionTextByDocumentIDRow, error)
 	GetDocumentReplyGenerationByID(ctx context.Context, arg GetDocumentReplyGenerationByIDParams) (*DocumentReplyGeneration, error)
+	GetDocumentReplyGenerationByIDAndUserID(ctx context.Context, arg GetDocumentReplyGenerationByIDAndUserIDParams) (*DocumentReplyGeneration, error)
+	GetDocumentReplyGenerationByUserAndClientRequestID(ctx context.Context, arg GetDocumentReplyGenerationByUserAndClientRequestIDParams) (*DocumentReplyGeneration, error)
 	GetInitialCaseDocument(ctx context.Context, arg GetInitialCaseDocumentParams) (*CaseDocument, error)
+	GetMatchingBuddyPointSpend(ctx context.Context, arg GetMatchingBuddyPointSpendParams) (*GetMatchingBuddyPointSpendRow, error)
+	GetPaperLetterDeliveryByID(ctx context.Context, arg GetPaperLetterDeliveryByIDParams) (*PaperLetterDelivery, error)
+	GetPaperLetterDeliveryByUserAndClientRequestID(ctx context.Context, arg GetPaperLetterDeliveryByUserAndClientRequestIDParams) (*PaperLetterDelivery, error)
+	GetPaperLetterUploadByIDAndUserID(ctx context.Context, arg GetPaperLetterUploadByIDAndUserIDParams) (*PaperLetterUpload, error)
 	GetSupportCase(ctx context.Context, arg GetSupportCaseParams) (*SupportCase, error)
 	GetSupportCaseByID(ctx context.Context, arg GetSupportCaseByIDParams) (*SupportCase, error)
 	GetSupportCaseMessagesBySupportCaseID(ctx context.Context, arg GetSupportCaseMessagesBySupportCaseIDParams) ([]*SupportCaseMessage, error)
@@ -52,7 +67,12 @@ type Querier interface {
 	MarkDocumentAnalysisProcessing(ctx context.Context, arg MarkDocumentAnalysisProcessingParams) (*MarkDocumentAnalysisProcessingRow, error)
 	MarkDocumentExtractionProcessing(ctx context.Context, arg MarkDocumentExtractionProcessingParams) (*MarkDocumentExtractionProcessingRow, error)
 	MarkDocumentReplyGenerationProcessing(ctx context.Context, arg MarkDocumentReplyGenerationProcessingParams) (*DocumentReplyGeneration, error)
+	MarkPaperLetterDeliveryManualReview(ctx context.Context, arg MarkPaperLetterDeliveryManualReviewParams) (*PaperLetterDelivery, error)
+	MarkPaperLetterDeliveryProcessing(ctx context.Context, arg MarkPaperLetterDeliveryProcessingParams) (*PaperLetterDelivery, error)
+	MarkPaperLetterDeliverySent(ctx context.Context, arg MarkPaperLetterDeliverySentParams) (*PaperLetterDelivery, error)
 	SetAIModelEnabled(ctx context.Context, arg SetAIModelEnabledParams) (*AiModel, error)
+	SetDocumentReplyGenerationJobID(ctx context.Context, arg SetDocumentReplyGenerationJobIDParams) error
+	SetPaperLetterDeliveryJobID(ctx context.Context, arg SetPaperLetterDeliveryJobIDParams) error
 	UpdateCaseTitle(ctx context.Context, arg UpdateCaseTitleParams) error
 	UpdateSupportCaseStatus(ctx context.Context, arg UpdateSupportCaseStatusParams) error
 	UpdateUserPoints(ctx context.Context, arg UpdateUserPointsParams) error

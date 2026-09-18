@@ -22,7 +22,7 @@ const (
 	DocumentAnalysisStatusFailed     DocumentAnalysisStatus = "failed"
 )
 
-func (e *DocumentAnalysisStatus) Scan(src interface{}) error {
+func (e *DocumentAnalysisStatus) Scan(src any) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = DocumentAnalysisStatus(s)
@@ -40,7 +40,7 @@ type NullDocumentAnalysisStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullDocumentAnalysisStatus) Scan(value interface{}) error {
+func (ns *NullDocumentAnalysisStatus) Scan(value any) error {
 	if value == nil {
 		ns.DocumentAnalysisStatus, ns.Valid = "", false
 		return nil
@@ -66,6 +66,55 @@ func AllDocumentAnalysisStatusValues() []DocumentAnalysisStatus {
 	}
 }
 
+type DocumentReplyGenerationMode string
+
+const (
+	DocumentReplyGenerationModeGenerate DocumentReplyGenerationMode = "generate"
+	DocumentReplyGenerationModeImprove  DocumentReplyGenerationMode = "improve"
+)
+
+func (e *DocumentReplyGenerationMode) Scan(src any) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = DocumentReplyGenerationMode(s)
+	case string:
+		*e = DocumentReplyGenerationMode(s)
+	default:
+		return fmt.Errorf("unsupported scan type for DocumentReplyGenerationMode: %T", src)
+	}
+	return nil
+}
+
+type NullDocumentReplyGenerationMode struct {
+	DocumentReplyGenerationMode DocumentReplyGenerationMode `json:"document_reply_generation_mode"`
+	Valid                       bool                        `json:"valid"` // Valid is true if DocumentReplyGenerationMode is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullDocumentReplyGenerationMode) Scan(value any) error {
+	if value == nil {
+		ns.DocumentReplyGenerationMode, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.DocumentReplyGenerationMode.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullDocumentReplyGenerationMode) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.DocumentReplyGenerationMode), nil
+}
+
+func AllDocumentReplyGenerationModeValues() []DocumentReplyGenerationMode {
+	return []DocumentReplyGenerationMode{
+		DocumentReplyGenerationModeGenerate,
+		DocumentReplyGenerationModeImprove,
+	}
+}
+
 type DocumentReplyGenerationStatus string
 
 const (
@@ -75,7 +124,7 @@ const (
 	DocumentReplyGenerationStatusFailed     DocumentReplyGenerationStatus = "failed"
 )
 
-func (e *DocumentReplyGenerationStatus) Scan(src interface{}) error {
+func (e *DocumentReplyGenerationStatus) Scan(src any) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = DocumentReplyGenerationStatus(s)
@@ -93,7 +142,7 @@ type NullDocumentReplyGenerationStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullDocumentReplyGenerationStatus) Scan(value interface{}) error {
+func (ns *NullDocumentReplyGenerationStatus) Scan(value any) error {
 	if value == nil {
 		ns.DocumentReplyGenerationStatus, ns.Valid = "", false
 		return nil
@@ -127,7 +176,7 @@ const (
 	DocumentUploadStatusFailed         DocumentUploadStatus = "failed"
 )
 
-func (e *DocumentUploadStatus) Scan(src interface{}) error {
+func (e *DocumentUploadStatus) Scan(src any) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = DocumentUploadStatus(s)
@@ -145,7 +194,7 @@ type NullDocumentUploadStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullDocumentUploadStatus) Scan(value interface{}) error {
+func (ns *NullDocumentUploadStatus) Scan(value any) error {
 	if value == nil {
 		ns.DocumentUploadStatus, ns.Valid = "", false
 		return nil
@@ -170,15 +219,121 @@ func AllDocumentUploadStatusValues() []DocumentUploadStatus {
 	}
 }
 
+type PaperLetterDeliveryStatus string
+
+const (
+	PaperLetterDeliveryStatusPending      PaperLetterDeliveryStatus = "pending"
+	PaperLetterDeliveryStatusProcessing   PaperLetterDeliveryStatus = "processing"
+	PaperLetterDeliveryStatusSent         PaperLetterDeliveryStatus = "sent"
+	PaperLetterDeliveryStatusFailed       PaperLetterDeliveryStatus = "failed"
+	PaperLetterDeliveryStatusManualReview PaperLetterDeliveryStatus = "manual_review"
+)
+
+func (e *PaperLetterDeliveryStatus) Scan(src any) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PaperLetterDeliveryStatus(s)
+	case string:
+		*e = PaperLetterDeliveryStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PaperLetterDeliveryStatus: %T", src)
+	}
+	return nil
+}
+
+type NullPaperLetterDeliveryStatus struct {
+	PaperLetterDeliveryStatus PaperLetterDeliveryStatus `json:"paper_letter_delivery_status"`
+	Valid                     bool                      `json:"valid"` // Valid is true if PaperLetterDeliveryStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPaperLetterDeliveryStatus) Scan(value any) error {
+	if value == nil {
+		ns.PaperLetterDeliveryStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PaperLetterDeliveryStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPaperLetterDeliveryStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.PaperLetterDeliveryStatus), nil
+}
+
+func AllPaperLetterDeliveryStatusValues() []PaperLetterDeliveryStatus {
+	return []PaperLetterDeliveryStatus{
+		PaperLetterDeliveryStatusPending,
+		PaperLetterDeliveryStatusProcessing,
+		PaperLetterDeliveryStatusSent,
+		PaperLetterDeliveryStatusFailed,
+		PaperLetterDeliveryStatusManualReview,
+	}
+}
+
+type PaperLetterUploadStatus string
+
+const (
+	PaperLetterUploadStatusPending   PaperLetterUploadStatus = "pending"
+	PaperLetterUploadStatusConfirmed PaperLetterUploadStatus = "confirmed"
+)
+
+func (e *PaperLetterUploadStatus) Scan(src any) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = PaperLetterUploadStatus(s)
+	case string:
+		*e = PaperLetterUploadStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for PaperLetterUploadStatus: %T", src)
+	}
+	return nil
+}
+
+type NullPaperLetterUploadStatus struct {
+	PaperLetterUploadStatus PaperLetterUploadStatus `json:"paper_letter_upload_status"`
+	Valid                   bool                    `json:"valid"` // Valid is true if PaperLetterUploadStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullPaperLetterUploadStatus) Scan(value any) error {
+	if value == nil {
+		ns.PaperLetterUploadStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.PaperLetterUploadStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullPaperLetterUploadStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.PaperLetterUploadStatus), nil
+}
+
+func AllPaperLetterUploadStatusValues() []PaperLetterUploadStatus {
+	return []PaperLetterUploadStatus{
+		PaperLetterUploadStatusPending,
+		PaperLetterUploadStatusConfirmed,
+	}
+}
+
 type RelatedEntityType string
 
 const (
-	RelatedEntityTypeBuddyPackages RelatedEntityType = "buddy_packages"
-	RelatedEntityTypeUser          RelatedEntityType = "user"
-	RelatedEntityTypeNull          RelatedEntityType = "null"
+	RelatedEntityTypeBuddyPackages         RelatedEntityType = "buddy_packages"
+	RelatedEntityTypeUser                  RelatedEntityType = "user"
+	RelatedEntityTypeNull                  RelatedEntityType = "null"
+	RelatedEntityTypePaperLetterGeneration RelatedEntityType = "paper_letter_generation"
+	RelatedEntityTypePaperLetterDelivery   RelatedEntityType = "paper_letter_delivery"
 )
 
-func (e *RelatedEntityType) Scan(src interface{}) error {
+func (e *RelatedEntityType) Scan(src any) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = RelatedEntityType(s)
@@ -196,7 +351,7 @@ type NullRelatedEntityType struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullRelatedEntityType) Scan(value interface{}) error {
+func (ns *NullRelatedEntityType) Scan(value any) error {
 	if value == nil {
 		ns.RelatedEntityType, ns.Valid = "", false
 		return nil
@@ -218,6 +373,8 @@ func AllRelatedEntityTypeValues() []RelatedEntityType {
 		RelatedEntityTypeBuddyPackages,
 		RelatedEntityTypeUser,
 		RelatedEntityTypeNull,
+		RelatedEntityTypePaperLetterGeneration,
+		RelatedEntityTypePaperLetterDelivery,
 	}
 }
 
@@ -230,7 +387,7 @@ const (
 	SupportCaseCategoryFeatureRequest SupportCaseCategory = "feature_request"
 )
 
-func (e *SupportCaseCategory) Scan(src interface{}) error {
+func (e *SupportCaseCategory) Scan(src any) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = SupportCaseCategory(s)
@@ -248,7 +405,7 @@ type NullSupportCaseCategory struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullSupportCaseCategory) Scan(value interface{}) error {
+func (ns *NullSupportCaseCategory) Scan(value any) error {
 	if value == nil {
 		ns.SupportCaseCategory, ns.Valid = "", false
 		return nil
@@ -283,7 +440,7 @@ const (
 	SupportCaseStatusClosed     SupportCaseStatus = "closed"
 )
 
-func (e *SupportCaseStatus) Scan(src interface{}) error {
+func (e *SupportCaseStatus) Scan(src any) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = SupportCaseStatus(s)
@@ -301,7 +458,7 @@ type NullSupportCaseStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullSupportCaseStatus) Scan(value interface{}) error {
+func (ns *NullSupportCaseStatus) Scan(value any) error {
 	if value == nil {
 		ns.SupportCaseStatus, ns.Valid = "", false
 		return nil
@@ -336,7 +493,7 @@ const (
 	TransactionTypeUsage        TransactionType = "usage"
 )
 
-func (e *TransactionType) Scan(src interface{}) error {
+func (e *TransactionType) Scan(src any) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = TransactionType(s)
@@ -354,7 +511,7 @@ type NullTransactionType struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullTransactionType) Scan(value interface{}) error {
+func (ns *NullTransactionType) Scan(value any) error {
 	if value == nil {
 		ns.TransactionType, ns.Valid = "", false
 		return nil
@@ -528,20 +685,57 @@ type DocumentExtraction struct {
 }
 
 type DocumentReplyGeneration struct {
-	ID           uuid.UUID                     `json:"id"`
-	DocumentID   uuid.UUID                     `json:"document_id"`
-	Status       DocumentReplyGenerationStatus `json:"status"`
-	JobID        pgtype.Int8                   `json:"job_id"`
-	Model        string                        `json:"model"`
-	Provider     string                        `json:"provider"`
-	Language     string                        `json:"language"`
-	Instruction  string                        `json:"instruction"`
-	Result       []byte                        `json:"result"`
-	ErrorMessage pgtype.Text                   `json:"error_message"`
-	StartedAt    *time.Time                    `json:"started_at"`
-	CompletedAt  *time.Time                    `json:"completed_at"`
-	CreatedAt    time.Time                     `json:"created_at"`
-	UpdatedAt    time.Time                     `json:"updated_at"`
+	ID              uuid.UUID                     `json:"id"`
+	UserID          uuid.UUID                     `json:"user_id"`
+	DocumentID      pgtype.UUID                   `json:"document_id"`
+	Mode            DocumentReplyGenerationMode   `json:"mode"`
+	ClientRequestID uuid.UUID                     `json:"client_request_id"`
+	Status          DocumentReplyGenerationStatus `json:"status"`
+	JobID           pgtype.Int8                   `json:"job_id"`
+	Model           string                        `json:"model"`
+	Provider        string                        `json:"provider"`
+	Language        string                        `json:"language"`
+	Input           []byte                        `json:"input"`
+	Result          []byte                        `json:"result"`
+	ErrorMessage    pgtype.Text                   `json:"error_message"`
+	StartedAt       *time.Time                    `json:"started_at"`
+	CompletedAt     *time.Time                    `json:"completed_at"`
+	CreatedAt       time.Time                     `json:"created_at"`
+	UpdatedAt       time.Time                     `json:"updated_at"`
+}
+
+type PaperLetterDelivery struct {
+	ID                          uuid.UUID                 `json:"id"`
+	UserID                      uuid.UUID                 `json:"user_id"`
+	UploadID                    uuid.UUID                 `json:"upload_id"`
+	ClientRequestID             uuid.UUID                 `json:"client_request_id"`
+	Status                      PaperLetterDeliveryStatus `json:"status"`
+	JobID                       pgtype.Int8               `json:"job_id"`
+	PingenID                    pgtype.Text               `json:"pingen_id"`
+	ProviderSubmissionStartedAt *time.Time                `json:"provider_submission_started_at"`
+	PageCount                   int32                     `json:"page_count"`
+	BpCost                      int32                     `json:"bp_cost"`
+	DeliveryProduct             string                    `json:"delivery_product"`
+	AddressPosition             string                    `json:"address_position"`
+	PrintMode                   string                    `json:"print_mode"`
+	PrintSpectrum               string                    `json:"print_spectrum"`
+	ErrorMessage                pgtype.Text               `json:"error_message"`
+	SentAt                      *time.Time                `json:"sent_at"`
+	CreatedAt                   time.Time                 `json:"created_at"`
+	UpdatedAt                   time.Time                 `json:"updated_at"`
+}
+
+type PaperLetterUpload struct {
+	ID                uuid.UUID               `json:"id"`
+	UserID            uuid.UUID               `json:"user_id"`
+	SanitizedFilename string                  `json:"sanitized_filename"`
+	Status            PaperLetterUploadStatus `json:"status"`
+	SizeBytes         int64                   `json:"size_bytes"`
+	PageCount         int32                   `json:"page_count"`
+	Sha256            string                  `json:"sha256"`
+	ConfirmedAt       *time.Time              `json:"confirmed_at"`
+	CreatedAt         time.Time               `json:"created_at"`
+	UpdatedAt         time.Time               `json:"updated_at"`
 }
 
 type Session struct {

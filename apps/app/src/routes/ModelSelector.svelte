@@ -4,20 +4,24 @@
 	let {
 		models,
 		value = $bindable(''),
-		disabled = false
+		disabled = false,
+		id = 'analyse-model',
+		label = m.analyse_model_label()
 	}: {
 		models: Array<{ id: string; name: string }>;
 		value?: string;
 		disabled?: boolean;
+		id?: string;
+		label?: string;
 	} = $props();
 </script>
 
 <div class="mt-6 flex flex-col gap-2">
-	<label for="analyse-model" class="text-sm font-medium text-[#b7b7c8]">
-		{m.analyse_model_label()}
+	<label for={id} class="text-sm font-medium text-[#b7b7c8]">
+		{label}
 	</label>
 	<select
-		id="analyse-model"
+		{id}
 		bind:value
 		disabled={disabled || models.length === 0}
 		class="w-full max-w-xs rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:border-white/30 focus:outline-none disabled:opacity-50"

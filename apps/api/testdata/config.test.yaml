@@ -4,3 +4,11 @@ server:
   read_timeout: 10
   write_timeout: 10
   graceful_shutdown: 1
+
+paper_letter:
+  max_pdf_bytes: 15728640
+
+pingen:
+  client_id: "test-client"
+  client_secret: "test-secret"
+  organisation_id: "00000000-0000-0000-0000-000000000001"

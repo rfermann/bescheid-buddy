@@ -12,6 +12,7 @@ import (
 
 	"github.com/bored-bots/bored-template/internal/config"
 	"github.com/bored-bots/bored-template/internal/server"
+	"github.com/bored-bots/bored-template/internal/services"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,7 +30,7 @@ func TestServer_Shutdown(t *testing.T) {
 				cfg, err := config.LoadConfig(configPath)
 				require.NoError(t, err)
 
-				app := server.NewServer(cfg)
+				app := server.NewServer(cfg, &services.Services{}, nil, nil)
 				done := make(chan error, 1)
 
 				go func() {
@@ -63,7 +64,7 @@ func TestServer_Shutdown(t *testing.T) {
 		cfg, err := config.LoadConfig(configPath)
 		require.NoError(t, err)
 
-		app := server.NewServer(cfg)
+		app := server.NewServer(cfg, &services.Services{}, nil, nil)
 
 		// Add a long-running handler
 		app.Router.Get("/slow", func(w http.ResponseWriter, r *http.Request) {

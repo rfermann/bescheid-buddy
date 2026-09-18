@@ -28,3 +28,18 @@ s3:
   secret_key: "ff6f5a71-2895-4291-8209-58ca8415f38c"
   region: "fr-par"
   frontend_url: "https://dev.app.bb.tricirc.de"
+
+paper_letter:
+  max_pdf_bytes: 15728640
+
+pingen:
+  client_id: ""
+  client_secret: ""
+  organisation_id: "9f98ed64-378f-4533-a4fc-6b0830389b8a"
+  identity_url: "https://identity-staging.pingen.com"
+  api_url: "https://api-staging.pingen.com"
+  scope: "letter"
+  product: "fast"
+  address_position: "left"
+  print_mode: "simplex"
+  print_spectrum: "color"

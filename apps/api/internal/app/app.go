@@ -7,8 +7,10 @@ import (
 
 	"github.com/bored-bots/bored-template/internal/config"
 	"github.com/bored-bots/bored-template/internal/queue"
+	"github.com/bored-bots/bored-template/internal/repository/buddy_packages_repository"
 	"github.com/bored-bots/bored-template/internal/repository/cases_repository"
 	"github.com/bored-bots/bored-template/internal/repository/models_repository"
+	"github.com/bored-bots/bored-template/internal/repository/users_repository"
 	"github.com/bored-bots/bored-template/internal/server"
 	"github.com/bored-bots/bored-template/internal/services"
 	"github.com/bored-bots/bored-template/internal/services/analysis_service"
@@ -16,7 +18,10 @@ import (
 	"github.com/bored-bots/bored-template/internal/services/extraction_service"
 	"github.com/bored-bots/bored-template/internal/services/llm_service"
 	"github.com/bored-bots/bored-template/internal/services/models_service"
+	"github.com/bored-bots/bored-template/internal/services/paper_letters_service"
+	"github.com/bored-bots/bored-template/internal/services/pingen_service"
 	"github.com/bored-bots/bored-template/internal/services/reply_service"
+	"github.com/bored-bots/bored-template/internal/services/users_service"
 	"github.com/bored-bots/bored-template/internal/services/vision_service"
 	s "github.com/bored-bots/bored-template/internal/store"
 	"github.com/minio/minio-go/v7"
@@ -59,9 +64,12 @@ func New() (*App, error) {
 	})
 	modelsService := models_service.New(models_repository.New(store), llmService)
 	analysisService := analysis_service.New(casesRepo, modelsService, llmService)
-	replyService := reply_service.New(casesRepo, modelsService, llmService)
+	userService := users_service.New(users_repository.New(store), buddy_packages_repository.New(store))
+	replyService := reply_service.New(casesRepo, modelsService, llmService, userService)
+	pingenService := pingen_service.New(cfg.Pingen)
+	deliveryProcessor := paper_letters_service.NewDeliveryProcessor(casesRepo, documentService, pingenService, userService, cfg.PaperLetter.MaxPDFBytes)
 
-	q, err := queue.New(store.Pool, extractionService, analysisService, replyService)
+	q, err := queue.New(store.Pool, extractionService, analysisService, replyService, deliveryProcessor)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +77,7 @@ func New() (*App, error) {
 		return nil, err
 	}
 
-	svc, err := services.NewService(cfg, modelsService, minioClient, q.Client, store, stripeClient)
+	svc, err := services.NewService(cfg, modelsService, userService, minioClient, q.Client, store, stripeClient)
 	if err != nil {
 		return nil, err
 	}

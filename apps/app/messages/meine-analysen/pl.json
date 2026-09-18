@@ -11,5 +11,6 @@
 	"analysis_detail_pending_title": "Analiza w toku",
 	"analysis_detail_pending_description": "Wynik nie jest jeszcze gotowy. Sprawdź ponownie za chwilę.",
 	"analysis_detail_failed_title": "Analiza nie powiodła się",
-	"analysis_detail_failed_description": "Nie udało się ukończyć tej analizy. Rozpocznij nową analizę lub skontaktuj się z pomocą techniczną."
+	"analysis_detail_failed_description": "Nie udało się ukończyć tej analizy. Rozpocznij nową analizę lub skontaktuj się z pomocą techniczną.",
+	"analysis_detail_create_paper_letter": "Utwórz list papierowy"
 }

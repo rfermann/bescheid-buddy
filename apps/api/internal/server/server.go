@@ -16,6 +16,7 @@ import (
 	"github.com/bored-bots/bored-template/internal/handlers/email"
 	"github.com/bored-bots/bored-template/internal/handlers/health"
 	"github.com/bored-bots/bored-template/internal/handlers/models"
+	"github.com/bored-bots/bored-template/internal/handlers/paper_letters"
 	"github.com/bored-bots/bored-template/internal/handlers/stripe"
 	"github.com/bored-bots/bored-template/internal/handlers/support_cases"
 	"github.com/bored-bots/bored-template/internal/handlers/users"
@@ -83,8 +84,11 @@ func NewServer(cfg *config.Config, services *services.Services, store *store.Sto
 	supportCasesHandler := support_cases_handler.NewHandler(services.SupportCasesService)
 	supportCasesHandler.RegisterRoutes(apiV1)
 
-	casesHandler := cases_handler.NewHandler(services.CasesService)
+	casesHandler := cases_handler.NewHandler(services.CasesService, services.PaperLettersService)
 	casesHandler.RegisterRoutes(apiV1)
+
+	paperLettersHandler := paper_letters_handler.NewHandler(services.PaperLettersService, services.PaperLettersPDFService)
+	paperLettersHandler.RegisterRoutes(apiV1)
 
 	return &Server{
 		httpServer: &http.Server{
@@ -121,7 +125,9 @@ func (s *Server) Start() error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(s.Config.Server.GracefulShutdown)*time.Second)
 	defer cancel()
-	defer s.store.Close()
+	if s.store != nil {
+		defer s.store.Close()
+	}
 
 	if s.queue != nil {
 		if err := s.queue.Stop(ctx); err != nil {

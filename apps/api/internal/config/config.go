@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -9,16 +10,18 @@ import (
 
 // Config represents the application configuration
 type Config struct {
-	Server   ServerConfig   `mapstructure:"server"`
-	Auth     AuthConfig     `mapstructure:"auth"`
-	API      APIConfig      `mapstructure:"api"`
-	Database DatabaseConfig `mapstructure:"database"`
-	S3       S3Config       `mapstructure:"s3"`
-	Stripe   StripeConfig   `mapstructure:"stripe"`
-	SMTP     SMTPConfig     `mapstructure:"smtp"`
-	Vision   VisionConfig   `mapstructure:"vision"`
-	Upload   UploadConfig   `mapstructure:"upload"`
-	LLM      LLMConfig      `mapstructure:"llm"`
+	Server      ServerConfig      `mapstructure:"server"`
+	Auth        AuthConfig        `mapstructure:"auth"`
+	API         APIConfig         `mapstructure:"api"`
+	Database    DatabaseConfig    `mapstructure:"database"`
+	S3          S3Config          `mapstructure:"s3"`
+	Stripe      StripeConfig      `mapstructure:"stripe"`
+	SMTP        SMTPConfig        `mapstructure:"smtp"`
+	Vision      VisionConfig      `mapstructure:"vision"`
+	Upload      UploadConfig      `mapstructure:"upload"`
+	PaperLetter PaperLetterConfig `mapstructure:"paper_letter"`
+	Pingen      PingenConfig      `mapstructure:"pingen"`
+	LLM         LLMConfig         `mapstructure:"llm"`
 }
 
 // ServerConfig holds server-related configuration
@@ -78,6 +81,23 @@ type UploadConfig struct {
 	MaxBytes int64 `mapstructure:"max_bytes"`
 }
 
+type PaperLetterConfig struct {
+	MaxPDFBytes int64 `mapstructure:"max_pdf_bytes"`
+}
+
+type PingenConfig struct {
+	ClientID        string `mapstructure:"client_id"`
+	ClientSecret    string `mapstructure:"client_secret"`
+	OrganisationID  string `mapstructure:"organisation_id"`
+	IdentityURL     string `mapstructure:"identity_url"`
+	APIURL          string `mapstructure:"api_url"`
+	Scope           string `mapstructure:"scope"`
+	Product         string `mapstructure:"product"`
+	AddressPosition string `mapstructure:"address_position"`
+	PrintMode       string `mapstructure:"print_mode"`
+	PrintSpectrum   string `mapstructure:"print_spectrum"`
+}
+
 type LLMConfig struct {
 	OpenAIAPIKey    string `mapstructure:"openai_api_key"`
 	GeminiAPIKey    string `mapstructure:"gemini_api_key"`
@@ -123,13 +143,33 @@ func LoadConfig(configPath string) (*Config, error) {
 	v.BindEnv("smtp.use_ssl")
 	v.BindEnv("vision.api_key")
 	v.BindEnv("upload.max_bytes")
+	v.BindEnv("paper_letter.max_pdf_bytes")
+	v.BindEnv("pingen.client_id")
+	v.BindEnv("pingen.client_secret")
+	v.BindEnv("pingen.organisation_id")
+	v.BindEnv("pingen.identity_url")
+	v.BindEnv("pingen.api_url")
+	v.BindEnv("pingen.scope")
+	v.BindEnv("pingen.product")
+	v.BindEnv("pingen.address_position")
+	v.BindEnv("pingen.print_mode")
+	v.BindEnv("pingen.print_spectrum")
 	v.BindEnv("llm.openai_api_key")
 	v.BindEnv("llm.gemini_api_key")
 	v.BindEnv("llm.anthropic_api_key")
 
-	v.SetConfigFile(configPath)
-	if err := v.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("failed to read config file %s: %w", configPath, err)
+	if configPath != "" {
+		v.SetConfigFile(configPath)
+		if err := v.ReadInConfig(); err != nil {
+			return nil, fmt.Errorf("failed to read config file %s: %w", configPath, err)
+		}
+	} else if environment := os.Getenv("APP_ENV"); environment != "" {
+		v.SetConfigName("config." + environment)
+		v.SetConfigType("yaml")
+		v.AddConfigPath(".")
+		if err := v.ReadInConfig(); err != nil {
+			return nil, fmt.Errorf("failed to read config file: %w", err)
+		}
 	}
 
 	var config Config
@@ -174,6 +214,14 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("api.title", "Bored Template")
 	v.SetDefault("api.version", "0.0.1")
 	v.SetDefault("upload.max_bytes", 15728640)
+	v.SetDefault("paper_letter.max_pdf_bytes", 15728640)
+	v.SetDefault("pingen.identity_url", "https://identity-staging.pingen.com")
+	v.SetDefault("pingen.api_url", "https://api-staging.pingen.com")
+	v.SetDefault("pingen.scope", "letter")
+	v.SetDefault("pingen.product", "fast")
+	v.SetDefault("pingen.address_position", "left")
+	v.SetDefault("pingen.print_mode", "simplex")
+	v.SetDefault("pingen.print_spectrum", "color")
 }
 
 // GetAddr returns the server address in host:port format

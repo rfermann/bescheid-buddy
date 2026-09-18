@@ -1,15 +1,47 @@
 <script lang="ts">
-	import type { HTMLInputTypeAttribute } from 'svelte/elements';
+	import type { HTMLInputAttributes, HTMLInputTypeAttribute } from 'svelte/elements';
 
 	type Props = {
-		label: string,
-		name: string,
-		type: HTMLInputTypeAttribute,
-	}
+		label: string;
+		name: string;
+		type: HTMLInputTypeAttribute;
+		value?: string | number;
+		disabled?: boolean;
+		required?: boolean;
+		maxlength?: number;
+		autocomplete?: HTMLInputAttributes['autocomplete'];
+		error?: string;
+	};
 
-	let { label, name, type }: Props = $props();
+	let {
+		label,
+		name,
+		type,
+		value = $bindable(''),
+		disabled = false,
+		required = false,
+		maxlength,
+		autocomplete,
+		error
+	}: Props = $props();
 </script>
+
 <div class="flex flex-col gap-1">
-	<label class="text-xs font-extrabold mb-2 tracking-widest uppercase" for={name}>{label}</label>
-	<input type={type} id={name} name={name} class="border  border-white/22 bg-white/5 rounded-xl" />
+	<label class="mb-2 text-xs font-extrabold tracking-widest uppercase" for={name}>{label}</label>
+	<input
+		{type}
+		id={name}
+		{name}
+		bind:value
+		{disabled}
+		{required}
+		{maxlength}
+		{autocomplete}
+		aria-invalid={error ? 'true' : undefined}
+		aria-describedby={error ? `${name}-error` : undefined}
+		class="rounded-xl border border-white/22 bg-white/5 disabled:opacity-50"
+	/>
+	{#if error}
+		<span id={`${name}-error`} class="text-sm text-red-300">{error}</span>
+	{/if}
 </div>

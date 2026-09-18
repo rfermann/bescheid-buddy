@@ -13,7 +13,8 @@
 			"./messages/datenschutz/{locale}.json",
 			"./messages/login/{locale}.json",
 			"./messages/email/{locale}.json",
-			"./messages/support/{locale}.json"
+			"./messages/support/{locale}.json",
+			"./messages/papierbrief/{locale}.json"
 		]
 	},
 	"baseLocale": "en",

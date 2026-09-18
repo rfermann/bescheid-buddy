@@ -11,8 +11,12 @@ import (
 
 type Repository interface {
 	BeginTx(ctx context.Context) (pgx.Tx, error)
+	CreditBuddyPoints(ctx context.Context, params db.CreditBuddyPointsParams) (int64, error)
+	DebitBuddyPoints(ctx context.Context, params db.DebitBuddyPointsParams) (int64, error)
 	GetBuddyPointsByUserID(ctx context.Context, params db.GetBuddyPointsByUserIDParams) (*db.GetBuddyPointsByUserIDRow, error)
+	GetBuddyPointsForUpdate(ctx context.Context, params db.GetBuddyPointsForUpdateParams) (*db.GetBuddyPointsForUpdateRow, error)
 	GetBuddyPointsLedgerByUserID(ctx context.Context, userID uuid.UUID) ([]*db.BuddyPointsLedger, error)
+	GetMatchingBuddyPointSpend(ctx context.Context, params db.GetMatchingBuddyPointSpendParams) (*db.GetMatchingBuddyPointSpendRow, error)
 	GetUserByID(ctx context.Context, userID db.GetUserByIDParams) (*db.User, error)
 	GetUserByStripeCustomerID(ctx context.Context, params db.GetUserByStripeCustomerIDParams) (*db.User, error)
 	InsertBuddyPointsLedger(ctx context.Context, params db.InsertBuddyPointsLedgerParams) error
@@ -44,14 +48,30 @@ func (r *UserRepository) BeginTx(ctx context.Context) (pgx.Tx, error) {
 	return r.Store.Pool.Begin(ctx)
 }
 
+func (r *UserRepository) CreditBuddyPoints(ctx context.Context, params db.CreditBuddyPointsParams) (int64, error) {
+	return r.Store.Queries.CreditBuddyPoints(ctx, params)
+}
+
+func (r *UserRepository) DebitBuddyPoints(ctx context.Context, params db.DebitBuddyPointsParams) (int64, error) {
+	return r.Store.Queries.DebitBuddyPoints(ctx, params)
+}
+
 func (r *UserRepository) GetBuddyPointsByUserID(ctx context.Context, params db.GetBuddyPointsByUserIDParams) (*db.GetBuddyPointsByUserIDRow, error) {
 	return r.Store.Queries.GetBuddyPointsByUserID(ctx, params)
+}
+
+func (r *UserRepository) GetBuddyPointsForUpdate(ctx context.Context, params db.GetBuddyPointsForUpdateParams) (*db.GetBuddyPointsForUpdateRow, error) {
+	return r.Store.Queries.GetBuddyPointsForUpdate(ctx, params)
 }
 
 func (r *UserRepository) GetBuddyPointsLedgerByUserID(ctx context.Context, userID uuid.UUID) ([]*db.BuddyPointsLedger, error) {
 	return r.Store.Queries.GetBuddyPointsLedgerByUserID(ctx, db.GetBuddyPointsLedgerByUserIDParams{
 		UserID: userID,
 	})
+}
+
+func (r *UserRepository) GetMatchingBuddyPointSpend(ctx context.Context, params db.GetMatchingBuddyPointSpendParams) (*db.GetMatchingBuddyPointSpendRow, error) {
+	return r.Store.Queries.GetMatchingBuddyPointSpend(ctx, params)
 }
 
 func (r *UserRepository) GetUserByID(ctx context.Context, params db.GetUserByIDParams) (*db.User, error) {

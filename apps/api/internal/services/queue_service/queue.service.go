@@ -64,3 +64,11 @@ func (s *Service) QueueDocumentReplyGenerationJobTx(ctx context.Context, tx pgx.
 	}
 	return result.Job.ID, nil
 }
+
+func (s *Service) QueuePaperLetterDeliveryJobTx(ctx context.Context, tx pgx.Tx, deliveryID uuid.UUID) (int64, error) {
+	result, err := s.client.InsertTx(ctx, tx, workers.PaperLetterDeliveryJobArgs{DeliveryID: deliveryID}, nil)
+	if err != nil {
+		return 0, err
+	}
+	return result.Job.ID, nil
+}

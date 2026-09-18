@@ -4,16 +4,19 @@ import (
 	"net/http"
 
 	"github.com/bored-bots/bored-template/internal/services/cases_service"
+	"github.com/bored-bots/bored-template/internal/services/paper_letters_service"
 	"github.com/danielgtaylor/huma/v2"
 )
 
 type Handler struct {
-	service *cases_service.Service
+	service      *cases_service.Service
+	paperLetters *paper_letters_service.Service
 }
 
-func NewHandler(service *cases_service.Service) *Handler {
+func NewHandler(service *cases_service.Service, paperLetters *paper_letters_service.Service) *Handler {
 	return &Handler{
-		service: service,
+		service:      service,
+		paperLetters: paperLetters,
 	}
 }
 

@@ -3,7 +3,6 @@ package cases_service
 import (
 	"context"
 	"errors"
-	"strings"
 
 	"github.com/bored-bots/bored-template/internal/repository/cases_repository"
 	"github.com/bored-bots/bored-template/internal/services/document_service"
@@ -14,16 +13,14 @@ import (
 )
 
 var (
-	ErrUploadNotFound          = errors.New("uploaded file was not found in storage")
-	ErrDocumentNotUploaded     = errors.New("document upload has not been confirmed")
-	ErrFileTooLarge            = errors.New("uploaded file exceeds the maximum allowed size")
-	ErrDocumentNotExtracted    = errors.New("document extraction has not completed")
-	ErrDocumentNotAnalyzed     = errors.New("document analysis has not completed")
-	ErrDocumentNotFound        = errors.New("document was not found")
-	ErrCaseNotFound            = errors.New("case was not found")
-	ErrReplyGenerationNotFound = errors.New("reply generation was not found")
-	ErrUnsupportedModel        = errors.New("unsupported model")
-	ErrUnsupportedLanguage     = errors.New("unsupported language")
+	ErrUploadNotFound       = errors.New("uploaded file was not found in storage")
+	ErrDocumentNotUploaded  = errors.New("document upload has not been confirmed")
+	ErrFileTooLarge         = errors.New("uploaded file exceeds the maximum allowed size")
+	ErrDocumentNotExtracted = errors.New("document extraction has not completed")
+	ErrDocumentNotAnalyzed  = errors.New("document analysis has not completed")
+	ErrDocumentNotFound     = errors.New("document was not found")
+	ErrCaseNotFound         = errors.New("case was not found")
+	ErrUnsupportedModel     = errors.New("unsupported model")
 )
 
 type DocumentStorage interface {
@@ -35,7 +32,6 @@ type DocumentStorage interface {
 type DocumentJobQueue interface {
 	QueueDocumentDataExtractionJobTx(ctx context.Context, tx pgx.Tx, userID, caseID, fileID uuid.UUID) (int64, error)
 	QueueDocumentAnalysisJobTx(ctx context.Context, tx pgx.Tx, documentID uuid.UUID, model, language string) (int64, error)
-	QueueDocumentReplyGenerationJobTx(ctx context.Context, tx pgx.Tx, replyGenerationID uuid.UUID) (int64, error)
 }
 
 type ModelCatalog interface {
@@ -260,122 +256,12 @@ func (s *Service) EnqueueDocumentAnalysis(ctx context.Context, input EnqueueAnal
 	}, nil
 }
 
-type EnqueueReplyGenerationInput struct {
-	UserID      uuid.UUID
-	CaseID      uuid.UUID
-	DocumentID  uuid.UUID
-	Model       string
-	Language    string
-	Instruction string
-}
-
-type EnqueueReplyGenerationResult struct {
-	ReplyGenerationID uuid.UUID
-	JobID             int64
-}
-
-func (s *Service) EnqueueDocumentReplyGeneration(ctx context.Context, input EnqueueReplyGenerationInput) (*EnqueueReplyGenerationResult, error) {
-	model, err := s.enabledModel(ctx, input.Model)
-	if err != nil {
-		return nil, err
-	}
-
-	language := strings.ToLower(strings.TrimSpace(input.Language))
-	switch language {
-	case "de", "en", "ru", "uk", "ua", "pl", "ar":
-	default:
-		return nil, ErrUnsupportedLanguage
-	}
-
-	if _, err := s.GetCaseByID(ctx, input.UserID, input.CaseID); err != nil {
-		return nil, ErrDocumentNotFound
-	}
-
-	document, err := s.repository.GetCaseDocumentByID(ctx, db.GetCaseDocumentByIDParams{ID: input.DocumentID})
-	if errors.Is(err, pgx.ErrNoRows) || (err == nil && document.CaseID != input.CaseID) {
-		return nil, ErrDocumentNotFound
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	analysis, err := s.repository.GetDocumentAnalysisByDocumentID(ctx, db.GetDocumentAnalysisByDocumentIDParams{DocumentID: input.DocumentID})
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, ErrDocumentNotAnalyzed
-	}
-	if err != nil {
-		return nil, err
-	}
-	if analysis.Status != db.DocumentAnalysisStatusCompleted {
-		return nil, ErrDocumentNotAnalyzed
-	}
-
-	replyGenerationID := uuid.New()
-	tx, err := s.repository.BeginTx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback(ctx)
-
-	jobID, err := s.queue.QueueDocumentReplyGenerationJobTx(ctx, tx, replyGenerationID)
-	if err != nil {
-		return nil, err
-	}
-
-	if _, err := s.repository.WithTx(tx).CreateDocumentReplyGeneration(ctx, db.CreateDocumentReplyGenerationParams{
-		ID:          replyGenerationID,
-		DocumentID:  input.DocumentID,
-		JobID:       pgtype.Int8{Int64: jobID, Valid: true},
-		Model:       model.ProviderModelID,
-		Provider:    model.Provider,
-		Language:    language,
-		Instruction: strings.TrimSpace(input.Instruction),
-	}); err != nil {
-		return nil, err
-	}
-
-	if err := tx.Commit(ctx); err != nil {
-		return nil, err
-	}
-
-	return &EnqueueReplyGenerationResult{
-		ReplyGenerationID: replyGenerationID,
-		JobID:             jobID,
-	}, nil
-}
-
 func (s *Service) enabledModel(ctx context.Context, providerModelID string) (*db.AiModel, error) {
 	model, err := s.models.GetModelByProviderModelID(ctx, providerModelID)
 	if errors.Is(err, pgx.ErrNoRows) || (err == nil && !model.Enabled) {
 		return nil, ErrUnsupportedModel
 	}
 	return model, err
-}
-
-func (s *Service) GetDocumentReplyGeneration(ctx context.Context, userID, caseID, documentID, replyGenerationID uuid.UUID) (*db.DocumentReplyGeneration, error) {
-	if _, err := s.GetCaseByID(ctx, userID, caseID); err != nil {
-		if errors.Is(err, ErrCaseNotFound) {
-			return nil, ErrReplyGenerationNotFound
-		}
-		return nil, err
-	}
-
-	document, err := s.repository.GetCaseDocumentByID(ctx, db.GetCaseDocumentByIDParams{ID: documentID})
-	if errors.Is(err, pgx.ErrNoRows) || (err == nil && document.CaseID != caseID) {
-		return nil, ErrReplyGenerationNotFound
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	generation, err := s.repository.GetDocumentReplyGenerationByID(ctx, db.GetDocumentReplyGenerationByIDParams{ID: replyGenerationID})
-	if errors.Is(err, pgx.ErrNoRows) || (err == nil && generation.DocumentID != documentID) {
-		return nil, ErrReplyGenerationNotFound
-	}
-	if err != nil {
-		return nil, err
-	}
-	return generation, nil
 }
 
 type ExtractionStatus struct {

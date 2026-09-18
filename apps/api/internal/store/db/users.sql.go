@@ -12,6 +12,54 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const creditBuddyPoints = `-- name: CreditBuddyPoints :execrows
+UPDATE "users"
+SET monthly_points  = monthly_points + $1,
+    lifetime_points = lifetime_points + $2,
+    updated_at      = NOW()
+WHERE id = $3
+  AND $1 >= 0
+  AND $2 >= 0
+`
+
+type CreditBuddyPointsParams struct {
+	MonthlyPoints  int32     `json:"monthly_points"`
+	LifetimePoints int32     `json:"lifetime_points"`
+	UserID         uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) CreditBuddyPoints(ctx context.Context, arg CreditBuddyPointsParams) (int64, error) {
+	result, err := q.db.Exec(ctx, creditBuddyPoints, arg.MonthlyPoints, arg.LifetimePoints, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
+const debitBuddyPoints = `-- name: DebitBuddyPoints :execrows
+UPDATE "users"
+SET monthly_points  = monthly_points - $1,
+    lifetime_points = lifetime_points - $2,
+    updated_at      = NOW()
+WHERE id = $3
+  AND monthly_points >= $1
+  AND lifetime_points >= $2
+`
+
+type DebitBuddyPointsParams struct {
+	MonthlyPoints  int32     `json:"monthly_points"`
+	LifetimePoints int32     `json:"lifetime_points"`
+	UserID         uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) DebitBuddyPoints(ctx context.Context, arg DebitBuddyPointsParams) (int64, error) {
+	result, err := q.db.Exec(ctx, debitBuddyPoints, arg.MonthlyPoints, arg.LifetimePoints, arg.UserID)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected(), nil
+}
+
 const getBuddyPointsByUserID = `-- name: GetBuddyPointsByUserID :one
 SELECT monthly_points,
        lifetime_points
@@ -31,6 +79,30 @@ type GetBuddyPointsByUserIDRow struct {
 func (q *Queries) GetBuddyPointsByUserID(ctx context.Context, arg GetBuddyPointsByUserIDParams) (*GetBuddyPointsByUserIDRow, error) {
 	row := q.db.QueryRow(ctx, getBuddyPointsByUserID, arg.ID)
 	var i GetBuddyPointsByUserIDRow
+	err := row.Scan(&i.MonthlyPoints, &i.LifetimePoints)
+	return &i, err
+}
+
+const getBuddyPointsForUpdate = `-- name: GetBuddyPointsForUpdate :one
+SELECT monthly_points,
+       lifetime_points
+FROM "users"
+WHERE id = $1
+FOR UPDATE
+`
+
+type GetBuddyPointsForUpdateParams struct {
+	UserID uuid.UUID `json:"user_id"`
+}
+
+type GetBuddyPointsForUpdateRow struct {
+	MonthlyPoints  int32 `json:"monthly_points"`
+	LifetimePoints int32 `json:"lifetime_points"`
+}
+
+func (q *Queries) GetBuddyPointsForUpdate(ctx context.Context, arg GetBuddyPointsForUpdateParams) (*GetBuddyPointsForUpdateRow, error) {
+	row := q.db.QueryRow(ctx, getBuddyPointsForUpdate, arg.UserID)
+	var i GetBuddyPointsForUpdateRow
 	err := row.Scan(&i.MonthlyPoints, &i.LifetimePoints)
 	return &i, err
 }
@@ -88,6 +160,49 @@ func (q *Queries) GetBuddyPointsLedgerByUserID(ctx context.Context, arg GetBuddy
 		return nil, err
 	}
 	return items, nil
+}
+
+const getMatchingBuddyPointSpend = `-- name: GetMatchingBuddyPointSpend :one
+SELECT amount,
+       monthly_points_before,
+       lifetime_points_before,
+       monthly_points_after,
+       lifetime_points_after
+FROM buddy_points_ledgers
+WHERE user_id = $1
+  AND transaction_type = 'usage'
+  AND amount < 0
+  AND related_entity_id = $2
+  AND related_entity_type = $3
+ORDER BY created_at ASC
+LIMIT 1
+`
+
+type GetMatchingBuddyPointSpendParams struct {
+	UserID            uuid.UUID             `json:"user_id"`
+	RelatedEntityID   pgtype.UUID           `json:"related_entity_id"`
+	RelatedEntityType NullRelatedEntityType `json:"related_entity_type"`
+}
+
+type GetMatchingBuddyPointSpendRow struct {
+	Amount               int32 `json:"amount"`
+	MonthlyPointsBefore  int32 `json:"monthly_points_before"`
+	LifetimePointsBefore int32 `json:"lifetime_points_before"`
+	MonthlyPointsAfter   int32 `json:"monthly_points_after"`
+	LifetimePointsAfter  int32 `json:"lifetime_points_after"`
+}
+
+func (q *Queries) GetMatchingBuddyPointSpend(ctx context.Context, arg GetMatchingBuddyPointSpendParams) (*GetMatchingBuddyPointSpendRow, error) {
+	row := q.db.QueryRow(ctx, getMatchingBuddyPointSpend, arg.UserID, arg.RelatedEntityID, arg.RelatedEntityType)
+	var i GetMatchingBuddyPointSpendRow
+	err := row.Scan(
+		&i.Amount,
+		&i.MonthlyPointsBefore,
+		&i.LifetimePointsBefore,
+		&i.MonthlyPointsAfter,
+		&i.LifetimePointsAfter,
+	)
+	return &i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one

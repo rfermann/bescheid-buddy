@@ -11,5 +11,6 @@
 	"analysis_detail_pending_title": "Аналіз триває",
 	"analysis_detail_pending_description": "Результат ще не готовий. Будь ласка, перевірте трохи пізніше.",
 	"analysis_detail_failed_title": "Не вдалося виконати аналіз",
-	"analysis_detail_failed_description": "Не вдалося завершити цей аналіз. Почніть новий аналіз або зверніться до служби підтримки."
+	"analysis_detail_failed_description": "Не вдалося завершити цей аналіз. Почніть новий аналіз або зверніться до служби підтримки.",
+	"analysis_detail_create_paper_letter": "Створити паперовий лист"
 }

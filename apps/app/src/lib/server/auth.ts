@@ -64,6 +64,7 @@ export const auth = betterAuth({
 						return;
 					}
 
+					console.log({ otp });
 					const OtpEmailComponent = await getOtpEmail();
 					const html = await renderEmail(OtpEmailComponent, { code: otp, mins: 5 });
 
@@ -78,6 +79,8 @@ export const auth = betterAuth({
 							sender: env.SMTP_USER,
 							subject: m.email_loginCodeSubject()
 						}
+					}).catch((error) => {
+						console.log({ error });
 					});
 				}
 			}

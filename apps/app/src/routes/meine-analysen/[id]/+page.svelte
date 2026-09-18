@@ -6,6 +6,7 @@
 	import PageHeading from '$lib/components/PageHeading.svelte';
 	import Result from '$lib/components/analysis/Result.svelte';
 	import Section from '$lib/components/Section.svelte';
+	import PrimaryLink from '$lib/components/PrimaryLink.svelte';
 	import { getAnalysisQuery } from '../analyses.remote';
 
 	const detail = $derived(await getAnalysisQuery({ id: page.params.id as string }));
@@ -47,8 +48,16 @@
 					{document.fileName}
 				</h2>
 
-				{#if document.analysis.status === 'completed' && (document.analysis.text || document.analysis.metadata)}
-					<Result result={document.analysis} />
+				{#if document.analysis.status === 'completed'}
+					{#if document.analysis.text || document.analysis.metadata}
+						<Result result={document.analysis} />
+					{/if}
+					<div class="mt-5 flex justify-end">
+						<PrimaryLink
+							href={`/papierbrief?analyse=${detail.analysisCase.id}&dokument=${document.documentId}`}
+							text={m.analysis_detail_create_paper_letter()}
+						/>
+					</div>
 				{:else if document.analysis.status === 'failed'}
 					<div
 						role="alert"

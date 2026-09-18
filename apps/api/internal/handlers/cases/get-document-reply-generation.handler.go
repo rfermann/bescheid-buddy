@@ -7,7 +7,7 @@ import (
 	"time"
 
 	appContext "github.com/bored-bots/bored-template/internal/context"
-	"github.com/bored-bots/bored-template/internal/services/cases_service"
+	"github.com/bored-bots/bored-template/internal/services/paper_letters_service"
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/google/uuid"
 )
@@ -53,23 +53,24 @@ func (h *Handler) getDocumentReplyGeneration(ctx context.Context, input *GetDocu
 		return nil, huma.Error401Unauthorized("Unauthorized")
 	}
 
-	generation, err := h.service.GetDocumentReplyGeneration(ctx, userID, input.CaseID, input.DocumentID, input.ReplyGenerationID)
+	result, err := h.paperLetters.GetSourceGeneration(ctx, userID, input.CaseID, input.DocumentID, input.ReplyGenerationID)
 	if err != nil {
-		if errors.Is(err, cases_service.ErrReplyGenerationNotFound) {
+		if errors.Is(err, paper_letters_service.ErrGenerationNotFound) {
 			return nil, huma.Error404NotFound("Reply generation not found")
 		}
 		return nil, huma.Error500InternalServerError("Failed to load reply generation", err)
 	}
+	generation := result.Generation
 
 	body := GetDocumentReplyGenerationOutputBody{
 		ReplyGenerationID: generation.ID,
-		DocumentID:        generation.DocumentID,
+		DocumentID:        input.DocumentID,
 		Status:            string(generation.Status),
 		JobID:             generation.JobID.Int64,
 		Model:             generation.Model,
 		Provider:          generation.Provider,
 		Language:          generation.Language,
-		Instruction:       generation.Instruction,
+		Instruction:       result.Input.Instruction,
 		ErrorMessage:      generation.ErrorMessage.String,
 		StartedAt:         generation.StartedAt,
 		CompletedAt:       generation.CompletedAt,

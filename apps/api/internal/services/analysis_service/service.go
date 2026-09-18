@@ -282,6 +282,7 @@ const schemaExample = `{
     "localized": "",
     "original": ""
   },
+  "reference_number": "",
   "dates": { "letter_date": "", "deadline_date": "" },
   "importance": "medium",
   "part_1_full_translation": "",
@@ -325,7 +326,7 @@ func buildPrompt(text, languageLabel string) (system, user string) {
 	system = "You are an expert AI assistant specialized in analyzing official letters, especially bureaucratic letters from government authorities, insurance companies, banks and courts.\n\n" +
 		"Your goal is to help the user clearly understand the letter they received.\n\n" +
 		"OUTPUT LANGUAGE — THIS IS CRITICAL\n" +
-		"Every field you output, in BOTH parts, MUST be written in " + languageLabel + " and only in " + languageLabel + ", except subject.original.\n\n" +
+		"Every field you output, in BOTH parts, MUST be written in " + languageLabel + " and only in " + languageLabel + ", except subject.original and reference_number.\n\n" +
 		"The output MUST always contain TWO CLEAR PARTS:\n" +
 		"PART 1 (part_1_full_translation): a COMPLETE TRANSLATION of the letter INTO " + languageLabel + ". " +
 		"The letter itself is usually written in German (or another language). You MUST translate all of its content into " + languageLabel + ". " +
@@ -337,12 +338,13 @@ func buildPrompt(text, languageLabel string) (system, user string) {
 		"- If something is unclear or missing, explicitly say it is unclear.\n" +
 		"- subject.original: copy the letter's explicitly printed subject exactly in its source language. Do not infer a subject from the body.\n" +
 		"- subject.localized: translate subject.original faithfully into " + languageLabel + ". If the letter has no explicit subject, return an empty string for both subject fields.\n" +
-		"- Extract sender, topic, reference numbers and deadlines if possible.\n" +
+		"- reference_number: copy the letter's explicitly printed primary reference, file, or case number exactly. Do not translate or infer it. Return an empty string when none is printed.\n" +
+		"- Extract sender, topic and deadlines if possible.\n" +
 		"- Use clear, simple language.\n" +
 		"- Do not give legal advice - only explanation and possible next steps.\n\n" +
 		"Return strict JSON only. No markdown, no code fences, no prose outside JSON. Use exactly the keys from the output format."
 
-	user = "Target output language: " + languageLabel + ". Every field below except subject.original must be written in " + languageLabel + ".\n\n" +
+	user = "Target output language: " + languageLabel + ". Every field below except subject.original and reference_number must be written in " + languageLabel + ".\n\n" +
 		"OCR text of the letter:\n" + text + "\n\n" +
 		"OUTPUT FORMAT (STRICT JSON) — remember: part_1_full_translation must be the letter TRANSLATED INTO " + languageLabel + ", not the original text:\n" + schemaExample
 	return system, user

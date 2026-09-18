@@ -153,7 +153,7 @@ SET status        = 'completed',
     completed_at  = NOW(),
     updated_at    = NOW()
 WHERE id = $1
-RETURNING id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+RETURNING id, user_id, document_id, mode, client_request_id, status, job_id, model, provider, language, input, result, error_message, started_at, completed_at, created_at, updated_at
 `
 
 type CompleteDocumentReplyGenerationParams struct {
@@ -166,17 +166,66 @@ func (q *Queries) CompleteDocumentReplyGeneration(ctx context.Context, arg Compl
 	var i DocumentReplyGeneration
 	err := row.Scan(
 		&i.ID,
+		&i.UserID,
 		&i.DocumentID,
+		&i.Mode,
+		&i.ClientRequestID,
 		&i.Status,
 		&i.JobID,
 		&i.Model,
 		&i.Provider,
 		&i.Language,
-		&i.Instruction,
+		&i.Input,
 		&i.Result,
 		&i.ErrorMessage,
 		&i.StartedAt,
 		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const confirmPaperLetterUpload = `-- name: ConfirmPaperLetterUpload :one
+UPDATE paper_letter_uploads
+SET status       = 'confirmed',
+    size_bytes   = $3,
+    page_count   = $4,
+    sha256       = $5,
+    confirmed_at = NOW(),
+    updated_at   = NOW()
+WHERE id = $1
+  AND user_id = $2
+  AND status = 'pending'
+RETURNING id, user_id, sanitized_filename, status, size_bytes, page_count, sha256, confirmed_at, created_at, updated_at
+`
+
+type ConfirmPaperLetterUploadParams struct {
+	ID        uuid.UUID `json:"id"`
+	UserID    uuid.UUID `json:"user_id"`
+	SizeBytes int64     `json:"size_bytes"`
+	PageCount int32     `json:"page_count"`
+	Sha256    string    `json:"sha256"`
+}
+
+func (q *Queries) ConfirmPaperLetterUpload(ctx context.Context, arg ConfirmPaperLetterUploadParams) (*PaperLetterUpload, error) {
+	row := q.db.QueryRow(ctx, confirmPaperLetterUpload,
+		arg.ID,
+		arg.UserID,
+		arg.SizeBytes,
+		arg.PageCount,
+		arg.Sha256,
+	)
+	var i PaperLetterUpload
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.SanitizedFilename,
+		&i.Status,
+		&i.SizeBytes,
+		&i.PageCount,
+		&i.Sha256,
+		&i.ConfirmedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -340,41 +389,50 @@ func (q *Queries) CreateDocumentExtraction(ctx context.Context, arg CreateDocume
 }
 
 const createDocumentReplyGeneration = `-- name: CreateDocumentReplyGeneration :one
-INSERT INTO document_reply_generations (id, document_id, job_id, model, provider, language, instruction)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+INSERT INTO document_reply_generations (id, user_id, document_id, mode, client_request_id, job_id, model, provider, language, input)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING id, user_id, document_id, mode, client_request_id, status, job_id, model, provider, language, input, result, error_message, started_at, completed_at, created_at, updated_at
 `
 
 type CreateDocumentReplyGenerationParams struct {
-	ID          uuid.UUID   `json:"id"`
-	DocumentID  uuid.UUID   `json:"document_id"`
-	JobID       pgtype.Int8 `json:"job_id"`
-	Model       string      `json:"model"`
-	Provider    string      `json:"provider"`
-	Language    string      `json:"language"`
-	Instruction string      `json:"instruction"`
+	ID              uuid.UUID                   `json:"id"`
+	UserID          uuid.UUID                   `json:"user_id"`
+	DocumentID      pgtype.UUID                 `json:"document_id"`
+	Mode            DocumentReplyGenerationMode `json:"mode"`
+	ClientRequestID uuid.UUID                   `json:"client_request_id"`
+	JobID           pgtype.Int8                 `json:"job_id"`
+	Model           string                      `json:"model"`
+	Provider        string                      `json:"provider"`
+	Language        string                      `json:"language"`
+	Input           []byte                      `json:"input"`
 }
 
 func (q *Queries) CreateDocumentReplyGeneration(ctx context.Context, arg CreateDocumentReplyGenerationParams) (*DocumentReplyGeneration, error) {
 	row := q.db.QueryRow(ctx, createDocumentReplyGeneration,
 		arg.ID,
+		arg.UserID,
 		arg.DocumentID,
+		arg.Mode,
+		arg.ClientRequestID,
 		arg.JobID,
 		arg.Model,
 		arg.Provider,
 		arg.Language,
-		arg.Instruction,
+		arg.Input,
 	)
 	var i DocumentReplyGeneration
 	err := row.Scan(
 		&i.ID,
+		&i.UserID,
 		&i.DocumentID,
+		&i.Mode,
+		&i.ClientRequestID,
 		&i.Status,
 		&i.JobID,
 		&i.Model,
 		&i.Provider,
 		&i.Language,
-		&i.Instruction,
+		&i.Input,
 		&i.Result,
 		&i.ErrorMessage,
 		&i.StartedAt,
@@ -382,6 +440,122 @@ func (q *Queries) CreateDocumentReplyGeneration(ctx context.Context, arg CreateD
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
+	return &i, err
+}
+
+const createPaperLetterDelivery = `-- name: CreatePaperLetterDelivery :one
+INSERT INTO paper_letter_deliveries
+    (id, user_id, upload_id, client_request_id, page_count, bp_cost,
+     delivery_product, address_position, print_mode, print_spectrum)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at
+`
+
+type CreatePaperLetterDeliveryParams struct {
+	ID              uuid.UUID `json:"id"`
+	UserID          uuid.UUID `json:"user_id"`
+	UploadID        uuid.UUID `json:"upload_id"`
+	ClientRequestID uuid.UUID `json:"client_request_id"`
+	PageCount       int32     `json:"page_count"`
+	BpCost          int32     `json:"bp_cost"`
+	DeliveryProduct string    `json:"delivery_product"`
+	AddressPosition string    `json:"address_position"`
+	PrintMode       string    `json:"print_mode"`
+	PrintSpectrum   string    `json:"print_spectrum"`
+}
+
+func (q *Queries) CreatePaperLetterDelivery(ctx context.Context, arg CreatePaperLetterDeliveryParams) (*PaperLetterDelivery, error) {
+	row := q.db.QueryRow(ctx, createPaperLetterDelivery,
+		arg.ID,
+		arg.UserID,
+		arg.UploadID,
+		arg.ClientRequestID,
+		arg.PageCount,
+		arg.BpCost,
+		arg.DeliveryProduct,
+		arg.AddressPosition,
+		arg.PrintMode,
+		arg.PrintSpectrum,
+	)
+	var i PaperLetterDelivery
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.UploadID,
+		&i.ClientRequestID,
+		&i.Status,
+		&i.JobID,
+		&i.PingenID,
+		&i.ProviderSubmissionStartedAt,
+		&i.PageCount,
+		&i.BpCost,
+		&i.DeliveryProduct,
+		&i.AddressPosition,
+		&i.PrintMode,
+		&i.PrintSpectrum,
+		&i.ErrorMessage,
+		&i.SentAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const createPaperLetterUpload = `-- name: CreatePaperLetterUpload :one
+INSERT INTO paper_letter_uploads (id, user_id, sanitized_filename)
+VALUES ($1, $2, $3)
+RETURNING id, user_id, sanitized_filename, status, size_bytes, page_count, sha256, confirmed_at, created_at, updated_at
+`
+
+type CreatePaperLetterUploadParams struct {
+	ID                uuid.UUID `json:"id"`
+	UserID            uuid.UUID `json:"user_id"`
+	SanitizedFilename string    `json:"sanitized_filename"`
+}
+
+func (q *Queries) CreatePaperLetterUpload(ctx context.Context, arg CreatePaperLetterUploadParams) (*PaperLetterUpload, error) {
+	row := q.db.QueryRow(ctx, createPaperLetterUpload, arg.ID, arg.UserID, arg.SanitizedFilename)
+	var i PaperLetterUpload
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.SanitizedFilename,
+		&i.Status,
+		&i.SizeBytes,
+		&i.PageCount,
+		&i.Sha256,
+		&i.ConfirmedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const failActiveDocumentReplyGeneration = `-- name: FailActiveDocumentReplyGeneration :one
+UPDATE document_reply_generations
+SET status        = 'failed',
+    error_message = $2,
+    completed_at  = NOW(),
+    updated_at    = NOW()
+WHERE id = $1
+  AND status IN ('pending', 'processing')
+RETURNING id, user_id
+`
+
+type FailActiveDocumentReplyGenerationParams struct {
+	ID           uuid.UUID   `json:"id"`
+	ErrorMessage pgtype.Text `json:"error_message"`
+}
+
+type FailActiveDocumentReplyGenerationRow struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) FailActiveDocumentReplyGeneration(ctx context.Context, arg FailActiveDocumentReplyGenerationParams) (*FailActiveDocumentReplyGenerationRow, error) {
+	row := q.db.QueryRow(ctx, failActiveDocumentReplyGeneration, arg.ID, arg.ErrorMessage)
+	var i FailActiveDocumentReplyGenerationRow
+	err := row.Scan(&i.ID, &i.UserID)
 	return &i, err
 }
 
@@ -487,41 +661,23 @@ func (q *Queries) FailDocumentExtraction(ctx context.Context, arg FailDocumentEx
 	return &i, err
 }
 
-const failDocumentReplyGeneration = `-- name: FailDocumentReplyGeneration :one
-UPDATE document_reply_generations
-SET status        = 'failed',
-    error_message = $2,
-    completed_at  = NOW(),
-    updated_at    = NOW()
-WHERE id = $1
-RETURNING id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+const failPaperLetterDelivery = `-- name: FailPaperLetterDelivery :one
+UPDATE paper_letter_deliveries
+SET status = 'failed', error_message = $2, updated_at = NOW()
+WHERE id = $1 AND status = 'processing'
+RETURNING id
 `
 
-type FailDocumentReplyGenerationParams struct {
+type FailPaperLetterDeliveryParams struct {
 	ID           uuid.UUID   `json:"id"`
 	ErrorMessage pgtype.Text `json:"error_message"`
 }
 
-func (q *Queries) FailDocumentReplyGeneration(ctx context.Context, arg FailDocumentReplyGenerationParams) (*DocumentReplyGeneration, error) {
-	row := q.db.QueryRow(ctx, failDocumentReplyGeneration, arg.ID, arg.ErrorMessage)
-	var i DocumentReplyGeneration
-	err := row.Scan(
-		&i.ID,
-		&i.DocumentID,
-		&i.Status,
-		&i.JobID,
-		&i.Model,
-		&i.Provider,
-		&i.Language,
-		&i.Instruction,
-		&i.Result,
-		&i.ErrorMessage,
-		&i.StartedAt,
-		&i.CompletedAt,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return &i, err
+func (q *Queries) FailPaperLetterDelivery(ctx context.Context, arg FailPaperLetterDeliveryParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, failPaperLetterDelivery, arg.ID, arg.ErrorMessage)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const getCaseByIDAndUserID = `-- name: GetCaseByIDAndUserID :one
@@ -792,7 +948,7 @@ func (q *Queries) GetDocumentExtractionTextByDocumentID(ctx context.Context, arg
 }
 
 const getDocumentReplyGenerationByID = `-- name: GetDocumentReplyGenerationByID :one
-SELECT id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+SELECT id, user_id, document_id, mode, client_request_id, status, job_id, model, provider, language, input, result, error_message, started_at, completed_at, created_at, updated_at
 FROM document_reply_generations
 WHERE id = $1
 `
@@ -806,13 +962,90 @@ func (q *Queries) GetDocumentReplyGenerationByID(ctx context.Context, arg GetDoc
 	var i DocumentReplyGeneration
 	err := row.Scan(
 		&i.ID,
+		&i.UserID,
 		&i.DocumentID,
+		&i.Mode,
+		&i.ClientRequestID,
 		&i.Status,
 		&i.JobID,
 		&i.Model,
 		&i.Provider,
 		&i.Language,
-		&i.Instruction,
+		&i.Input,
+		&i.Result,
+		&i.ErrorMessage,
+		&i.StartedAt,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const getDocumentReplyGenerationByIDAndUserID = `-- name: GetDocumentReplyGenerationByIDAndUserID :one
+SELECT id, user_id, document_id, mode, client_request_id, status, job_id, model, provider, language, input, result, error_message, started_at, completed_at, created_at, updated_at
+FROM document_reply_generations
+WHERE id = $1
+  AND user_id = $2
+`
+
+type GetDocumentReplyGenerationByIDAndUserIDParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) GetDocumentReplyGenerationByIDAndUserID(ctx context.Context, arg GetDocumentReplyGenerationByIDAndUserIDParams) (*DocumentReplyGeneration, error) {
+	row := q.db.QueryRow(ctx, getDocumentReplyGenerationByIDAndUserID, arg.ID, arg.UserID)
+	var i DocumentReplyGeneration
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.DocumentID,
+		&i.Mode,
+		&i.ClientRequestID,
+		&i.Status,
+		&i.JobID,
+		&i.Model,
+		&i.Provider,
+		&i.Language,
+		&i.Input,
+		&i.Result,
+		&i.ErrorMessage,
+		&i.StartedAt,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const getDocumentReplyGenerationByUserAndClientRequestID = `-- name: GetDocumentReplyGenerationByUserAndClientRequestID :one
+SELECT id, user_id, document_id, mode, client_request_id, status, job_id, model, provider, language, input, result, error_message, started_at, completed_at, created_at, updated_at
+FROM document_reply_generations
+WHERE user_id = $1
+  AND client_request_id = $2
+`
+
+type GetDocumentReplyGenerationByUserAndClientRequestIDParams struct {
+	UserID          uuid.UUID `json:"user_id"`
+	ClientRequestID uuid.UUID `json:"client_request_id"`
+}
+
+func (q *Queries) GetDocumentReplyGenerationByUserAndClientRequestID(ctx context.Context, arg GetDocumentReplyGenerationByUserAndClientRequestIDParams) (*DocumentReplyGeneration, error) {
+	row := q.db.QueryRow(ctx, getDocumentReplyGenerationByUserAndClientRequestID, arg.UserID, arg.ClientRequestID)
+	var i DocumentReplyGeneration
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.DocumentID,
+		&i.Mode,
+		&i.ClientRequestID,
+		&i.Status,
+		&i.JobID,
+		&i.Model,
+		&i.Provider,
+		&i.Language,
+		&i.Input,
 		&i.Result,
 		&i.ErrorMessage,
 		&i.StartedAt,
@@ -849,6 +1082,105 @@ func (q *Queries) GetInitialCaseDocument(ctx context.Context, arg GetInitialCase
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.CompletedAt,
+	)
+	return &i, err
+}
+
+const getPaperLetterDeliveryByID = `-- name: GetPaperLetterDeliveryByID :one
+SELECT id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at FROM paper_letter_deliveries WHERE id = $1
+`
+
+type GetPaperLetterDeliveryByIDParams struct {
+	ID uuid.UUID `json:"id"`
+}
+
+func (q *Queries) GetPaperLetterDeliveryByID(ctx context.Context, arg GetPaperLetterDeliveryByIDParams) (*PaperLetterDelivery, error) {
+	row := q.db.QueryRow(ctx, getPaperLetterDeliveryByID, arg.ID)
+	var i PaperLetterDelivery
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.UploadID,
+		&i.ClientRequestID,
+		&i.Status,
+		&i.JobID,
+		&i.PingenID,
+		&i.ProviderSubmissionStartedAt,
+		&i.PageCount,
+		&i.BpCost,
+		&i.DeliveryProduct,
+		&i.AddressPosition,
+		&i.PrintMode,
+		&i.PrintSpectrum,
+		&i.ErrorMessage,
+		&i.SentAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const getPaperLetterDeliveryByUserAndClientRequestID = `-- name: GetPaperLetterDeliveryByUserAndClientRequestID :one
+SELECT id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at FROM paper_letter_deliveries WHERE user_id = $1 AND client_request_id = $2
+`
+
+type GetPaperLetterDeliveryByUserAndClientRequestIDParams struct {
+	UserID          uuid.UUID `json:"user_id"`
+	ClientRequestID uuid.UUID `json:"client_request_id"`
+}
+
+func (q *Queries) GetPaperLetterDeliveryByUserAndClientRequestID(ctx context.Context, arg GetPaperLetterDeliveryByUserAndClientRequestIDParams) (*PaperLetterDelivery, error) {
+	row := q.db.QueryRow(ctx, getPaperLetterDeliveryByUserAndClientRequestID, arg.UserID, arg.ClientRequestID)
+	var i PaperLetterDelivery
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.UploadID,
+		&i.ClientRequestID,
+		&i.Status,
+		&i.JobID,
+		&i.PingenID,
+		&i.ProviderSubmissionStartedAt,
+		&i.PageCount,
+		&i.BpCost,
+		&i.DeliveryProduct,
+		&i.AddressPosition,
+		&i.PrintMode,
+		&i.PrintSpectrum,
+		&i.ErrorMessage,
+		&i.SentAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const getPaperLetterUploadByIDAndUserID = `-- name: GetPaperLetterUploadByIDAndUserID :one
+SELECT id, user_id, sanitized_filename, status, size_bytes, page_count, sha256, confirmed_at, created_at, updated_at
+FROM paper_letter_uploads
+WHERE id = $1
+  AND user_id = $2
+`
+
+type GetPaperLetterUploadByIDAndUserIDParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) GetPaperLetterUploadByIDAndUserID(ctx context.Context, arg GetPaperLetterUploadByIDAndUserIDParams) (*PaperLetterUpload, error) {
+	row := q.db.QueryRow(ctx, getPaperLetterUploadByIDAndUserID, arg.ID, arg.UserID)
+	var i PaperLetterUpload
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.SanitizedFilename,
+		&i.Status,
+		&i.SizeBytes,
+		&i.PageCount,
+		&i.Sha256,
+		&i.ConfirmedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return &i, err
 }
@@ -1018,7 +1350,7 @@ SET status     = 'processing',
     started_at = COALESCE(started_at, NOW()),
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, document_id, status, job_id, model, provider, language, instruction, result, error_message, started_at, completed_at, created_at, updated_at
+RETURNING id, user_id, document_id, mode, client_request_id, status, job_id, model, provider, language, input, result, error_message, started_at, completed_at, created_at, updated_at
 `
 
 type MarkDocumentReplyGenerationProcessingParams struct {
@@ -1030,13 +1362,16 @@ func (q *Queries) MarkDocumentReplyGenerationProcessing(ctx context.Context, arg
 	var i DocumentReplyGeneration
 	err := row.Scan(
 		&i.ID,
+		&i.UserID,
 		&i.DocumentID,
+		&i.Mode,
+		&i.ClientRequestID,
 		&i.Status,
 		&i.JobID,
 		&i.Model,
 		&i.Provider,
 		&i.Language,
-		&i.Instruction,
+		&i.Input,
 		&i.Result,
 		&i.ErrorMessage,
 		&i.StartedAt,
@@ -1045,6 +1380,152 @@ func (q *Queries) MarkDocumentReplyGenerationProcessing(ctx context.Context, arg
 		&i.UpdatedAt,
 	)
 	return &i, err
+}
+
+const markPaperLetterDeliveryManualReview = `-- name: MarkPaperLetterDeliveryManualReview :one
+UPDATE paper_letter_deliveries
+SET status = 'manual_review', updated_at = NOW()
+WHERE id = $1
+  AND status = 'processing'
+  AND provider_submission_started_at <= $2
+RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at
+`
+
+type MarkPaperLetterDeliveryManualReviewParams struct {
+	ID     uuid.UUID  `json:"id"`
+	Cutoff *time.Time `json:"cutoff"`
+}
+
+func (q *Queries) MarkPaperLetterDeliveryManualReview(ctx context.Context, arg MarkPaperLetterDeliveryManualReviewParams) (*PaperLetterDelivery, error) {
+	row := q.db.QueryRow(ctx, markPaperLetterDeliveryManualReview, arg.ID, arg.Cutoff)
+	var i PaperLetterDelivery
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.UploadID,
+		&i.ClientRequestID,
+		&i.Status,
+		&i.JobID,
+		&i.PingenID,
+		&i.ProviderSubmissionStartedAt,
+		&i.PageCount,
+		&i.BpCost,
+		&i.DeliveryProduct,
+		&i.AddressPosition,
+		&i.PrintMode,
+		&i.PrintSpectrum,
+		&i.ErrorMessage,
+		&i.SentAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const markPaperLetterDeliveryProcessing = `-- name: MarkPaperLetterDeliveryProcessing :one
+UPDATE paper_letter_deliveries
+SET status = 'processing', provider_submission_started_at = COALESCE(provider_submission_started_at, NOW()), updated_at = NOW()
+WHERE id = $1 AND status IN ('pending', 'processing')
+RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at
+`
+
+type MarkPaperLetterDeliveryProcessingParams struct {
+	ID uuid.UUID `json:"id"`
+}
+
+func (q *Queries) MarkPaperLetterDeliveryProcessing(ctx context.Context, arg MarkPaperLetterDeliveryProcessingParams) (*PaperLetterDelivery, error) {
+	row := q.db.QueryRow(ctx, markPaperLetterDeliveryProcessing, arg.ID)
+	var i PaperLetterDelivery
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.UploadID,
+		&i.ClientRequestID,
+		&i.Status,
+		&i.JobID,
+		&i.PingenID,
+		&i.ProviderSubmissionStartedAt,
+		&i.PageCount,
+		&i.BpCost,
+		&i.DeliveryProduct,
+		&i.AddressPosition,
+		&i.PrintMode,
+		&i.PrintSpectrum,
+		&i.ErrorMessage,
+		&i.SentAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const markPaperLetterDeliverySent = `-- name: MarkPaperLetterDeliverySent :one
+UPDATE paper_letter_deliveries
+SET status = 'sent', pingen_id = $2, error_message = NULL, sent_at = NOW(), updated_at = NOW()
+WHERE id = $1 AND status = 'processing'
+RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at
+`
+
+type MarkPaperLetterDeliverySentParams struct {
+	ID       uuid.UUID   `json:"id"`
+	PingenID pgtype.Text `json:"pingen_id"`
+}
+
+func (q *Queries) MarkPaperLetterDeliverySent(ctx context.Context, arg MarkPaperLetterDeliverySentParams) (*PaperLetterDelivery, error) {
+	row := q.db.QueryRow(ctx, markPaperLetterDeliverySent, arg.ID, arg.PingenID)
+	var i PaperLetterDelivery
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.UploadID,
+		&i.ClientRequestID,
+		&i.Status,
+		&i.JobID,
+		&i.PingenID,
+		&i.ProviderSubmissionStartedAt,
+		&i.PageCount,
+		&i.BpCost,
+		&i.DeliveryProduct,
+		&i.AddressPosition,
+		&i.PrintMode,
+		&i.PrintSpectrum,
+		&i.ErrorMessage,
+		&i.SentAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return &i, err
+}
+
+const setDocumentReplyGenerationJobID = `-- name: SetDocumentReplyGenerationJobID :exec
+UPDATE document_reply_generations
+SET job_id    = $2,
+    updated_at = NOW()
+WHERE id = $1
+`
+
+type SetDocumentReplyGenerationJobIDParams struct {
+	ID    uuid.UUID   `json:"id"`
+	JobID pgtype.Int8 `json:"job_id"`
+}
+
+func (q *Queries) SetDocumentReplyGenerationJobID(ctx context.Context, arg SetDocumentReplyGenerationJobIDParams) error {
+	_, err := q.db.Exec(ctx, setDocumentReplyGenerationJobID, arg.ID, arg.JobID)
+	return err
+}
+
+const setPaperLetterDeliveryJobID = `-- name: SetPaperLetterDeliveryJobID :exec
+UPDATE paper_letter_deliveries SET job_id = $2, updated_at = NOW() WHERE id = $1
+`
+
+type SetPaperLetterDeliveryJobIDParams struct {
+	ID    uuid.UUID   `json:"id"`
+	JobID pgtype.Int8 `json:"job_id"`
+}
+
+func (q *Queries) SetPaperLetterDeliveryJobID(ctx context.Context, arg SetPaperLetterDeliveryJobIDParams) error {
+	_, err := q.db.Exec(ctx, setPaperLetterDeliveryJobID, arg.ID, arg.JobID)
+	return err
 }
 
 const updateCaseTitle = `-- name: UpdateCaseTitle :exec

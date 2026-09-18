@@ -21,7 +21,7 @@
 
 	const navItems: NavItem[] = [
 		{ id: 'analysis', label: m.nav_analysis, href: '/' },
-		{ id: 'paper-letter', label: m.nav_send_paper_letter, href: '/paper-letter' },
+		{ id: 'paper-letter', label: m.nav_send_paper_letter, href: '/papierbrief' },
 		{ id: 'analyses', label: m.nav_analyses, href: '/meine-analysen' },
 		{ id: 'reply-pdf', label: m.nav_reply_pdf, href: '/reply-pdf', hidden: true },
 		{ id: 'solutions', label: m.nav_solutions, href: '/solutions' },

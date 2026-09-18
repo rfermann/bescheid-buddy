@@ -61,6 +61,7 @@ type Metadata struct {
 	LetterType      string  `json:"letter_type,omitempty"`
 	Topic           string  `json:"topic,omitempty"`
 	Subject         Subject `json:"subject,omitempty"`
+	ReferenceNumber string  `json:"reference_number"`
 	Dates           Dates   `json:"dates,omitempty"`
 	Importance      string  `json:"importance,omitempty"`
 	FullTranslation string  `json:"part_1_full_translation,omitempty"`
