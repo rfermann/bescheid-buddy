@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { replaceState } from '$app/navigation';
 	import { page } from '$app/state';
 	import { toast } from 'svelte-sonner';
 	import * as m from '$lib/paraglide/messages.js';
@@ -8,11 +9,11 @@
 	import Section from '$lib/components/Section.svelte';
 	import PrimaryButton from '$lib/components/PrimaryButton.svelte';
 	import InputField from '$lib/components/input/InputField.svelte';
+	import SelectField from '$lib/components/input/SelectField.svelte';
 	import Textarea from '$lib/components/input/Textarea.svelte';
 	import SignatureCanvas from './SignatureCanvas.svelte';
-	import ModelSelector from '../ModelSelector.svelte';
 	import { getModelsQuery } from '../analyse.remote';
-	import { getAnalysisQuery } from '../meine-analysen/analyses.remote';
+	import { getAnalysisQuery, getCasesQuery } from '../meine-analysen/analyses.remote';
 	import { getBuddyPointsQuery } from '../meine-buddypoints/points.remote';
 	import {
 		confirmPaperLetterUploadCommand,
@@ -36,7 +37,13 @@
 		paperLetterPDFWithinLimit,
 		putPaperLetterPDF
 	} from './papierbrief.upload.client';
-	import type { Address, DeliveryBody, GenerationResultBody, Metadata } from '../../generated';
+	import type {
+		Address,
+		CaseDocumentBody,
+		DeliveryBody,
+		GenerationResultBody,
+		Metadata
+	} from '../../generated';
 
 	const categories = [
 		'Jobcenter',
@@ -97,9 +104,15 @@
 	};
 
 	const models = $derived(await getModelsQuery({}));
+	const analyses = $derived(
+		(await getCasesQuery({})).toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+	);
 	const pointsQuery = getBuddyPointsQuery({});
 	const buddyPoints = $derived(await pointsQuery);
 	const locale = getLocale() as CreateGenerationRequest['locale'];
+	const sourceDateFormatter = new Intl.DateTimeFormat(locale === 'ua' ? 'uk' : locale, {
+		dateStyle: 'medium'
+	});
 	const requestedCaseId = page.url.searchParams.get('analyse');
 	const requestedDocumentId = page.url.searchParams.get('dokument');
 
@@ -117,7 +130,10 @@
 	let improvementFeedback = $state('');
 	let sourceCaseId = $state<string | undefined>();
 	let sourceDocumentId = $state<string | undefined>();
-	let sourceState = $state<'manual' | 'loading' | 'loaded' | 'unavailable'>(
+	let selectedAnalysisId = $state(requestedCaseId ?? '');
+	let selectedDocumentId = $state(requestedDocumentId ?? '');
+	let sourceDocuments = $state<CaseDocumentBody[]>([]);
+	let sourceState = $state<'manual' | 'loading' | 'selecting' | 'loaded' | 'unavailable'>(
 		requestedCaseId || requestedDocumentId ? 'loading' : 'manual'
 	);
 	let sourceName = $state('');
@@ -155,14 +171,15 @@
 	let isPollingDelivery = $state(false);
 	const controlsDisabled = $derived(
 		isSubmitting ||
-			isPolling ||
-			isPreparingPDF ||
-			isUploadingPDF ||
-			isCreatingDelivery ||
-			isPollingDelivery
+		isPolling ||
+		isPreparingPDF ||
+		isUploadingPDF ||
+		isCreatingDelivery ||
+		isPollingDelivery
 	);
 	let pollVersion = 0;
 	let deliveryPollVersion = 0;
+	let sourceLoadVersion = 0;
 	let destroyed = false;
 
 	$effect(() => {
@@ -280,39 +297,87 @@
 		reference = clean(metadata.reference_number);
 	};
 
-	const loadSource = async () => {
-		if (!isUUID(requestedCaseId) || !isUUID(requestedDocumentId)) {
-			if (requestedCaseId || requestedDocumentId) {
-				sourceState = 'unavailable';
-			}
+	const updateSourceURL = (caseId?: string, documentId?: string) => {
+		const url = new URL(page.url);
+		caseId ? url.searchParams.set('analyse', caseId) : url.searchParams.delete('analyse');
+		documentId ? url.searchParams.set('dokument', documentId) : url.searchParams.delete('dokument');
+		replaceState(`${url.pathname}${url.search}${url.hash}`, {});
+	};
+
+	const applyDocument = (document: CaseDocumentBody, caseId: string) => {
+		if (!document.analysis.metadata) {
+			sourceState = 'unavailable';
 			return;
 		}
+		applySource(document.analysis.metadata);
+		selectedDocumentId = document.documentId;
+		sourceCaseId = caseId;
+		sourceDocumentId = document.documentId;
+		sourceName = document.fileName;
+		sourceState = 'loaded';
+		updateSourceURL(caseId, document.documentId);
+	};
+
+	const loadSource = async (caseId: string | null, preferredDocumentId?: string | null) => {
+		const version = ++sourceLoadVersion;
+		if (!isUUID(caseId) || (preferredDocumentId && !isUUID(preferredDocumentId))) {
+			if (caseId || preferredDocumentId) sourceState = 'unavailable';
+			return;
+		}
+		sourceState = 'loading';
 		try {
-			const detail = await getAnalysisQuery({ id: requestedCaseId });
-			const document = detail.documents.find(
-				(candidate) =>
-					candidate.documentId === requestedDocumentId && candidate.analysis.status === 'completed'
+			const detail = await getAnalysisQuery({ id: caseId });
+			if (version !== sourceLoadVersion) return;
+			sourceDocuments = detail.documents.filter(
+				(document) => document.analysis.status === 'completed' && document.analysis.metadata
 			);
-			if (!document?.analysis.metadata) {
+			if (!sourceDocuments.length) {
 				sourceState = 'unavailable';
 				return;
 			}
-			applySource(document.analysis.metadata);
-			sourceCaseId = requestedCaseId;
-			sourceDocumentId = requestedDocumentId;
-			sourceName = document.fileName;
-			sourceState = 'loaded';
+			const document = preferredDocumentId
+				? sourceDocuments.find((candidate) => candidate.documentId === preferredDocumentId)
+				: sourceDocuments.length === 1
+					? sourceDocuments[0]
+					: undefined;
+			if (document) applyDocument(document, caseId);
+			else sourceState = preferredDocumentId ? 'unavailable' : 'selecting';
 		} catch {
-			sourceState = 'unavailable';
+			if (version === sourceLoadVersion) sourceState = 'unavailable';
 		}
 	};
 
+	const selectAnalysis = (value: string) => {
+		selectedAnalysisId = value;
+		selectedDocumentId = '';
+		sourceDocuments = [];
+		sourceCaseId = undefined;
+		sourceDocumentId = undefined;
+		updateSourceURL(selectedAnalysisId || undefined);
+		if (selectedAnalysisId) void loadSource(selectedAnalysisId);
+		else {
+			sourceName = '';
+			sourceState = 'manual';
+		}
+	};
+
+	const selectDocument = (value: string) => {
+		selectedDocumentId = value;
+		const document = sourceDocuments.find(
+			(candidate) => candidate.documentId === selectedDocumentId
+		);
+		if (document) applyDocument(document, selectedAnalysisId);
+	};
+
 	onMount(() => {
-		void loadSource();
+		if (requestedCaseId || requestedDocumentId) {
+			void loadSource(requestedCaseId, requestedDocumentId);
+		}
 		return () => {
 			destroyed = true;
 			pollVersion += 1;
 			deliveryPollVersion += 1;
+			sourceLoadVersion += 1;
 			if (preparedPDFURL) {
 				URL.revokeObjectURL(preparedPDFURL);
 			}
@@ -754,14 +819,47 @@
 		<p class="text-[#b7b7c8]">{m.papierbrief_intro()}</p>
 		<div class="mt-4 rounded-xl border border-white/10 bg-white/5 p-4" aria-live="polite">
 			<h2 class="font-semibold text-white">{m.papierbrief_source_title()}</h2>
+			<div class="mt-4 grid gap-x-14 gap-y-4 lg:grid-cols-2">
+				<SelectField
+					name="papierbrief-analysis"
+					label={m.papierbrief_source_analysis_label()}
+					placeholder={m.papierbrief_source_analysis_placeholder()}
+					options={analyses.map((analysis) => ({
+						value: analysis.id,
+						label: `${analysis.title || m.analyses_untitled()} · ${sourceDateFormatter.format(analysis.createdAt)}`
+					}))}
+					value={selectedAnalysisId}
+					onchange={selectAnalysis}
+					disabled={controlsDisabled || sourceState === 'loading' || analyses.length === 0}
+				/>
+
+				{#if sourceDocuments.length > 1}
+					<SelectField
+						name="papierbrief-document"
+						label={m.papierbrief_source_document_label()}
+						placeholder={m.papierbrief_source_document_placeholder()}
+						options={sourceDocuments.map((document) => ({
+							value: document.documentId,
+							label: document.fileName
+						}))}
+						value={selectedDocumentId}
+						onchange={selectDocument}
+						disabled={controlsDisabled}
+					/>
+				{/if}
+			</div>
 			{#if sourceState === 'loading'}
 				<p class="mt-1 text-sm text-[#b7b7c8]">{m.papierbrief_source_loading()}</p>
+			{:else if sourceState === 'selecting'}
+				<p class="mt-1 text-sm text-[#b7b7c8]">{m.papierbrief_source_select_document()}</p>
 			{:else if sourceState === 'loaded'}
 				<p class="mt-1 text-sm text-emerald-300">
 					{m.papierbrief_source_loaded({ name: sourceName })}
 				</p>
 			{:else if sourceState === 'unavailable'}
 				<p class="mt-1 text-sm text-amber-200">{m.papierbrief_source_unavailable()}</p>
+			{:else if analyses.length === 0}
+				<p class="mt-1 text-sm text-[#b7b7c8]">{m.papierbrief_source_empty()}</p>
 			{:else}
 				<p class="mt-1 text-sm text-[#b7b7c8]">{m.papierbrief_source_manual()}</p>
 			{/if}
@@ -817,57 +915,51 @@
 			</fieldset>
 		</div>
 
-		<div class="mt-6 grid gap-5 md:grid-cols-2">
-			<div class="flex flex-col gap-2">
-				<label for="category" class="text-xs font-extrabold tracking-widest uppercase"
-					>{m.papierbrief_category_label()}</label
-				>
-				<select
-					id="category"
-					bind:value={category}
+		<div class="mt-6 grid gap-x-6 gap-y-5 lg:grid-cols-2">
+			<div class="px-4">
+				<SelectField
+					name="category"
+					label={m.papierbrief_category_label()}
+					options={categories.map((value) => ({ value, label: categoryLabels[value]() }))}
+					value={category}
+					onchange={(value) => (category = value as Category)}
 					disabled={controlsDisabled}
-					class="rounded-xl border border-white/22 bg-white/5 disabled:opacity-50"
-				>
-					{#each categories as value (value)}<option class="bg-[#1a1a24]" {value}
-							>{categoryLabels[value]()}</option
-						>{/each}
-				</select>
+				/>
 			</div>
-			<div class="flex flex-col gap-2">
-				<label for="subcategory" class="text-xs font-extrabold tracking-widest uppercase"
-					>{m.papierbrief_subcategory_label()}</label
-				>
-				<select
-					id="subcategory"
-					bind:value={subcategory}
+			<div class="px-4">
+				<SelectField
+					name="subcategory"
+					label={m.papierbrief_subcategory_label()}
+					options={subcategories.map((value) => ({ value, label: subcategoryLabels[value]() }))}
+					value={subcategory}
+					onchange={(value) => (subcategory = value as Subcategory)}
 					disabled={controlsDisabled}
-					class="rounded-xl border border-white/22 bg-white/5 disabled:opacity-50"
-				>
-					{#each subcategories as value (value)}<option class="bg-[#1a1a24]" {value}
-							>{subcategoryLabels[value]()}</option
-						>{/each}
-				</select>
+				/>
 			</div>
-			<InputField
-				name="subject"
-				type="text"
-				label={m.papierbrief_subject_label()}
-				bind:value={subject}
-				maxlength={500}
-				error={fieldErrors.pdfSubject}
-				disabled={controlsDisabled}
-			/>
-			<InputField
-				name="reference"
-				type="text"
-				label={m.papierbrief_reference_label()}
-				bind:value={reference}
-				maxlength={200}
-				disabled={controlsDisabled}
-			/>
+			<div class="px-4">
+				<InputField
+					name="subject"
+					type="text"
+					label={m.papierbrief_subject_label()}
+					bind:value={subject}
+					maxlength={500}
+					error={fieldErrors.pdfSubject}
+					disabled={controlsDisabled}
+				/>
+			</div>
+			<div class="px-4">
+				<InputField
+					name="reference"
+					type="text"
+					label={m.papierbrief_reference_label()}
+					bind:value={reference}
+					maxlength={200}
+					disabled={controlsDisabled}
+				/>
+			</div>
 		</div>
 
-		<div class="mt-5">
+		<div class="mt-5 px-4">
 			<Textarea
 				name="instruction"
 				rows={5}
@@ -880,18 +972,21 @@
 			<p class="mt-2 text-sm text-[#b7b7c8]">{m.papierbrief_instruction_help()}</p>
 		</div>
 
-		<ModelSelector
-			id="papierbrief-model"
-			label={m.papierbrief_model_label()}
-			{models}
-			bind:value={selectedModel}
-			disabled={controlsDisabled}
-		/>
-		{#if fieldErrors.model}
-			<p class="mt-2 text-sm text-red-300">{fieldErrors.model}</p>
-		{/if}
+		<div class="mt-6 grid gap-x-6 lg:grid-cols-2">
+			<div class="px-4">
+				<SelectField
+					name="papierbrief-model"
+					label={m.papierbrief_model_label()}
+					options={models.map((model) => ({ value: model.id, label: model.name }))}
+					value={selectedModel}
+					onchange={(value) => (selectedModel = value)}
+					disabled={controlsDisabled || models.length === 0}
+					error={fieldErrors.model}
+				/>
+			</div>
+		</div>
 
-		<div class="mt-7 flex flex-wrap items-center justify-between gap-4">
+		<div class="mt-7 flex flex-wrap items-center justify-between gap-4 px-4">
 			<div>
 				<p class="font-semibold text-white">{m.papierbrief_price({ points: 10 })}</p>
 				<p class="text-sm text-[#b7b7c8]">
@@ -1067,24 +1162,26 @@
 
 	<Section>
 		<h2 class="text-2xl font-semibold text-white">{m.papierbrief_upload_title()}</h2>
-		<p class="mt-2 text-sm text-[#b7b7c8]">{m.papierbrief_upload_description()}</p>
-		<p class="mt-1 text-sm text-[#b7b7c8]">
+		<p class="mt-2 pl-5 text-sm text-[#b7b7c8]">{m.papierbrief_upload_description()}</p>
+		<p class="mt-1 pl-5 text-sm text-[#b7b7c8]">
 			{m.papierbrief_upload_limit({ size: maxPaperLetterPDFBytes / 1024 / 1024 })}
 		</p>
-		<p class="mt-1 text-sm text-[#b7b7c8]">{m.papierbrief_delivery_pricing()}</p>
+		<p class="mt-1 pl-5 text-sm text-[#b7b7c8]">{m.papierbrief_delivery_pricing()}</p>
 
-		<div class="mt-5">
-			<label for="papierbrief-ready-pdf" class="text-xs font-extrabold tracking-widest uppercase">
-				{m.papierbrief_upload_file_label()}
-			</label>
-			<input
-				id="papierbrief-ready-pdf"
-				type="file"
-				accept="application/pdf,.pdf"
-				disabled={controlsDisabled}
-				onchange={selectReadyPDF}
-				class="mt-2 block w-full rounded-xl border border-white/22 bg-white/5 p-3 text-sm disabled:opacity-50"
-			/>
+		<div class="mt-5 grid gap-x-6 lg:grid-cols-2">
+			<div class="px-4">
+				<label for="papierbrief-ready-pdf" class="text-xs font-extrabold tracking-widest uppercase">
+					{m.papierbrief_upload_file_label()}
+				</label>
+				<input
+					id="papierbrief-ready-pdf"
+					type="file"
+					accept="application/pdf,.pdf"
+					disabled={controlsDisabled}
+					onchange={selectReadyPDF}
+					class="mt-2 block w-full rounded-xl border border-white/22 bg-white/5 p-3 text-sm focus:border-primary/45 focus:ring-primary/45 focus:outline-none disabled:opacity-50"
+				/>
+			</div>
 		</div>
 
 		{#if uploadPDFBlob}
@@ -1092,7 +1189,7 @@
 				{m.papierbrief_upload_selected({ name: uploadPDFFilename })}
 			</p>
 		{/if}
-		<div class="mt-5">
+		<div class="mt-5 px-4">
 			<PrimaryButton
 				type="button"
 				onclick={uploadSelectedPDF}
@@ -1132,7 +1229,7 @@
 				<p class="mt-4 text-sm text-[#b7b7c8]">
 					{m.papierbrief_delivery_confirmation({ points: confirmedDeliveryPrice })}
 				</p>
-				<div class="mt-4">
+				<div class="mt-4 px-4">
 					<PrimaryButton
 						type="button"
 						onclick={submitDelivery}

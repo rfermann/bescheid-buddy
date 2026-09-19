@@ -14,7 +14,9 @@ const mocks = vi.hoisted(() => ({
 	pollGeneration: vi.fn(),
 	pollDelivery: vi.fn(),
 	putPDF: vi.fn(),
+	getCases: vi.fn(),
 	getAnalysis: vi.fn(),
+	replaceState: vi.fn(),
 	refreshPoints: vi.fn()
 }));
 
@@ -25,10 +27,14 @@ vi.mock('$app/state', () => ({
 		}
 	}
 }));
+vi.mock('$app/navigation', () => ({ replaceState: mocks.replaceState }));
 vi.mock('../analyse.remote', () => ({
 	getModelsQuery: vi.fn().mockResolvedValue([{ id: 'model-1', name: 'Test model' }])
 }));
-vi.mock('../meine-analysen/analyses.remote', () => ({ getAnalysisQuery: mocks.getAnalysis }));
+vi.mock('../meine-analysen/analyses.remote', () => ({
+	getCasesQuery: mocks.getCases,
+	getAnalysisQuery: mocks.getAnalysis
+}));
 vi.mock('../meine-buddypoints/points.remote', () => ({
 	getBuddyPointsQuery: () =>
 		Object.assign(Promise.resolve({ monthly_points: 100, lifetime_points: 0 }), {
@@ -88,6 +94,7 @@ const fillManualLetter = async (screen: Awaited<ReturnType<typeof render>>) => {
 beforeEach(() => {
 	vi.clearAllMocks();
 	mocks.url = 'http://localhost/papierbrief';
+	mocks.getCases.mockResolvedValue([]);
 	setLocale('en', { reload: false });
 	mocks.createGeneration.mockResolvedValue({
 		ok: true,
@@ -123,6 +130,88 @@ beforeEach(() => {
 		status: 'sent',
 		pingenId: 'pingen-1'
 	});
+});
+
+test('selects an analysis, prefills its only completed document, and submits its source IDs', async () => {
+	const caseId = '00000000-0000-4000-8000-000000000011';
+	const documentId = '00000000-0000-4000-8000-000000000012';
+	mocks.getCases.mockResolvedValue([
+		{
+			id: caseId,
+			title: 'Jobcenter decision',
+			createdAt: new Date('2026-01-02T00:00:00Z'),
+			updatedAt: new Date('2026-01-02T00:00:00Z')
+		}
+	]);
+	mocks.getAnalysis.mockResolvedValue({
+		documents: [
+			{
+				documentId,
+				fileName: 'decision.pdf',
+				analysis: {
+					status: 'completed',
+					metadata: {
+						receiver: { name: 'Max Mustermann', address: 'Musterweg 1, 10115 Berlin' },
+						sender: { name: 'Jobcenter', address: 'Amtstraße 2, 20095 Hamburg' },
+						subject: { original: 'Decision' }
+					}
+				}
+			}
+		]
+	});
+
+	const screen = await render(Page);
+	await userEvent.selectOptions(screen.getByLabelText('Analysis'), caseId);
+	await expect.element(screen.getByText(/Details were prefilled from decision\.pdf/)).toBeVisible();
+	await expect
+		.element(document.querySelector<HTMLElement>('[name="recipient-name"]')!)
+		.toHaveValue('Jobcenter');
+	await userEvent.click(screen.getByRole('button', { name: 'Generate letter' }));
+	expect(mocks.createGeneration).toHaveBeenCalledWith(
+		expect.objectContaining({ sourceCaseId: caseId, sourceDocumentId: documentId })
+	);
+	expect(mocks.replaceState).toHaveBeenLastCalledWith(
+		`/papierbrief?analyse=${caseId}&dokument=${documentId}`,
+		{}
+	);
+});
+
+test('asks for a document when an analysis has multiple completed documents', async () => {
+	const caseId = '00000000-0000-4000-8000-000000000021';
+	const firstDocumentId = '00000000-0000-4000-8000-000000000022';
+	const secondDocumentId = '00000000-0000-4000-8000-000000000023';
+	mocks.getCases.mockResolvedValue([
+		{
+			id: caseId,
+			title: 'Two documents',
+			createdAt: new Date('2026-01-02T00:00:00Z'),
+			updatedAt: new Date('2026-01-02T00:00:00Z')
+		}
+	]);
+	mocks.getAnalysis.mockResolvedValue({
+		documents: [
+			{
+				documentId: firstDocumentId,
+				fileName: 'first.pdf',
+				analysis: { status: 'completed', metadata: { sender: { name: 'First office' } } }
+			},
+			{
+				documentId: secondDocumentId,
+				fileName: 'second.pdf',
+				analysis: { status: 'completed', metadata: { sender: { name: 'Second office' } } }
+			}
+		]
+	});
+
+	const screen = await render(Page);
+	await userEvent.selectOptions(screen.getByLabelText('Analysis'), caseId);
+	await expect
+		.element(screen.getByText('Select a completed document to prefill the letter details.'))
+		.toBeVisible();
+	await userEvent.selectOptions(screen.getByLabelText('Document'), secondDocumentId);
+	await expect
+		.element(document.querySelector<HTMLElement>('[name="recipient-name"]')!)
+		.toHaveValue('Second office');
 });
 
 test('runs manual Generate, Improve, PDF, generated upload, and mocked delivery as one flow', async () => {

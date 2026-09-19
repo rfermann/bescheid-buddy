@@ -34,7 +34,7 @@
 		{maxlength}
 		aria-invalid={error ? 'true' : undefined}
 		aria-describedby={error ? `${name}-error` : undefined}
-		class="rounded-xl border border-white/22 bg-white/5 disabled:opacity-50"
+		class="rounded-xl border border-white/22 bg-white/5 focus:border-primary/45 focus:ring-primary/45 focus:outline-none disabled:opacity-50"
 	></textarea>
 	{#if error}
 		<span id={`${name}-error`} class="text-sm text-red-300">{error}</span>

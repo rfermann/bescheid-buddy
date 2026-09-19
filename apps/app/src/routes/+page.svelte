@@ -3,8 +3,8 @@
 	import PageHeading from '$lib/components/PageHeading.svelte';
 	import Section from '$lib/components/Section.svelte';
 	import StepProgress from '$lib/components/StepProgress.svelte';
+	import SelectField from '$lib/components/input/SelectField.svelte';
 	import FileSelector from './FileSelector.svelte';
-	import ModelSelector from './ModelSelector.svelte';
 	import ConsentGate from './ConsentGate.svelte';
 	import Result from '$lib/components/analysis/Result.svelte';
 	import {
@@ -73,7 +73,16 @@
 		</div>
 	</div>
 	<FileSelector onFileSelected={handleFileSelected} />
-	<ModelSelector {models} bind:value={selectedModel} disabled={isUploading} />
+	<div class="mt-6 max-w-xs">
+		<SelectField
+			name="analyse-model"
+			label={m.analyse_model_label()}
+			options={models.map((model) => ({ value: model.id, label: model.name }))}
+			value={selectedModel}
+			onchange={(value) => (selectedModel = value as AnalysisModel)}
+			disabled={isUploading || models.length === 0}
+		/>
+	</div>
 	<div class="mt-6 grid grid-cols-1 gap-3">
 		<ConsentGate canProceed={!!selectedFile && !!selectedModel} onConfirm={runAnalysis} />
 		{#if uploadError}
