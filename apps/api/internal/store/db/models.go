@@ -22,7 +22,7 @@ const (
 	DocumentAnalysisStatusFailed     DocumentAnalysisStatus = "failed"
 )
 
-func (e *DocumentAnalysisStatus) Scan(src any) error {
+func (e *DocumentAnalysisStatus) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = DocumentAnalysisStatus(s)
@@ -40,7 +40,7 @@ type NullDocumentAnalysisStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullDocumentAnalysisStatus) Scan(value any) error {
+func (ns *NullDocumentAnalysisStatus) Scan(value interface{}) error {
 	if value == nil {
 		ns.DocumentAnalysisStatus, ns.Valid = "", false
 		return nil
@@ -73,7 +73,7 @@ const (
 	DocumentReplyGenerationModeImprove  DocumentReplyGenerationMode = "improve"
 )
 
-func (e *DocumentReplyGenerationMode) Scan(src any) error {
+func (e *DocumentReplyGenerationMode) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = DocumentReplyGenerationMode(s)
@@ -91,7 +91,7 @@ type NullDocumentReplyGenerationMode struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullDocumentReplyGenerationMode) Scan(value any) error {
+func (ns *NullDocumentReplyGenerationMode) Scan(value interface{}) error {
 	if value == nil {
 		ns.DocumentReplyGenerationMode, ns.Valid = "", false
 		return nil
@@ -124,7 +124,7 @@ const (
 	DocumentReplyGenerationStatusFailed     DocumentReplyGenerationStatus = "failed"
 )
 
-func (e *DocumentReplyGenerationStatus) Scan(src any) error {
+func (e *DocumentReplyGenerationStatus) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = DocumentReplyGenerationStatus(s)
@@ -142,7 +142,7 @@ type NullDocumentReplyGenerationStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullDocumentReplyGenerationStatus) Scan(value any) error {
+func (ns *NullDocumentReplyGenerationStatus) Scan(value interface{}) error {
 	if value == nil {
 		ns.DocumentReplyGenerationStatus, ns.Valid = "", false
 		return nil
@@ -176,7 +176,7 @@ const (
 	DocumentUploadStatusFailed         DocumentUploadStatus = "failed"
 )
 
-func (e *DocumentUploadStatus) Scan(src any) error {
+func (e *DocumentUploadStatus) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = DocumentUploadStatus(s)
@@ -194,7 +194,7 @@ type NullDocumentUploadStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullDocumentUploadStatus) Scan(value any) error {
+func (ns *NullDocumentUploadStatus) Scan(value interface{}) error {
 	if value == nil {
 		ns.DocumentUploadStatus, ns.Valid = "", false
 		return nil
@@ -229,7 +229,7 @@ const (
 	PaperLetterDeliveryStatusManualReview PaperLetterDeliveryStatus = "manual_review"
 )
 
-func (e *PaperLetterDeliveryStatus) Scan(src any) error {
+func (e *PaperLetterDeliveryStatus) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = PaperLetterDeliveryStatus(s)
@@ -247,7 +247,7 @@ type NullPaperLetterDeliveryStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullPaperLetterDeliveryStatus) Scan(value any) error {
+func (ns *NullPaperLetterDeliveryStatus) Scan(value interface{}) error {
 	if value == nil {
 		ns.PaperLetterDeliveryStatus, ns.Valid = "", false
 		return nil
@@ -281,7 +281,7 @@ const (
 	PaperLetterUploadStatusConfirmed PaperLetterUploadStatus = "confirmed"
 )
 
-func (e *PaperLetterUploadStatus) Scan(src any) error {
+func (e *PaperLetterUploadStatus) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = PaperLetterUploadStatus(s)
@@ -299,7 +299,7 @@ type NullPaperLetterUploadStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullPaperLetterUploadStatus) Scan(value any) error {
+func (ns *NullPaperLetterUploadStatus) Scan(value interface{}) error {
 	if value == nil {
 		ns.PaperLetterUploadStatus, ns.Valid = "", false
 		return nil
@@ -333,7 +333,7 @@ const (
 	RelatedEntityTypePaperLetterDelivery   RelatedEntityType = "paper_letter_delivery"
 )
 
-func (e *RelatedEntityType) Scan(src any) error {
+func (e *RelatedEntityType) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = RelatedEntityType(s)
@@ -351,7 +351,7 @@ type NullRelatedEntityType struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullRelatedEntityType) Scan(value any) error {
+func (ns *NullRelatedEntityType) Scan(value interface{}) error {
 	if value == nil {
 		ns.RelatedEntityType, ns.Valid = "", false
 		return nil
@@ -387,7 +387,7 @@ const (
 	SupportCaseCategoryFeatureRequest SupportCaseCategory = "feature_request"
 )
 
-func (e *SupportCaseCategory) Scan(src any) error {
+func (e *SupportCaseCategory) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = SupportCaseCategory(s)
@@ -405,7 +405,7 @@ type NullSupportCaseCategory struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullSupportCaseCategory) Scan(value any) error {
+func (ns *NullSupportCaseCategory) Scan(value interface{}) error {
 	if value == nil {
 		ns.SupportCaseCategory, ns.Valid = "", false
 		return nil
@@ -440,7 +440,7 @@ const (
 	SupportCaseStatusClosed     SupportCaseStatus = "closed"
 )
 
-func (e *SupportCaseStatus) Scan(src any) error {
+func (e *SupportCaseStatus) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = SupportCaseStatus(s)
@@ -458,7 +458,7 @@ type NullSupportCaseStatus struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullSupportCaseStatus) Scan(value any) error {
+func (ns *NullSupportCaseStatus) Scan(value interface{}) error {
 	if value == nil {
 		ns.SupportCaseStatus, ns.Valid = "", false
 		return nil
@@ -493,7 +493,7 @@ const (
 	TransactionTypeUsage        TransactionType = "usage"
 )
 
-func (e *TransactionType) Scan(src any) error {
+func (e *TransactionType) Scan(src interface{}) error {
 	switch s := src.(type) {
 	case []byte:
 		*e = TransactionType(s)
@@ -511,7 +511,7 @@ type NullTransactionType struct {
 }
 
 // Scan implements the Scanner interface.
-func (ns *NullTransactionType) Scan(value any) error {
+func (ns *NullTransactionType) Scan(value interface{}) error {
 	if value == nil {
 		ns.TransactionType, ns.Valid = "", false
 		return nil
@@ -723,6 +723,9 @@ type PaperLetterDelivery struct {
 	SentAt                      *time.Time                `json:"sent_at"`
 	CreatedAt                   time.Time                 `json:"created_at"`
 	UpdatedAt                   time.Time                 `json:"updated_at"`
+	CaseID                      pgtype.UUID               `json:"case_id"`
+	Recipient                   pgtype.Text               `json:"recipient"`
+	Topic                       pgtype.Text               `json:"topic"`
 }
 
 type PaperLetterUpload struct {

@@ -248,9 +248,9 @@ RETURNING *;
 
 -- name: CreatePaperLetterDelivery :one
 INSERT INTO paper_letter_deliveries
-    (id, user_id, upload_id, client_request_id, page_count, bp_cost,
+    (id, user_id, upload_id, client_request_id, case_id, recipient, topic, page_count, bp_cost,
      delivery_product, address_position, print_mode, print_spectrum)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 RETURNING *;
 
 -- name: GetPaperLetterDeliveryByID :one
@@ -258,6 +258,12 @@ SELECT * FROM paper_letter_deliveries WHERE id = $1;
 
 -- name: GetPaperLetterDeliveryByUserAndClientRequestID :one
 SELECT * FROM paper_letter_deliveries WHERE user_id = $1 AND client_request_id = $2;
+
+-- name: GetPaperLetterDeliveriesByUserID :many
+SELECT *
+FROM paper_letter_deliveries
+WHERE user_id = $1
+ORDER BY created_at DESC, id DESC;
 
 -- name: SetPaperLetterDeliveryJobID :exec
 UPDATE paper_letter_deliveries SET job_id = $2, updated_at = NOW() WHERE id = $1;

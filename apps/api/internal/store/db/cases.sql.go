@@ -445,23 +445,26 @@ func (q *Queries) CreateDocumentReplyGeneration(ctx context.Context, arg CreateD
 
 const createPaperLetterDelivery = `-- name: CreatePaperLetterDelivery :one
 INSERT INTO paper_letter_deliveries
-    (id, user_id, upload_id, client_request_id, page_count, bp_cost,
+    (id, user_id, upload_id, client_request_id, case_id, recipient, topic, page_count, bp_cost,
      delivery_product, address_position, print_mode, print_spectrum)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at, case_id, recipient, topic
 `
 
 type CreatePaperLetterDeliveryParams struct {
-	ID              uuid.UUID `json:"id"`
-	UserID          uuid.UUID `json:"user_id"`
-	UploadID        uuid.UUID `json:"upload_id"`
-	ClientRequestID uuid.UUID `json:"client_request_id"`
-	PageCount       int32     `json:"page_count"`
-	BpCost          int32     `json:"bp_cost"`
-	DeliveryProduct string    `json:"delivery_product"`
-	AddressPosition string    `json:"address_position"`
-	PrintMode       string    `json:"print_mode"`
-	PrintSpectrum   string    `json:"print_spectrum"`
+	ID              uuid.UUID   `json:"id"`
+	UserID          uuid.UUID   `json:"user_id"`
+	UploadID        uuid.UUID   `json:"upload_id"`
+	ClientRequestID uuid.UUID   `json:"client_request_id"`
+	CaseID          pgtype.UUID `json:"case_id"`
+	Recipient       pgtype.Text `json:"recipient"`
+	Topic           pgtype.Text `json:"topic"`
+	PageCount       int32       `json:"page_count"`
+	BpCost          int32       `json:"bp_cost"`
+	DeliveryProduct string      `json:"delivery_product"`
+	AddressPosition string      `json:"address_position"`
+	PrintMode       string      `json:"print_mode"`
+	PrintSpectrum   string      `json:"print_spectrum"`
 }
 
 func (q *Queries) CreatePaperLetterDelivery(ctx context.Context, arg CreatePaperLetterDeliveryParams) (*PaperLetterDelivery, error) {
@@ -470,6 +473,9 @@ func (q *Queries) CreatePaperLetterDelivery(ctx context.Context, arg CreatePaper
 		arg.UserID,
 		arg.UploadID,
 		arg.ClientRequestID,
+		arg.CaseID,
+		arg.Recipient,
+		arg.Topic,
 		arg.PageCount,
 		arg.BpCost,
 		arg.DeliveryProduct,
@@ -497,6 +503,9 @@ func (q *Queries) CreatePaperLetterDelivery(ctx context.Context, arg CreatePaper
 		&i.SentAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.CaseID,
+		&i.Recipient,
+		&i.Topic,
 	)
 	return &i, err
 }
@@ -1086,8 +1095,61 @@ func (q *Queries) GetInitialCaseDocument(ctx context.Context, arg GetInitialCase
 	return &i, err
 }
 
+const getPaperLetterDeliveriesByUserID = `-- name: GetPaperLetterDeliveriesByUserID :many
+SELECT id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at, case_id, recipient, topic
+FROM paper_letter_deliveries
+WHERE user_id = $1
+ORDER BY created_at DESC, id DESC
+`
+
+type GetPaperLetterDeliveriesByUserIDParams struct {
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) GetPaperLetterDeliveriesByUserID(ctx context.Context, arg GetPaperLetterDeliveriesByUserIDParams) ([]*PaperLetterDelivery, error) {
+	rows, err := q.db.Query(ctx, getPaperLetterDeliveriesByUserID, arg.UserID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*PaperLetterDelivery
+	for rows.Next() {
+		var i PaperLetterDelivery
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.UploadID,
+			&i.ClientRequestID,
+			&i.Status,
+			&i.JobID,
+			&i.PingenID,
+			&i.ProviderSubmissionStartedAt,
+			&i.PageCount,
+			&i.BpCost,
+			&i.DeliveryProduct,
+			&i.AddressPosition,
+			&i.PrintMode,
+			&i.PrintSpectrum,
+			&i.ErrorMessage,
+			&i.SentAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.CaseID,
+			&i.Recipient,
+			&i.Topic,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, &i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPaperLetterDeliveryByID = `-- name: GetPaperLetterDeliveryByID :one
-SELECT id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at FROM paper_letter_deliveries WHERE id = $1
+SELECT id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at, case_id, recipient, topic FROM paper_letter_deliveries WHERE id = $1
 `
 
 type GetPaperLetterDeliveryByIDParams struct {
@@ -1116,12 +1178,15 @@ func (q *Queries) GetPaperLetterDeliveryByID(ctx context.Context, arg GetPaperLe
 		&i.SentAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.CaseID,
+		&i.Recipient,
+		&i.Topic,
 	)
 	return &i, err
 }
 
 const getPaperLetterDeliveryByUserAndClientRequestID = `-- name: GetPaperLetterDeliveryByUserAndClientRequestID :one
-SELECT id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at FROM paper_letter_deliveries WHERE user_id = $1 AND client_request_id = $2
+SELECT id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at, case_id, recipient, topic FROM paper_letter_deliveries WHERE user_id = $1 AND client_request_id = $2
 `
 
 type GetPaperLetterDeliveryByUserAndClientRequestIDParams struct {
@@ -1151,6 +1216,9 @@ func (q *Queries) GetPaperLetterDeliveryByUserAndClientRequestID(ctx context.Con
 		&i.SentAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.CaseID,
+		&i.Recipient,
+		&i.Topic,
 	)
 	return &i, err
 }
@@ -1388,7 +1456,7 @@ SET status = 'manual_review', updated_at = NOW()
 WHERE id = $1
   AND status = 'processing'
   AND provider_submission_started_at <= $2
-RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at
+RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at, case_id, recipient, topic
 `
 
 type MarkPaperLetterDeliveryManualReviewParams struct {
@@ -1418,6 +1486,9 @@ func (q *Queries) MarkPaperLetterDeliveryManualReview(ctx context.Context, arg M
 		&i.SentAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.CaseID,
+		&i.Recipient,
+		&i.Topic,
 	)
 	return &i, err
 }
@@ -1426,7 +1497,7 @@ const markPaperLetterDeliveryProcessing = `-- name: MarkPaperLetterDeliveryProce
 UPDATE paper_letter_deliveries
 SET status = 'processing', provider_submission_started_at = COALESCE(provider_submission_started_at, NOW()), updated_at = NOW()
 WHERE id = $1 AND status IN ('pending', 'processing')
-RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at
+RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at, case_id, recipient, topic
 `
 
 type MarkPaperLetterDeliveryProcessingParams struct {
@@ -1455,6 +1526,9 @@ func (q *Queries) MarkPaperLetterDeliveryProcessing(ctx context.Context, arg Mar
 		&i.SentAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.CaseID,
+		&i.Recipient,
+		&i.Topic,
 	)
 	return &i, err
 }
@@ -1463,7 +1537,7 @@ const markPaperLetterDeliverySent = `-- name: MarkPaperLetterDeliverySent :one
 UPDATE paper_letter_deliveries
 SET status = 'sent', pingen_id = $2, error_message = NULL, sent_at = NOW(), updated_at = NOW()
 WHERE id = $1 AND status = 'processing'
-RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at
+RETURNING id, user_id, upload_id, client_request_id, status, job_id, pingen_id, provider_submission_started_at, page_count, bp_cost, delivery_product, address_position, print_mode, print_spectrum, error_message, sent_at, created_at, updated_at, case_id, recipient, topic
 `
 
 type MarkPaperLetterDeliverySentParams struct {
@@ -1493,6 +1567,9 @@ func (q *Queries) MarkPaperLetterDeliverySent(ctx context.Context, arg MarkPaper
 		&i.SentAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.CaseID,
+		&i.Recipient,
+		&i.Topic,
 	)
 	return &i, err
 }

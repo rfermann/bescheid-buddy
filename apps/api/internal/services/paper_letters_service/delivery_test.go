@@ -1,10 +1,12 @@
 package paper_letters_service
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"sort"
 	"sync"
 	"testing"
 	"time"
@@ -70,6 +72,7 @@ func (r *deliveryRepositoryFake) CreatePaperLetterDelivery(_ context.Context, p 
 	}
 	delivery := &db.PaperLetterDelivery{
 		ID: p.ID, UserID: p.UserID, UploadID: p.UploadID, ClientRequestID: p.ClientRequestID,
+		CaseID: p.CaseID, Recipient: p.Recipient, Topic: p.Topic,
 		Status: db.PaperLetterDeliveryStatusPending, PageCount: p.PageCount, BpCost: p.BpCost,
 		DeliveryProduct: p.DeliveryProduct, AddressPosition: p.AddressPosition,
 		PrintMode: p.PrintMode, PrintSpectrum: p.PrintSpectrum,
@@ -95,6 +98,21 @@ func (r *deliveryRepositoryFake) GetPaperLetterDeliveryByUserAndClientRequestID(
 		}
 	}
 	return nil, pgx.ErrNoRows
+}
+func (r *deliveryRepositoryFake) GetPaperLetterDeliveriesByUserID(_ context.Context, p db.GetPaperLetterDeliveriesByUserIDParams) ([]*db.PaperLetterDelivery, error) {
+	var result []*db.PaperLetterDelivery
+	for _, delivery := range r.deliveries {
+		if delivery.UserID == p.UserID {
+			result = append(result, delivery)
+		}
+	}
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].CreatedAt.Equal(result[j].CreatedAt) {
+			return bytes.Compare(result[i].ID[:], result[j].ID[:]) > 0
+		}
+		return result[i].CreatedAt.After(result[j].CreatedAt)
+	})
+	return result, nil
 }
 func (r *deliveryRepositoryFake) SetPaperLetterDeliveryJobID(_ context.Context, p db.SetPaperLetterDeliveryJobIDParams) error {
 	r.deliveries[p.ID].JobID = p.JobID
@@ -174,8 +192,10 @@ func TestCreateDelivery(t *testing.T) {
 	t.Run("charges creates and enqueues once", func(t *testing.T) {
 		repo, points := newDeliveryRepositoryFake(confirmed), &deliveryPointsFake{}
 		service := newService(repo, points, deliveryQueueFake{})
-		result, err := service.CreateDelivery(context.Background(), CreateDeliveryInput{UserID: userID, UploadID: uploadID, ClientRequestID: requestID})
+		result, err := service.CreateDelivery(context.Background(), CreateDeliveryInput{UserID: userID, UploadID: uploadID, ClientRequestID: requestID, Recipient: " Jobcenter ", Topic: " Widerspruch "})
 		require.NoError(t, err)
+		assert.Equal(t, "Jobcenter", result.Delivery.Recipient.String)
+		assert.Equal(t, "Widerspruch", result.Delivery.Topic.String)
 		assert.Equal(t, int32(90), result.Delivery.BpCost)
 		assert.Equal(t, int64(42), result.Delivery.JobID.Int64)
 		assert.Equal(t, db.RelatedEntityTypePaperLetterDelivery, points.input.RelatedEntityType)
@@ -184,9 +204,24 @@ func TestCreateDelivery(t *testing.T) {
 		_, err = service.GetDelivery(context.Background(), uuid.New(), result.Delivery.ID)
 		assert.ErrorIs(t, err, ErrDeliveryNotFound)
 
-		again, err := service.CreateDelivery(context.Background(), CreateDeliveryInput{UserID: userID, UploadID: uploadID, ClientRequestID: requestID})
+		again, err := service.CreateDelivery(context.Background(), CreateDeliveryInput{
+			UserID: userID, UploadID: uploadID, ClientRequestID: requestID,
+			Recipient: "Different recipient", Topic: "Different topic",
+		})
 		require.NoError(t, err)
 		assert.True(t, again.Existing)
+		assert.Equal(t, "Jobcenter", again.Delivery.Recipient.String)
+		assert.Equal(t, "Widerspruch", again.Delivery.Topic.String)
+	})
+
+	t.Run("rejects invalid snapshots before transaction", func(t *testing.T) {
+		repo, points := newDeliveryRepositoryFake(confirmed), &deliveryPointsFake{}
+		_, err := newService(repo, points, deliveryQueueFake{}).CreateDelivery(context.Background(), CreateDeliveryInput{
+			UserID: userID, UploadID: uploadID, ClientRequestID: uuid.New(), Recipient: "   ", Topic: "Widerspruch",
+		})
+		assert.ErrorIs(t, err, ErrInvalidInput)
+		assert.False(t, repo.tx.committed)
+		assert.False(t, repo.tx.rolledBack)
 	})
 
 	tests := []struct {
@@ -205,7 +240,7 @@ func TestCreateDelivery(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			repo := newDeliveryRepositoryFake(test.upload)
 			_, err := newService(repo, &deliveryPointsFake{err: test.points}, deliveryQueueFake{err: test.queue}).CreateDelivery(
-				context.Background(), CreateDeliveryInput{UserID: userID, UploadID: uploadID, ClientRequestID: uuid.New()},
+				context.Background(), CreateDeliveryInput{UserID: userID, UploadID: uploadID, ClientRequestID: uuid.New(), Recipient: "Jobcenter", Topic: "Widerspruch"},
 			)
 			if test.name == "queue rollback" {
 				assert.ErrorContains(t, err, test.want.Error())
@@ -223,11 +258,24 @@ func TestCreateDelivery(t *testing.T) {
 		repo.createErr = &pgconn.PgError{Code: "23505", ConstraintName: deliveryRequestConstraint}
 		repo.skipFirstLookup = true
 		result, err := newService(repo, points, deliveryQueueFake{}).CreateDelivery(context.Background(), CreateDeliveryInput{
-			UserID: userID, UploadID: uploadID, ClientRequestID: requestID,
+			UserID: userID, UploadID: uploadID, ClientRequestID: requestID, Recipient: "Jobcenter", Topic: "Widerspruch",
 		})
 		require.NoError(t, err)
 		assert.True(t, result.Existing)
 	})
+}
+
+func TestGetDeliveriesScopesToUser(t *testing.T) {
+	userID, otherUserID := uuid.New(), uuid.New()
+	repo := newDeliveryRepositoryFake(nil)
+	repo.deliveries[uuid.New()] = &db.PaperLetterDelivery{UserID: userID}
+	repo.deliveries[uuid.New()] = &db.PaperLetterDelivery{UserID: otherUserID}
+
+	deliveries, err := (&Service{repository: repo}).GetDeliveries(context.Background(), userID)
+
+	require.NoError(t, err)
+	require.Len(t, deliveries, 1)
+	assert.Equal(t, userID, deliveries[0].UserID)
 }
 
 type deliveryProviderFake struct {

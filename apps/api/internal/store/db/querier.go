@@ -50,6 +50,7 @@ type Querier interface {
 	GetDocumentReplyGenerationByUserAndClientRequestID(ctx context.Context, arg GetDocumentReplyGenerationByUserAndClientRequestIDParams) (*DocumentReplyGeneration, error)
 	GetInitialCaseDocument(ctx context.Context, arg GetInitialCaseDocumentParams) (*CaseDocument, error)
 	GetMatchingBuddyPointSpend(ctx context.Context, arg GetMatchingBuddyPointSpendParams) (*GetMatchingBuddyPointSpendRow, error)
+	GetPaperLetterDeliveriesByUserID(ctx context.Context, arg GetPaperLetterDeliveriesByUserIDParams) ([]*PaperLetterDelivery, error)
 	GetPaperLetterDeliveryByID(ctx context.Context, arg GetPaperLetterDeliveryByIDParams) (*PaperLetterDelivery, error)
 	GetPaperLetterDeliveryByUserAndClientRequestID(ctx context.Context, arg GetPaperLetterDeliveryByUserAndClientRequestIDParams) (*PaperLetterDelivery, error)
 	GetPaperLetterUploadByIDAndUserID(ctx context.Context, arg GetPaperLetterUploadByIDAndUserIDParams) (*PaperLetterUpload, error)

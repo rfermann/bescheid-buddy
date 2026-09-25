@@ -12,8 +12,11 @@ import (
 
 type CreatePaperLetterDeliveryInput struct {
 	Body struct {
-		UploadID        uuid.UUID `json:"uploadId" required:"true"`
-		ClientRequestID uuid.UUID `json:"clientRequestId" required:"true"`
+		UploadID        uuid.UUID  `json:"uploadId" required:"true"`
+		ClientRequestID uuid.UUID  `json:"clientRequestId" required:"true"`
+		CaseID          *uuid.UUID `json:"caseId,omitempty"`
+		Recipient       string     `json:"recipient" required:"true" minLength:"1" maxLength:"200"`
+		Topic           string     `json:"topic" required:"true" minLength:"1" maxLength:"500"`
 	}
 }
 
@@ -25,7 +28,8 @@ func (h *Handler) createDelivery(ctx context.Context, input *CreatePaperLetterDe
 		return nil, huma.Error401Unauthorized("Unauthorized")
 	}
 	result, err := h.service.CreateDelivery(ctx, paper_letters_service.CreateDeliveryInput{
-		UserID: userID, UploadID: input.Body.UploadID, ClientRequestID: input.Body.ClientRequestID,
+		UserID: userID, UploadID: input.Body.UploadID, ClientRequestID: input.Body.ClientRequestID, CaseID: input.Body.CaseID,
+		Recipient: input.Body.Recipient, Topic: input.Body.Topic,
 	})
 	if err != nil {
 		switch {
@@ -37,6 +41,8 @@ func (h *Handler) createDelivery(ctx context.Context, input *CreatePaperLetterDe
 			return nil, huma.Error402PaymentRequired("Insufficient BuddyPoints")
 		case errors.Is(err, paper_letters_service.ErrInvalidInput):
 			return nil, huma.Error422UnprocessableEntity("Invalid delivery input")
+		case errors.Is(err, paper_letters_service.ErrInvalidSource):
+			return nil, huma.Error422UnprocessableEntity("Invalid case")
 		default:
 			return nil, huma.Error500InternalServerError("Failed to create paper letter delivery", err)
 		}

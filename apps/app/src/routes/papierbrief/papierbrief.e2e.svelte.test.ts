@@ -251,6 +251,9 @@ test('runs manual Generate, Improve, PDF, generated upload, and mocked delivery 
 	);
 	await expect.element(screen.getByText('Sent.')).toBeVisible();
 	expect(mocks.createDelivery).toHaveBeenCalledOnce();
+	expect(mocks.createDelivery).toHaveBeenCalledWith(
+		expect.objectContaining({ recipient: 'Jobcenter', topic: 'Widerspruch' })
+	);
 
 	screen.unmount();
 	const reloaded = await render(Page);
@@ -315,6 +318,12 @@ test('prefills from analysis and supports a ready PDF upload', async () => {
 	const deliveryButton = screen.getByRole('button', {
 		name: 'Confirm delivery for 70 BuddyPoints'
 	});
+	await userEvent.clear(document.querySelector('[name="recipient-name"]')!);
+	await userEvent.clear(document.querySelector('[name="subject"]')!);
+	await userEvent.click(deliveryButton);
+	expect(mocks.createDelivery).not.toHaveBeenCalled();
+	await userEvent.fill(document.querySelector('[name="recipient-name"]')!, 'Jobcenter');
+	await userEvent.fill(document.querySelector('[name="subject"]')!, 'Widerspruch');
 	await userEvent.click(deliveryButton);
 	await userEvent.click(deliveryButton);
 	const firstRequest = mocks.createDelivery.mock.calls[0][0].clientRequestId;

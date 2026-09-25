@@ -6,7 +6,9 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/bored-bots/bored-template/internal/repository/cases_repository"
 	"github.com/bored-bots/bored-template/internal/services/users_service"
@@ -49,6 +51,9 @@ type CreateDeliveryInput struct {
 	UserID          uuid.UUID
 	UploadID        uuid.UUID
 	ClientRequestID uuid.UUID
+	CaseID          *uuid.UUID
+	Recipient       string
+	Topic           string
 }
 
 type CreateDeliveryResult struct {
@@ -64,6 +69,11 @@ func (s *Service) CreateDelivery(ctx context.Context, input CreateDeliveryInput)
 		return &CreateDeliveryResult{Delivery: existing, Existing: true}, nil
 	} else if !errors.Is(err, pgx.ErrNoRows) {
 		return nil, fmt.Errorf("load delivery request: %w", err)
+	}
+
+	recipient, topic := strings.TrimSpace(input.Recipient), strings.TrimSpace(input.Topic)
+	if recipient == "" || topic == "" || utf8.RuneCountInString(recipient) > 200 || utf8.RuneCountInString(topic) > 500 {
+		return nil, ErrInvalidInput
 	}
 
 	deliveryID := uuid.New()
@@ -83,6 +93,16 @@ func (s *Service) CreateDelivery(ctx context.Context, input CreateDeliveryInput)
 	if upload.Status != db.PaperLetterUploadStatusConfirmed {
 		return nil, ErrUploadNotConfirmed
 	}
+	caseID := pgtype.UUID{}
+	if input.CaseID != nil {
+		if _, err := txRepo.GetCaseByIDAndUserID(ctx, db.GetCaseByIDAndUserIDParams{ID: *input.CaseID, UserID: input.UserID}); err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				return nil, ErrInvalidSource
+			}
+			return nil, fmt.Errorf("load delivery case: %w", err)
+		}
+		caseID = pgtype.UUID{Bytes: *input.CaseID, Valid: true}
+	}
 	cost := int32(deliveryPrice(int(upload.PageCount)))
 	if _, err := s.points.SpendTx(ctx, tx, users_service.SpendTxInput{
 		UserID: input.UserID, Amount: cost, Description: "Papierbrief delivery",
@@ -92,6 +112,8 @@ func (s *Service) CreateDelivery(ctx context.Context, input CreateDeliveryInput)
 	}
 	delivery, err := txRepo.CreatePaperLetterDelivery(ctx, db.CreatePaperLetterDeliveryParams{
 		ID: deliveryID, UserID: input.UserID, UploadID: input.UploadID, ClientRequestID: input.ClientRequestID,
+		CaseID:    caseID,
+		Recipient: pgtype.Text{String: recipient, Valid: true}, Topic: pgtype.Text{String: topic, Valid: true},
 		PageCount: upload.PageCount, BpCost: cost, DeliveryProduct: s.pingen.Product,
 		AddressPosition: s.pingen.AddressPosition, PrintMode: s.pingen.PrintMode, PrintSpectrum: s.pingen.PrintSpectrum,
 	})
@@ -129,6 +151,14 @@ func (s *Service) GetDelivery(ctx context.Context, userID, deliveryID uuid.UUID)
 		return nil, fmt.Errorf("load delivery: %w", err)
 	}
 	return delivery, nil
+}
+
+func (s *Service) GetDeliveries(ctx context.Context, userID uuid.UUID) ([]*db.PaperLetterDelivery, error) {
+	deliveries, err := s.repository.GetPaperLetterDeliveriesByUserID(ctx, db.GetPaperLetterDeliveriesByUserIDParams{UserID: userID})
+	if err != nil {
+		return nil, fmt.Errorf("load deliveries: %w", err)
+	}
+	return deliveries, nil
 }
 
 func (s *Service) deliveryByRequest(ctx context.Context, userID, requestID uuid.UUID) (*db.PaperLetterDelivery, error) {

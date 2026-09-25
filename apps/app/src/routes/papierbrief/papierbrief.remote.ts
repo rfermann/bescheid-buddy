@@ -88,7 +88,6 @@ export const createGenerationCommand = authenticatedCommand(
 				input: request.input
 			}
 		});
-
 		if (result.data) {
 			return { ok: true as const, generation: result.data };
 		}
@@ -243,11 +242,11 @@ export const confirmPaperLetterUploadCommand = authenticatedCommand(
 		};
 	}
 );
-
 export const createPaperLetterDeliveryCommand = authenticatedCommand(
 	vCreatePaperLetterDeliveryBody,
 	async (request) => {
 		const result = await createPaperLetterDelivery({ ...getClientConfig(), body: request });
+
 		if (result.data) {
 			return { ok: true as const, delivery: result.data };
 		}

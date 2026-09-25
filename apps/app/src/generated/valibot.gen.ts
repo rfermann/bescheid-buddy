@@ -102,7 +102,10 @@ export const vCreateModelOutputBody = v.strictObject({
 
 export const vCreatePaperLetterDeliveryInputBody = v.strictObject({
     $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    caseId: v.optional(v.string()),
     clientRequestId: v.string(),
+    recipient: v.pipe(v.string(), v.minLength(1), v.maxLength(200)),
+    topic: v.pipe(v.string(), v.minLength(1), v.maxLength(500)),
     uploadId: v.string()
 });
 
@@ -145,6 +148,7 @@ export const vDeliveryBody = v.strictObject({
     $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
     addressPosition: v.string(),
     buddyPointsCost: v.pipe(v.number(), v.integer(), v.minValue(-2147483648, 'Invalid value: Expected int32 to be >= -2147483648'), v.maxValue(2147483647, 'Invalid value: Expected int32 to be <= 2147483647')),
+    caseId: v.nullable(v.string()),
     clientRequestId: v.string(),
     createdAt: v.pipe(v.string(), v.isoTimestamp()),
     deliveryId: v.string(),
@@ -153,11 +157,23 @@ export const vDeliveryBody = v.strictObject({
     pingenId: v.optional(v.string()),
     printMode: v.string(),
     printSpectrum: v.string(),
+    recipient: v.nullable(v.string()),
     sentAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
     status: v.string(),
     submissionStartedAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
+    topic: v.nullable(v.string()),
     updatedAt: v.pipe(v.string(), v.isoTimestamp()),
     uploadId: v.string()
+});
+
+export const vDeliveryListItemBody = v.strictObject({
+    caseId: v.nullable(v.string()),
+    deliveryId: v.string(),
+    recipient: v.nullable(v.string()),
+    sentAt: v.nullable(v.pipe(v.string(), v.isoTimestamp())),
+    status: v.string(),
+    topic: v.nullable(v.string()),
+    updatedAt: v.pipe(v.string(), v.isoTimestamp())
 });
 
 export const vDetails = v.strictObject({
@@ -332,6 +348,11 @@ export const vGetDocumentReplyGenerationOutputBody = v.strictObject({
 export const vGetModelProvidersOutputBody = v.strictObject({
     $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
     providers: v.nullable(v.array(v.string()))
+});
+
+export const vGetPaperLetterDeliveriesOutputBody = v.strictObject({
+    $schema: v.optional(v.pipe(v.pipe(v.string(), v.url()), v.readonly())),
+    deliveries: v.nullable(v.array(vDeliveryListItemBody))
 });
 
 export const vHealthCheckResponseBody = v.strictObject({
@@ -678,7 +699,10 @@ export const vCreatePdfInputBodyWritable = v.strictObject({
 });
 
 export const vCreatePaperLetterDeliveryInputBodyWritable = v.strictObject({
+    caseId: v.optional(v.string()),
     clientRequestId: v.string(),
+    recipient: v.pipe(v.string(), v.minLength(1), v.maxLength(200)),
+    topic: v.pipe(v.string(), v.minLength(1), v.maxLength(500)),
     uploadId: v.string()
 });
 
@@ -719,6 +743,7 @@ export const vCreateSupportCaseOutputBodyWritable = v.strictObject({
 export const vDeliveryBodyWritable = v.strictObject({
     addressPosition: v.string(),
     buddyPointsCost: v.pipe(v.number(), v.integer(), v.minValue(-2147483648, 'Invalid value: Expected int32 to be >= -2147483648'), v.maxValue(2147483647, 'Invalid value: Expected int32 to be <= 2147483647')),
+    caseId: v.nullable(v.string()),
     clientRequestId: v.string(),
     createdAt: v.pipe(v.string(), v.isoTimestamp()),
     deliveryId: v.string(),
@@ -727,9 +752,11 @@ export const vDeliveryBodyWritable = v.strictObject({
     pingenId: v.optional(v.string()),
     printMode: v.string(),
     printSpectrum: v.string(),
+    recipient: v.nullable(v.string()),
     sentAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
     status: v.string(),
     submissionStartedAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
+    topic: v.nullable(v.string()),
     updatedAt: v.pipe(v.string(), v.isoTimestamp()),
     uploadId: v.string()
 });
@@ -889,6 +916,10 @@ export const vGetModelProvidersOutputBodyWritable = v.strictObject({
 
 export const vGetModelsOutputBodyWritable = v.strictObject({
     models: v.nullable(v.array(vModelBody))
+});
+
+export const vGetPaperLetterDeliveriesOutputBodyWritable = v.strictObject({
+    deliveries: v.nullable(v.array(vDeliveryListItemBody))
 });
 
 export const vGetSupportCaseByIdOutputBodyWritable = v.strictObject({
@@ -1091,6 +1122,11 @@ export const vHealthCheckResponse = vHealthCheckResponseBody;
  * OK
  */
 export const vGetModelsResponse = vGetModelsOutputBody;
+
+/**
+ * OK
+ */
+export const vListPaperLetterDeliveriesResponse = vGetPaperLetterDeliveriesOutputBody;
 
 export const vCreatePaperLetterDeliveryBody = vCreatePaperLetterDeliveryInputBodyWritable;
 

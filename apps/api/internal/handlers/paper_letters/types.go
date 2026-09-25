@@ -14,6 +14,9 @@ type DeliveryBody struct {
 	DeliveryID        uuid.UUID  `json:"deliveryId"`
 	UploadID          uuid.UUID  `json:"uploadId"`
 	ClientRequestID   uuid.UUID  `json:"clientRequestId"`
+	CaseID            *uuid.UUID `json:"caseId" nullable:"true"`
+	Recipient         *string    `json:"recipient" nullable:"true"`
+	Topic             *string    `json:"topic" nullable:"true"`
 	Status            string     `json:"status"`
 	PageCount         int32      `json:"pageCount"`
 	BuddyPointsCost   int32      `json:"buddyPointsCost"`
@@ -39,6 +42,16 @@ func deliveryBody(delivery *db.PaperLetterDelivery) DeliveryBody {
 	}
 	if delivery.PingenID.Valid {
 		body.PingenID = &delivery.PingenID.String
+	}
+	if delivery.CaseID.Valid {
+		caseID := uuid.UUID(delivery.CaseID.Bytes)
+		body.CaseID = &caseID
+	}
+	if delivery.Recipient.Valid {
+		body.Recipient = &delivery.Recipient.String
+	}
+	if delivery.Topic.Valid {
+		body.Topic = &delivery.Topic.String
 	}
 	return body
 }

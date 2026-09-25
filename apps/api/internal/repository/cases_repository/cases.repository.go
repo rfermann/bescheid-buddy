@@ -46,6 +46,7 @@ type Repository interface {
 	CreatePaperLetterDelivery(ctx context.Context, params db.CreatePaperLetterDeliveryParams) (*db.PaperLetterDelivery, error)
 	GetPaperLetterDeliveryByID(ctx context.Context, params db.GetPaperLetterDeliveryByIDParams) (*db.PaperLetterDelivery, error)
 	GetPaperLetterDeliveryByUserAndClientRequestID(ctx context.Context, params db.GetPaperLetterDeliveryByUserAndClientRequestIDParams) (*db.PaperLetterDelivery, error)
+	GetPaperLetterDeliveriesByUserID(ctx context.Context, params db.GetPaperLetterDeliveriesByUserIDParams) ([]*db.PaperLetterDelivery, error)
 	SetPaperLetterDeliveryJobID(ctx context.Context, params db.SetPaperLetterDeliveryJobIDParams) error
 	MarkPaperLetterDeliveryProcessing(ctx context.Context, params db.MarkPaperLetterDeliveryProcessingParams) (*db.PaperLetterDelivery, error)
 	MarkPaperLetterDeliverySent(ctx context.Context, params db.MarkPaperLetterDeliverySentParams) (*db.PaperLetterDelivery, error)
@@ -215,6 +216,10 @@ func (r *CasesRepository) GetPaperLetterDeliveryByID(ctx context.Context, params
 
 func (r *CasesRepository) GetPaperLetterDeliveryByUserAndClientRequestID(ctx context.Context, params db.GetPaperLetterDeliveryByUserAndClientRequestIDParams) (*db.PaperLetterDelivery, error) {
 	return r.Store.Queries.GetPaperLetterDeliveryByUserAndClientRequestID(ctx, params)
+}
+
+func (r *CasesRepository) GetPaperLetterDeliveriesByUserID(ctx context.Context, params db.GetPaperLetterDeliveriesByUserIDParams) ([]*db.PaperLetterDelivery, error) {
+	return r.Store.Queries.GetPaperLetterDeliveriesByUserID(ctx, params)
 }
 
 func (r *CasesRepository) SetPaperLetterDeliveryJobID(ctx context.Context, params db.SetPaperLetterDeliveryJobIDParams) error {

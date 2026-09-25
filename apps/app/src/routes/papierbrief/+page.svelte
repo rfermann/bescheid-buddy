@@ -349,6 +349,7 @@
 
 	const selectAnalysis = (value: string) => {
 		selectedAnalysisId = value;
+		deliveryRetryRequestID = '';
 		selectedDocumentId = '';
 		sourceDocuments = [];
 		sourceCaseId = undefined;
@@ -756,6 +757,14 @@
 
 	const submitDelivery = async () => {
 		if (controlsDisabled || !confirmedUploadID) return;
+		const snapshotErrors: Record<string, string> = {};
+		if (!clean(recipientName)) snapshotErrors.recipientName = m.papierbrief_validation_recipient_name();
+		if (!clean(subject)) snapshotErrors.pdfSubject = m.papierbrief_pdf_validation_subject();
+		if (Object.keys(snapshotErrors).length > 0) {
+			fieldErrors = snapshotErrors;
+			deliveryError = m.papierbrief_pdf_validation_summary();
+			return;
+		}
 		const clientRequestId = deliveryRetryRequestID || crypto.randomUUID();
 		const version = ++deliveryPollVersion;
 		let accepted = false;
@@ -764,7 +773,10 @@
 		try {
 			const response = await createPaperLetterDeliveryCommand({
 				uploadId: confirmedUploadID,
-				clientRequestId
+				clientRequestId,
+				caseId: selectedAnalysisId || undefined,
+				recipient: clean(recipientName),
+				topic: clean(subject)
 			});
 			if (!response.ok) {
 				deliveryRetryRequestID = response.error === 'request_failed' ? clientRequestId : '';
