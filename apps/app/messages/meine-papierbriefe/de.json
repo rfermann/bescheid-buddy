@@ -1,0 +1,18 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"paper_deliveries_page_title": "Meine Papierbriefe",
+	"paper_deliveries_new": "Papierbrief senden",
+	"paper_deliveries_empty_title": "Noch keine Papierbriefe",
+	"paper_deliveries_empty_description": "Sobald du einen Papierbrief sendest, erscheint er hier.",
+	"paper_deliveries_topic_missing": "Kein Betreff",
+	"paper_deliveries_recipient_missing": "Unbekannter Empfänger",
+	"paper_deliveries_sent_at": "Gesendet",
+	"paper_deliveries_updated_at": "Zuletzt aktualisiert",
+	"paper_deliveries_view_analysis": "Analyse ansehen",
+	"paper_deliveries_status_pending": "Ausstehend",
+	"paper_deliveries_status_processing": "In Bearbeitung",
+	"paper_deliveries_status_sent": "Gesendet",
+	"paper_deliveries_status_failed": "Fehlgeschlagen",
+	"paper_deliveries_status_manual_review": "Manuelle Prüfung",
+	"paper_deliveries_status_unknown": "Unbekannter Status"
+}

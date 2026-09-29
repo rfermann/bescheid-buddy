@@ -1,0 +1,18 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"paper_deliveries_page_title": "Мои бумажные письма",
+	"paper_deliveries_new": "Отправить бумажное письмо",
+	"paper_deliveries_empty_title": "Бумажных писем пока нет",
+	"paper_deliveries_empty_description": "После отправки бумажного письма оно появится здесь.",
+	"paper_deliveries_topic_missing": "Без темы",
+	"paper_deliveries_recipient_missing": "Получатель неизвестен",
+	"paper_deliveries_sent_at": "Отправлено",
+	"paper_deliveries_updated_at": "Последнее обновление",
+	"paper_deliveries_view_analysis": "Открыть анализ",
+	"paper_deliveries_status_pending": "Ожидает",
+	"paper_deliveries_status_processing": "Обрабатывается",
+	"paper_deliveries_status_sent": "Отправлено",
+	"paper_deliveries_status_failed": "Не отправлено",
+	"paper_deliveries_status_manual_review": "Ручная проверка",
+	"paper_deliveries_status_unknown": "Неизвестный статус"
+}

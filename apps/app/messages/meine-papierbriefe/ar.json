@@ -1,0 +1,18 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"paper_deliveries_page_title": "رسائلي الورقية",
+	"paper_deliveries_new": "إرسال رسالة ورقية",
+	"paper_deliveries_empty_title": "لا توجد رسائل ورقية بعد",
+	"paper_deliveries_empty_description": "بعد إرسال رسالة ورقية ستظهر هنا.",
+	"paper_deliveries_topic_missing": "بلا موضوع",
+	"paper_deliveries_recipient_missing": "المستلم غير معروف",
+	"paper_deliveries_sent_at": "أُرسلت",
+	"paper_deliveries_updated_at": "آخر تحديث",
+	"paper_deliveries_view_analysis": "عرض التحليل",
+	"paper_deliveries_status_pending": "قيد الانتظار",
+	"paper_deliveries_status_processing": "قيد المعالجة",
+	"paper_deliveries_status_sent": "أُرسلت",
+	"paper_deliveries_status_failed": "فشلت",
+	"paper_deliveries_status_manual_review": "مراجعة يدوية",
+	"paper_deliveries_status_unknown": "حالة غير معروفة"
+}

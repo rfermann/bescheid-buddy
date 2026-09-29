@@ -1,0 +1,18 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"paper_deliveries_page_title": "My paper letters",
+	"paper_deliveries_new": "Send paper letter",
+	"paper_deliveries_empty_title": "No paper letters yet",
+	"paper_deliveries_empty_description": "Once you send a paper letter, it will appear here.",
+	"paper_deliveries_topic_missing": "No topic",
+	"paper_deliveries_recipient_missing": "Unknown recipient",
+	"paper_deliveries_sent_at": "Sent",
+	"paper_deliveries_updated_at": "Last updated",
+	"paper_deliveries_view_analysis": "View analysis",
+	"paper_deliveries_status_pending": "Pending",
+	"paper_deliveries_status_processing": "Processing",
+	"paper_deliveries_status_sent": "Sent",
+	"paper_deliveries_status_failed": "Failed",
+	"paper_deliveries_status_manual_review": "Manual review",
+	"paper_deliveries_status_unknown": "Unknown status"
+}

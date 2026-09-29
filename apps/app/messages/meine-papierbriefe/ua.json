@@ -1,0 +1,18 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"paper_deliveries_page_title": "Мої паперові листи",
+	"paper_deliveries_new": "Надіслати паперовий лист",
+	"paper_deliveries_empty_title": "Паперових листів ще немає",
+	"paper_deliveries_empty_description": "Після надсилання паперовий лист з’явиться тут.",
+	"paper_deliveries_topic_missing": "Без теми",
+	"paper_deliveries_recipient_missing": "Невідомий одержувач",
+	"paper_deliveries_sent_at": "Надіслано",
+	"paper_deliveries_updated_at": "Останнє оновлення",
+	"paper_deliveries_view_analysis": "Переглянути аналіз",
+	"paper_deliveries_status_pending": "Очікує",
+	"paper_deliveries_status_processing": "Обробляється",
+	"paper_deliveries_status_sent": "Надіслано",
+	"paper_deliveries_status_failed": "Не надіслано",
+	"paper_deliveries_status_manual_review": "Ручна перевірка",
+	"paper_deliveries_status_unknown": "Невідомий статус"
+}

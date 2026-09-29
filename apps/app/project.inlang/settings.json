@@ -14,7 +14,8 @@
 			"./messages/login/{locale}.json",
 			"./messages/email/{locale}.json",
 			"./messages/support/{locale}.json",
-			"./messages/papierbrief/{locale}.json"
+			"./messages/papierbrief/{locale}.json",
+			"./messages/meine-papierbriefe/{locale}.json"
 		]
 	},
 	"baseLocale": "en",

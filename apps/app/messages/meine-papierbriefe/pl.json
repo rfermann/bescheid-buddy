@@ -1,0 +1,18 @@
+{
+	"$schema": "https://inlang.com/schema/inlang-message-format",
+	"paper_deliveries_page_title": "Moje listy papierowe",
+	"paper_deliveries_new": "Wyślij list papierowy",
+	"paper_deliveries_empty_title": "Brak listów papierowych",
+	"paper_deliveries_empty_description": "Po wysłaniu listu papierowego pojawi się on tutaj.",
+	"paper_deliveries_topic_missing": "Brak tematu",
+	"paper_deliveries_recipient_missing": "Nieznany odbiorca",
+	"paper_deliveries_sent_at": "Wysłano",
+	"paper_deliveries_updated_at": "Ostatnia aktualizacja",
+	"paper_deliveries_view_analysis": "Zobacz analizę",
+	"paper_deliveries_status_pending": "Oczekuje",
+	"paper_deliveries_status_processing": "W trakcie przetwarzania",
+	"paper_deliveries_status_sent": "Wysłano",
+	"paper_deliveries_status_failed": "Niepowodzenie",
+	"paper_deliveries_status_manual_review": "Weryfikacja ręczna",
+	"paper_deliveries_status_unknown": "Nieznany status"
+}
