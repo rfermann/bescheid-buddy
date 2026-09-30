@@ -14,5 +14,16 @@
 	"paper_deliveries_status_sent": "Надіслано",
 	"paper_deliveries_status_failed": "Не надіслано",
 	"paper_deliveries_status_manual_review": "Ручна перевірка",
-	"paper_deliveries_status_unknown": "Невідомий статус"
+	"paper_deliveries_status_unknown": "Невідомий статус",
+	"paper_delivery_detail_back": "Назад до паперових листів",
+	"paper_delivery_detail_heading": "Деталі надсилання",
+	"paper_delivery_detail_recipient": "Одержувач",
+	"paper_delivery_detail_dates": "Дати",
+	"paper_delivery_detail_created": "Створено",
+	"paper_delivery_detail_pages": "Сторінки",
+	"paper_delivery_detail_cost": "Вартість",
+	"paper_delivery_detail_print_settings": "Налаштування друку",
+	"paper_delivery_detail_pdf": "PDF листа",
+	"paper_delivery_detail_download": "Завантажити PDF",
+	"paper_delivery_detail_pdf_title": "Попередній перегляд PDF паперового листа"
 }

@@ -14,5 +14,16 @@
 	"paper_deliveries_status_sent": "أُرسلت",
 	"paper_deliveries_status_failed": "فشلت",
 	"paper_deliveries_status_manual_review": "مراجعة يدوية",
-	"paper_deliveries_status_unknown": "حالة غير معروفة"
+	"paper_deliveries_status_unknown": "حالة غير معروفة",
+	"paper_delivery_detail_back": "العودة إلى الرسائل الورقية",
+	"paper_delivery_detail_heading": "تفاصيل الإرسال",
+	"paper_delivery_detail_recipient": "المستلم",
+	"paper_delivery_detail_dates": "التواريخ",
+	"paper_delivery_detail_created": "تاريخ الإنشاء",
+	"paper_delivery_detail_pages": "الصفحات",
+	"paper_delivery_detail_cost": "التكلفة",
+	"paper_delivery_detail_print_settings": "إعدادات الطباعة",
+	"paper_delivery_detail_pdf": "ملف PDF للرسالة",
+	"paper_delivery_detail_download": "تنزيل PDF",
+	"paper_delivery_detail_pdf_title": "معاينة PDF للرسالة الورقية"
 }

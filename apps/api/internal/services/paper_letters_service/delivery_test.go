@@ -180,6 +180,29 @@ func (q deliveryQueueFake) QueuePaperLetterDeliveryJobTx(context.Context, pgx.Tx
 	return 42, q.err
 }
 
+func TestGetDeliveryPDFURLs(t *testing.T) {
+	userID, uploadID, deliveryID := uuid.New(), uuid.New(), uuid.New()
+	upload := &db.PaperLetterUpload{ID: uploadID, UserID: userID, SanitizedFilename: "my letter.pdf"}
+	repository := newDeliveryRepositoryFake(upload)
+	repository.deliveries[deliveryID] = &db.PaperLetterDelivery{ID: deliveryID, UserID: userID, UploadID: uploadID}
+	storage := &uploadStorageFake{inlineURL: "https://storage.example/inline", downloadURL: "https://storage.example/download"}
+	service := &Service{repository: repository, storage: storage}
+
+	result, err := service.GetDeliveryPDFURLs(context.Background(), userID, deliveryID)
+
+	require.NoError(t, err)
+	assert.Equal(t, "https://storage.example/inline", result.InlineURL)
+	assert.Equal(t, "https://storage.example/download", result.DownloadURL)
+	assert.Equal(t, []bool{false, true}, storage.downloadRequests)
+	assert.Equal(t, userID, storage.userID)
+	assert.Equal(t, "paper-letters/"+uploadID.String()+".pdf", storage.objectKey)
+	assert.Equal(t, "my letter.pdf", storage.filename)
+
+	_, err = service.GetDeliveryPDFURLs(context.Background(), uuid.New(), deliveryID)
+	assert.ErrorIs(t, err, ErrDeliveryNotFound)
+	assert.Len(t, storage.downloadRequests, 2)
+}
+
 func TestCreateDelivery(t *testing.T) {
 	userID, uploadID, requestID := uuid.New(), uuid.New(), uuid.New()
 	confirmed := &db.PaperLetterUpload{ID: uploadID, UserID: userID, Status: db.PaperLetterUploadStatusConfirmed, PageCount: 3}

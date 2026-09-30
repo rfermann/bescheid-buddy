@@ -14,5 +14,16 @@
 	"paper_deliveries_status_sent": "Gesendet",
 	"paper_deliveries_status_failed": "Fehlgeschlagen",
 	"paper_deliveries_status_manual_review": "Manuelle Prüfung",
-	"paper_deliveries_status_unknown": "Unbekannter Status"
+	"paper_deliveries_status_unknown": "Unbekannter Status",
+	"paper_delivery_detail_back": "Zurück zu den Papierbriefen",
+	"paper_delivery_detail_heading": "Versanddetails",
+	"paper_delivery_detail_recipient": "Empfänger",
+	"paper_delivery_detail_dates": "Datumsangaben",
+	"paper_delivery_detail_created": "Erstellt",
+	"paper_delivery_detail_pages": "Seiten",
+	"paper_delivery_detail_cost": "Kosten",
+	"paper_delivery_detail_print_settings": "Druckeinstellungen",
+	"paper_delivery_detail_pdf": "Brief-PDF",
+	"paper_delivery_detail_download": "PDF herunterladen",
+	"paper_delivery_detail_pdf_title": "Vorschau des Papierbrief-PDFs"
 }

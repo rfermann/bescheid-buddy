@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net/url"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 type MinIOClient interface {
 	BucketExists(ctx context.Context, bucket string) (bool, error)
 	MakeBucket(ctx context.Context, bucket string, opts minio.MakeBucketOptions) error
+	PresignedGetObject(ctx context.Context, bucket, object string, expires time.Duration, reqParams url.Values) (*url.URL, error)
 	PresignedPutObject(ctx context.Context, bucket, object string, expires time.Duration) (*url.URL, error)
 	SetBucketCors(ctx context.Context, bucketName string, corsConfig *cors.Config) error
 	StatObject(ctx context.Context, bucket, object string, opts minio.StatObjectOptions) (minio.ObjectInfo, error)
@@ -78,6 +80,21 @@ func (s *Service) PresignObjectUpload(ctx context.Context, userID uuid.UUID, obj
 		return "", err
 	}
 
+	return presignedURL.String(), nil
+}
+
+func (s *Service) PresignObjectDownload(ctx context.Context, userID uuid.UUID, objectKey, filename string, attachment bool) (string, error) {
+	disposition := "inline"
+	if attachment {
+		disposition = "attachment"
+	}
+	presignedURL, err := s.minioClient.PresignedGetObject(ctx, userID.String(), objectKey, 15*time.Minute, url.Values{
+		"response-content-type":        {"application/pdf"},
+		"response-content-disposition": {mime.FormatMediaType(disposition, map[string]string{"filename": filename})},
+	})
+	if err != nil {
+		return "", err
+	}
 	return presignedURL.String(), nil
 }
 

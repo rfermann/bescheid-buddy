@@ -153,6 +153,32 @@ func (s *Service) GetDelivery(ctx context.Context, userID, deliveryID uuid.UUID)
 	return delivery, nil
 }
 
+type DeliveryPDFURLs struct {
+	InlineURL   string
+	DownloadURL string
+}
+
+func (s *Service) GetDeliveryPDFURLs(ctx context.Context, userID, deliveryID uuid.UUID) (*DeliveryPDFURLs, error) {
+	delivery, err := s.GetDelivery(ctx, userID, deliveryID)
+	if err != nil {
+		return nil, err
+	}
+	upload, err := s.repository.GetPaperLetterUploadByIDAndUserID(ctx, db.GetPaperLetterUploadByIDAndUserIDParams{ID: delivery.UploadID, UserID: userID})
+	if err != nil {
+		return nil, fmt.Errorf("load delivery upload: %w", err)
+	}
+	objectKey := paperLetterObjectKey(upload.ID)
+	inlineURL, err := s.storage.PresignObjectDownload(ctx, userID, objectKey, upload.SanitizedFilename, false)
+	if err != nil {
+		return nil, fmt.Errorf("presign inline delivery PDF: %w", err)
+	}
+	downloadURL, err := s.storage.PresignObjectDownload(ctx, userID, objectKey, upload.SanitizedFilename, true)
+	if err != nil {
+		return nil, fmt.Errorf("presign delivery PDF download: %w", err)
+	}
+	return &DeliveryPDFURLs{InlineURL: inlineURL, DownloadURL: downloadURL}, nil
+}
+
 func (s *Service) GetDeliveries(ctx context.Context, userID uuid.UUID) ([]*db.PaperLetterDelivery, error) {
 	deliveries, err := s.repository.GetPaperLetterDeliveriesByUserID(ctx, db.GetPaperLetterDeliveriesByUserIDParams{UserID: userID})
 	if err != nil {

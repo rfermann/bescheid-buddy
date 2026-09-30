@@ -69,7 +69,12 @@
 						<div class="min-w-0">
 							<div class="flex flex-wrap items-center gap-2">
 								<h3 class="text-base font-semibold break-words text-[#e9e9f1]">
-									{delivery.topic || m.paper_deliveries_topic_missing()}
+									<a
+										href={resolve('/meine-papierbriefe/[id]', { id: delivery.deliveryId })}
+										class="hover:text-primary hover:underline"
+									>
+										{delivery.topic || m.paper_deliveries_topic_missing()}
+									</a>
 								</h3>
 								<span class={`rounded-full px-2 py-0.5 text-xs font-semibold ${status.class}`}>
 									{status.label()}

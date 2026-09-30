@@ -14,5 +14,16 @@
 	"paper_deliveries_status_sent": "Wysłano",
 	"paper_deliveries_status_failed": "Niepowodzenie",
 	"paper_deliveries_status_manual_review": "Weryfikacja ręczna",
-	"paper_deliveries_status_unknown": "Nieznany status"
+	"paper_deliveries_status_unknown": "Nieznany status",
+	"paper_delivery_detail_back": "Wróć do listów papierowych",
+	"paper_delivery_detail_heading": "Szczegóły wysyłki",
+	"paper_delivery_detail_recipient": "Odbiorca",
+	"paper_delivery_detail_dates": "Daty",
+	"paper_delivery_detail_created": "Utworzono",
+	"paper_delivery_detail_pages": "Strony",
+	"paper_delivery_detail_cost": "Koszt",
+	"paper_delivery_detail_print_settings": "Ustawienia druku",
+	"paper_delivery_detail_pdf": "PDF listu",
+	"paper_delivery_detail_download": "Pobierz PDF",
+	"paper_delivery_detail_pdf_title": "Podgląd PDF listu papierowego"
 }

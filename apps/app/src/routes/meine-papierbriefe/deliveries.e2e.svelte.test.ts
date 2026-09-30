@@ -69,6 +69,9 @@ test('renders delivery details, statuses, dates, and available analysis links', 
 		await expect.element(screen.getByText(text, { exact: text !== '2026' }).first()).toBeVisible();
 	}
 	await expect
+		.element(screen.getByRole('link', { name: 'Pending letter' }))
+		.toHaveAttribute('href', '/meine-papierbriefe/delivery-pending');
+	await expect
 		.element(screen.getByRole('link', { name: 'View analysis' }).first())
 		.toHaveAttribute('href', '/meine-analysen/case-pending');
 	expect(document.querySelectorAll('a[href^="/meine-analysen/"]')).toHaveLength(2);

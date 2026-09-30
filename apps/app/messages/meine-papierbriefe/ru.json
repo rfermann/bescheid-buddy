@@ -14,5 +14,16 @@
 	"paper_deliveries_status_sent": "Отправлено",
 	"paper_deliveries_status_failed": "Не отправлено",
 	"paper_deliveries_status_manual_review": "Ручная проверка",
-	"paper_deliveries_status_unknown": "Неизвестный статус"
+	"paper_deliveries_status_unknown": "Неизвестный статус",
+	"paper_delivery_detail_back": "Назад к бумажным письмам",
+	"paper_delivery_detail_heading": "Детали отправки",
+	"paper_delivery_detail_recipient": "Получатель",
+	"paper_delivery_detail_dates": "Даты",
+	"paper_delivery_detail_created": "Создано",
+	"paper_delivery_detail_pages": "Страницы",
+	"paper_delivery_detail_cost": "Стоимость",
+	"paper_delivery_detail_print_settings": "Настройки печати",
+	"paper_delivery_detail_pdf": "PDF письма",
+	"paper_delivery_detail_download": "Скачать PDF",
+	"paper_delivery_detail_pdf_title": "Предпросмотр PDF бумажного письма"
 }

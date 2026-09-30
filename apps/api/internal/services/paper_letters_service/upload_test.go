@@ -65,19 +65,32 @@ func (r *uploadRepositoryFake) ConfirmPaperLetterUpload(_ context.Context, input
 }
 
 type uploadStorageFake struct {
-	url         string
-	data        []byte
-	statErr     error
-	downloadErr error
-	userID      uuid.UUID
-	objectKey   string
-	maxBytes    int64
-	statCalls   int
+	url              string
+	inlineURL        string
+	downloadURL      string
+	data             []byte
+	statErr          error
+	downloadErr      error
+	userID           uuid.UUID
+	objectKey        string
+	filename         string
+	maxBytes         int64
+	statCalls        int
+	downloadRequests []bool
 }
 
 func (s *uploadStorageFake) PresignObjectUpload(_ context.Context, userID uuid.UUID, objectKey string) (string, error) {
 	s.userID, s.objectKey = userID, objectKey
 	return s.url, nil
+}
+
+func (s *uploadStorageFake) PresignObjectDownload(_ context.Context, userID uuid.UUID, objectKey, filename string, attachment bool) (string, error) {
+	s.userID, s.objectKey, s.filename = userID, objectKey, filename
+	s.downloadRequests = append(s.downloadRequests, attachment)
+	if attachment {
+		return s.downloadURL, nil
+	}
+	return s.inlineURL, nil
 }
 
 func (s *uploadStorageFake) StatObjectSize(_ context.Context, userID uuid.UUID, objectKey string) (int64, error) {

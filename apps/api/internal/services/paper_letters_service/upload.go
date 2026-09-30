@@ -30,6 +30,7 @@ var (
 
 type PaperLetterStorage interface {
 	PresignObjectUpload(ctx context.Context, userID uuid.UUID, objectKey string) (string, error)
+	PresignObjectDownload(ctx context.Context, userID uuid.UUID, objectKey, filename string, attachment bool) (string, error)
 	StatObjectSize(ctx context.Context, userID uuid.UUID, objectKey string) (int64, error)
 	DownloadObject(ctx context.Context, userID uuid.UUID, objectKey string, maxBytes int64) ([]byte, error)
 }

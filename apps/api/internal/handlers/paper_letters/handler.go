@@ -41,6 +41,13 @@ func (h *Handler) RegisterRoutes(api huma.API) {
 	}, h.getDelivery)
 
 	huma.Register(api, huma.Operation{
+		OperationID: "get-paper-letter-delivery-pdf-urls", Method: http.MethodGet,
+		Path: "/paper-letters/deliveries/{deliveryId}/pdf-urls", Summary: "Get paper letter delivery PDF URLs",
+		Description: "Get 15-minute signed inline and download URLs for an owned paper letter delivery",
+		Tags:        []string{"Paper Letters"}, Security: []map[string][]string{{"session-cookie": {}}},
+	}, h.getDeliveryPDFURLs)
+
+	huma.Register(api, huma.Operation{
 		OperationID:   "create-paper-letter-upload",
 		Method:        http.MethodPost,
 		Path:          "/paper-letters/uploads",
